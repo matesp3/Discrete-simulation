@@ -1,9 +1,14 @@
 package mpoljak.dsim.common;
 
+import java.util.Random;
+
 /**
  * Monte Carlo simulation core class.
  */
-public abstract class MCSimCore {
+public abstract class MCSimCore extends SimCore {
+    public MCSimCore(Random seedGenerator, long repCount) {
+        super(repCount);
+    }
 
     /**
      * This is MONTE CARLO.
@@ -14,15 +19,8 @@ public abstract class MCSimCore {
     public double run(long repCount) { // template method
         double cumRes = 0;
         for (long i = 0; i < repCount; i++) {
-            cumRes += this.experiment();
+//            cumRes += this.experiment();
         }
         return cumRes / repCount;
     }
-
-    /**
-     * Executes experiment specific for each type.
-     * @return result of experiment
-     */
-    protected abstract double experiment();
-
 }

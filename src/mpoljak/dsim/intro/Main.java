@@ -2,18 +2,26 @@ package mpoljak.dsim.intro;
 
 import mpoljak.dsim.common.MCSimCore;
 
+import java.util.Random;
+
 public class Main {
     public static void main(String[] args) {
         long repCount = 10_000_000;
         double d = 5;
         double l = 4;
-        MCSimCore mc = new BuffonNeedle(l, d ); // Monte carlo simulation
+        MCSimCore mc = new BuffonNeedle(new Random(), repCount, l, d ); // Monte carlo simulation
         double prob = mc.run(repCount);
         double pi = (2 * l) / (d * prob);
         System.out.println("Probability of crossing: "+prob);
         System.out.println("Replications: "+repCount+"  | result PI: "+pi);
 
-        //todo kniznica na robenie grafov: JFreeChart - naucit sa robit vykreslovanie
-        //todo 2: v stredu sa zverejni zadanie, tak si ho poriadne precitat, aby som na cviku bol nan pripraveny, lebo na dalsi tyzden je kontrola
+        Random rnd = new Random();
+        double minVal = 10;
+        double maxVal = 70;
+        double percent = rnd.nextDouble() * (maxVal - minVal) + minVal;
+        if (rnd.nextDouble()*100 <= percent)
+            System.out.println("dodavatel doda suciastky");
+        else
+            System.out.println("dodavatel NEdoda suciastky");
     }
 }
