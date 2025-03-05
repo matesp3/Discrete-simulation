@@ -25,6 +25,9 @@ public abstract class SimCore {
         return this.repCount;
     }
 
+    /**
+     * Launches and executes whole simulation.
+     */
     public final void simulate() { // TEMPLATE METHOD
         this.currentRep = 0;            // reset
         this.beforeSimulation();        // hook - before sim

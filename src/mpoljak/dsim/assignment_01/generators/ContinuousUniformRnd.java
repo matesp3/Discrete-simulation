@@ -36,8 +36,8 @@ public class ContinuousUniformRnd extends Generator {
 
     private static void printForTest() {
         final int n = 50_000;
-        double min = 5;
-        double max = 10;
+        double min = 10;
+        double max = 70;
         ContinuousUniformRnd rnd = new ContinuousUniformRnd(new Random(), min, max);
         for (int i = 0; i < n; i++) {
             System.out.println(rnd.sample());

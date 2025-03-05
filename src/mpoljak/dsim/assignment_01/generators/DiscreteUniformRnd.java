@@ -34,6 +34,7 @@ public class DiscreteUniformRnd extends Generator {
     // test of generated values
     public static void main(String[] args) throws UnexpectedException {
 //        printForTest(); // ok
+
         final int reps = 100_000;
         int min = 1;
         int max = 7;
@@ -74,8 +75,8 @@ public class DiscreteUniformRnd extends Generator {
 
     private static void printForTest() {
         final int n = 50_000;
-        int min = 5;
-        int max = 10;
+        int min = 50;
+        int max = 100;
         DiscreteUniformRnd rnd = new DiscreteUniformRnd(new Random(), min, max);
         for (int i = 0; i < n; i++) {
             System.out.println(rnd.sample());
