@@ -52,7 +52,7 @@ public abstract class EmpiricalRnd extends Generator {
     }
 
     @Override
-    public double sample() {
+    public double sample() {    // TEMPLATE METHOD
         final double val = rndIntervalPicker.nextDouble();
         int i = 0;
         double cumulated = this.probs[i];

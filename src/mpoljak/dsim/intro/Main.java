@@ -1,5 +1,8 @@
 package mpoljak.dsim.intro;
 
+import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
+import mpoljak.dsim.assignment_01.generators.DiscreteEmpiricalRnd;
+import mpoljak.dsim.assignment_01.generators.DiscreteUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
 
 import java.util.Random;
@@ -15,5 +18,6 @@ public class Main {
         double pi = (2 * l) / (d * prob);
         System.out.println("Probability of crossing: "+prob);
         System.out.println("Replications: "+repCount+"  | result PI: "+pi);
+
     }
 }
