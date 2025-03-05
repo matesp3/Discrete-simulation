@@ -1,26 +1,44 @@
 package mpoljak.dsim.common;
 
-import java.util.Random;
+import mpoljak.dsim.utils.DoubleComp;
 
 /**
  * Monte Carlo simulation core class.
  */
 public abstract class MCSimCore extends SimCore {
-    public MCSimCore(Random seedGenerator, long repCount) {
+    private double accumulatedVal;
+
+    public MCSimCore(long repCount) {
         super(repCount);
+        this.resetAccumulation();
     }
 
     /**
-     * This is MONTE CARLO.
-     * Executes <code>repCount</code> same experiments including random variables and calculates probability of event.
-     * @param repCount amount of executed experiments
-     * @return calculated probability for this event.
+     * @return result of the Monte Carlo simulation, which is a probability of the observed event by this instance.
      */
-    public double run(long repCount) { // template method
-        double cumRes = 0;
-        for (long i = 0; i < repCount; i++) {
-//            cumRes += this.experiment();
+    public double getResult() {
+        return this.accumulatedVal / this.getRepCount();
+    }
+
+    /**
+     * Adds <code>value</code> to cumulated value of all executed experiments so far.
+     * @param value result of currently executed experiment
+     */
+    protected final void cumulate(double value) {
+        if (DoubleComp.compare(value, 0.0) > -1) { // (value >= 0)
+            this.accumulatedVal += value;
         }
-        return cumRes / repCount;
+    }
+
+    @Override
+    protected void beforeSimulation() {
+        this.resetAccumulation();
+    }
+
+    /**
+     * Cumulated value of all executed experiments so far is reset to 0.
+     */
+    private void resetAccumulation() {
+        this.accumulatedVal = 0;
     }
 }

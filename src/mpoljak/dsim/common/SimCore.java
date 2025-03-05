@@ -1,5 +1,7 @@
 package mpoljak.dsim.common;
 
+import java.util.Random;
+
 public abstract class SimCore {
     private final long repCount;
     private long currentRep;
@@ -9,8 +11,22 @@ public abstract class SimCore {
         this.repCount = replicationsCount;
     }
 
+    /**
+     * @return number of current replication
+     */
+    public long getCurrentReplication() {
+        return this.currentRep;
+    }
+
+    /**
+     * @return number of replication that are executed within one simulation.
+     */
+    public long getRepCount() {
+        return this.repCount;
+    }
+
     public final void simulate() { // TEMPLATE METHOD
-        this.currentRep = 0; // reset
+        this.currentRep = 0;            // reset
         this.beforeSimulation();        // hook - before sim
         for (int i = 0; i < this.repCount; i++) {
             this.currentRep++;
@@ -19,14 +35,6 @@ public abstract class SimCore {
             this.afterExperiment();     // hook - after rep
         }
         this.afterSimulation();         // hook - after sim
-    }
-
-    public long getCurrentReplication() {
-        return this.currentRep;
-    }
-
-    public long getRepCount() {
-        return this.repCount;
     }
 
     protected abstract void experiment();
