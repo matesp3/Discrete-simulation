@@ -18,8 +18,12 @@ public class DiscreteUniformRnd extends Generator {
      */
     public DiscreteUniformRnd(Random seedGen, int minValue, int maxValue) {
         super(seedGen);
-        if (minValue > maxValue)
-            throw new IllegalArgumentException("minVal > maxVal");
+        if (minValue  < 0)
+            throw new IllegalArgumentException("minValue cannot be negative");
+        if (maxValue <= 0)
+            throw new IllegalArgumentException("maxValue must be greater than 0");
+        if (minValue >= maxValue)
+            throw new IllegalArgumentException("maxValue must be greater than minValue");
 
         this.rand = new Random(seedGen.nextLong());
         this.min = minValue;

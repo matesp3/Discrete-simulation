@@ -1,5 +1,6 @@
 package mpoljak.dsim.intro;
 
+import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
 import mpoljak.dsim.common.SimCore;
 
@@ -9,8 +10,10 @@ import java.util.Random;
  * Monte Carlo Simulation - Buffon's needle experiment.
  */
 public class BuffonNeedle extends MCSimCore {
-    Random genNeedle;
-    Random genAngle;
+//    Random genNeedle;
+    ContinuosUniformRnd genNeedle;
+//    Random genAngle;
+    ContinuosUniformRnd genAngle;
     double d;
     double l;
 
@@ -18,14 +21,19 @@ public class BuffonNeedle extends MCSimCore {
         super(replications);
         this.d = linesDist;
         this.l = needleLength;
-        this.genNeedle = new Random(seedGenerator.nextLong());
-        this.genAngle = new Random(seedGenerator.nextLong());
+//        this.genNeedle = new Random(seedGenerator.nextLong());
+        this.genNeedle = new ContinuosUniformRnd(seedGenerator, 0, 1);
+//        this.genAngle = new Random(seedGenerator.nextLong());
+        this.genAngle = new ContinuosUniformRnd(seedGenerator, 0, 1);
     }
 
     @Override
     protected void experiment() {
-        double y = genNeedle.nextDouble() * this.d;
-        double alfaRad = genAngle.nextDouble() * Math.PI;
+        double y = genNeedle.sample() * this.d;
+//        double y = genNeedle.nextDouble() * this.d;
+        double alfaRad = genAngle.sample() * Math.PI;
+//        double alfaRad = genAngle.nextDouble() * Math.PI;
+
             /* here is the paradox of PI. We need to use radians, while we know that 180deg = 3.14 rad. Without PI, it
                is not possible to calculate PI.
             This is paradox, which only occurs in programming. Buffon didn't need to generate angle. */
