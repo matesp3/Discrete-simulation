@@ -31,7 +31,7 @@ public class ContinuosUniformRnd extends Generator {
 
     @Override
     public double sample() {
-        return this.rand.nextDouble() *( this.max - this.min) + this.min;
+        return this.rand.nextDouble() *(this.max - this.min) + this.min;
     }
 //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
 
