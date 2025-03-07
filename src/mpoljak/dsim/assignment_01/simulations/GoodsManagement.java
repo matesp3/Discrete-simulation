@@ -68,6 +68,7 @@ public class GoodsManagement extends MCSimCore {
         System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
         int amountAbsorbers, amountBrakePads, amountHeadlights;
         double confidentiality, deliveryDecision;
+        double costs = 0; // todo mozem v semestralke spomenut, ze najlepsie by bolo nevyrabat nic, ale potrebujeme uspokojit zakaznika
 
         for (int i = 0; i < OBSERVED_WEEKS; i++) { // week algorithm
             System.out.println("  +WEEK - "+(i+1));
