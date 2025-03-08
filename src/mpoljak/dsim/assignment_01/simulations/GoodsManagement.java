@@ -7,6 +7,8 @@ import mpoljak.dsim.assignment_01.generators.DiscreteUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
 import mpoljak.dsim.utils.DoubleComp;
 
+import java.time.DayOfWeek;
+import java.util.Calendar;
 import java.util.Random;
 
 public class GoodsManagement extends MCSimCore {
@@ -17,7 +19,7 @@ public class GoodsManagement extends MCSimCore {
     private final static int ORDER_AMOUNT_ABSORBERS = 100;
     private final static int ORDER_AMOUNT_BRAKE_PADS = 200;
     private final static int ORDER_AMOUNT_HEADLIGHTS = 150;
-    private final static int OBSERVED_WEEKS = 6;
+    private final static int OBSERVED_WEEKS = 30;
 
     private final DiscreteUniformRnd rndAbsorbers;
     private final DiscreteUniformRnd rndBrakePads;
@@ -31,12 +33,9 @@ public class GoodsManagement extends MCSimCore {
     private final ContinuosUniformRnd rndDeliverySuccessA;
     private final ContinuosUniformRnd rndDeliverySuccessB;
 
-    private int storedAbsorbers;
-    private int storedBrakePads;
-    private int storedHeadlights;
-
     public GoodsManagement(Random seedGen, long repCount) {
         super(repCount);
+
         this.rndAbsorbers = new DiscreteUniformRnd(seedGen, 50, 100);
         this.rndBrakePads = new DiscreteUniformRnd(seedGen, 60, 250);
         this.rndHeadlights = new DiscreteEmpiricalRnd(seedGen,
@@ -58,46 +57,90 @@ public class GoodsManagement extends MCSimCore {
         );
         this.rndDeliverySuccessA = new ContinuosUniformRnd(seedGen, 0, 100);
         this.rndDeliverySuccessB = new ContinuosUniformRnd(seedGen, 0, 100);
-        this.storedAbsorbers = 0;
-        this.storedBrakePads = 0;
-        this.storedHeadlights = 0;
+
+        // todo: here will be some method to load configuration
     }
 
     @Override
     protected void experiment() {
-        System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
-        int amountAbsorbers, amountBrakePads, amountHeadlights;
+        boolean log = false;
+        if (log) System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
+        int orderAbsorbers, orderBrakePads, orderHeadlights;
         double confidentiality, deliveryDecision;
-        double costs = 0; // todo mozem v semestralke spomenut, ze najlepsie by bolo nevyrabat nic, ale potrebujeme uspokojit zakaznika
+        // costs can only increase, not decrease
+        double costs = 0; // costs for storing (after morning) products & for not providing wanted amount of products on friday
+        // todo mozem v semestralke spomenut, ze najlepsie by bolo nevyrabat nic, ale potrebujeme uspokojit zakaznika
+        int storedAbsorbers = 0;
+        int storedBrakePads = 0;
+        int storedHeadlights = 0;
 
-        for (int i = 0; i < OBSERVED_WEEKS; i++) { // week algorithm
-            System.out.println("  +WEEK - "+(i+1));
-            // generated PERCENT PROBABILITIES of delivery success
-            if (i+1 < 3) {  // season: A. 3 is the first week of B confidentiality
-                confidentiality =  this.rndConfSupplier1A.sample();
-                deliveryDecision = this.rndDeliverySuccessA.sample();
-//                if ( < ) // '<' bcs first value is in 0,so we have to exclude last one
-            }
-            else {          // season: B
-                confidentiality =  this.rndConfSupplier1B.sample();  // todo this could be wrapped into SupplierClass, so that we can implement STRATEGY design pattern
-                deliveryDecision = this.rndDeliverySuccessB.sample();
-            }
-            if (DoubleComp.compare(deliveryDecision, confidentiality) == -1) { // order is supplied
-                this.storedAbsorbers += ORDER_AMOUNT_ABSORBERS;
-                this.storedBrakePads += ORDER_AMOUNT_BRAKE_PADS;
-                this.storedHeadlights += ORDER_AMOUNT_HEADLIGHTS;
-            }   // else -> ROLLBACK operation of week order, if it's not delivered on Monday -> stored amounts not changed
+        for (int w = 0; w < OBSERVED_WEEKS; w++) { // week algorithm
+            if (log) System.out.println("  + WEEK-"+(w+1)+":");
+            for (int day = 1; day < 8; day++) {
+                if (log) this.printDayOfWeek(day);
+                // mondayStrategy - contains strategy for choosing supplier & amount of ordered amounts
+                if (day == DayOfWeek.MONDAY.getValue()) {
+//                    // DELIVERY OF PRODUCTS [generated PERCENT PROBABILITIES of delivery success
+                    if (w < 10) {  // season: A. 3 is the first week of B confidentiality
+//                    if ( < ) // '<' bcs first value is in 0.0, so we have to exclude last one
+                        confidentiality =  this.rndConfSupplier1A.sample();
+                        deliveryDecision = this.rndDeliverySuccessA.sample();
+                    }
+                    else {          // season: B
+                        confidentiality =  this.rndConfSupplier1B.sample();  // todo this could be wrapped into SupplierClass, so that we can implement STRATEGY design pattern
+                        deliveryDecision = this.rndDeliverySuccessB.sample();
+                    }
 
-            System.out.printf("      |_> (deliveryCond=%.02f < conf=%.02f%%) => supplied=%B  => NEW STORED AMOUNTS: [A=%d  B=%d  H=%d]\n",
-                    deliveryDecision, confidentiality, (DoubleComp.compare(deliveryDecision, confidentiality) == -1), this.storedAbsorbers, this.storedBrakePads, this.storedHeadlights);
-            // generated WANTED AMOUNTS of products by CUSTOMER on week basis
-            amountAbsorbers = (int)this.rndAbsorbers.sample();
-            amountBrakePads = (int)this.rndBrakePads.sample();
-            amountHeadlights = (int)this.rndHeadlights.sample();
-//            this.storedAbsorbers -= amountAbsorbers;
-//            this.storedBrakePads -= amountBrakePads;
-//            this.storedHeadlights -= amountHeadlights;
+                    if (DoubleComp.compare(deliveryDecision, confidentiality) == -1) { // order is supplied
+                        storedAbsorbers += ORDER_AMOUNT_ABSORBERS;
+                        storedBrakePads += ORDER_AMOUNT_BRAKE_PADS;
+                        storedHeadlights += ORDER_AMOUNT_HEADLIGHTS;
+                    }   // else -> ROLLBACK operation of week order, if it's not delivered on Monday -> stored amounts not changed
+
+                    if (log) System.out.printf("\n         ^-- INTRA-DAY: (reality=%.02f < confidence=%.02f%%) => supplied=%B",
+                            deliveryDecision, confidentiality, (DoubleComp.compare(deliveryDecision, confidentiality) == -1));
+                }
+                else if (day == DayOfWeek.FRIDAY.getValue()) {
+//                     SELLING PRODUCTS [generated AMOUNTS of products ORDERED by CUSTOMER]
+                    orderAbsorbers = (int)this.rndAbsorbers.sample();
+                    orderBrakePads = (int)this.rndBrakePads.sample();
+                    orderHeadlights = (int)this.rndHeadlights.sample();
+                    storedAbsorbers -= orderAbsorbers;
+                    storedBrakePads -= orderBrakePads;
+                    storedHeadlights -= orderHeadlights;
+//                    paying penalties for not providing ordered product
+                    if (Double.compare(storedAbsorbers, 0) == -1) { // (storedAbsorbers < 0)
+                        costs += (-1)*(storedAbsorbers)*PENALTY;
+                        storedAbsorbers = 0;
+                    }
+                    if (Double.compare(storedBrakePads, 0) == -1) { // (storedBrakePads < 0)
+                        costs += (-1)*(storedBrakePads)*PENALTY;
+                        storedBrakePads = 0;
+                    }
+                    if (Double.compare(storedHeadlights, 0) == -1) { // (storedHeadlights < 0)
+                        costs += (-1)*(storedHeadlights)*PENALTY;
+                        storedHeadlights = 0;
+                    }
+                    if (log) System.out.printf("\n         ^-- INTRA-DAY: [required amounts: [A=%d  B=%d  H=%d]]",
+                            orderAbsorbers, orderBrakePads, orderHeadlights);
+                }
+//                at the end of every day, we have to pay storing costs
+                costs += storedAbsorbers * STORAGE_COST_ABSORBERS + storedBrakePads * STORAGE_COST_BRAKE_PADS +
+                            storedHeadlights * STORAGE_COST_HEADLIGHTS;
+                if (log) { System.out.printf("\n         ^-- ");
+                            this.printEndOfDayState(storedAbsorbers, storedBrakePads, storedHeadlights, costs);
+                }
+            }
         }
+        this.cumulate(costs);
+    }
+
+    private void printEndOfDayState(int amountA, int amountB, int amountH, double costs) {
+        System.out.printf("EVENING: [costs=%.2f  STORED: [A=%d   B=%d    H=%d]]\n"
+                , costs, amountA, amountB, amountH);
+    }
+    private void printDayOfWeek(int day) {
+        System.out.printf("       %s", DayOfWeek.of(day).name().substring(0, 3));
     }
 
     @Override
@@ -116,7 +159,8 @@ public class GoodsManagement extends MCSimCore {
     }
 
     public static void main(String[] args) {
-        GoodsManagement gm = new GoodsManagement(new Random(), 1);
+        GoodsManagement gm = new GoodsManagement(new Random(), 1_000_000);
         gm.simulate();
+        System.out.println("avg costs [strategy A]: "+gm.getResult());
     }
 }
