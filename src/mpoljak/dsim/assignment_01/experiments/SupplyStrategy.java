@@ -13,7 +13,7 @@ public abstract class SupplyStrategy {
     /**
      * Covers algorithm of decision whether to supply in specified <code>week</code> based on internal probability
      * distribution.
-     * @param week
+     * @param week number of observed week
      * @param printDecisionDetails gives details through console about generated probability of delivery success in
      *                             percents and about reality, if delivery was successful.
      * @return results of delivery's reality

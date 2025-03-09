@@ -8,10 +8,8 @@ import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.assignment_01.generators.DiscreteUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
-import mpoljak.dsim.utils.DoubleComp;
 
 import java.time.DayOfWeek;
-import java.util.Calendar;
 import java.util.Random;
 
 public class GoodsManagement extends MCSimCore {

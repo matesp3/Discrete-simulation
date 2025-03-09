@@ -1,7 +1,7 @@
 package mpoljak.dsim.assignment_01.experiments;
 
 public class SingleSupply extends SupplyStrategy {
-    private Supplier supplier;
+    private final Supplier supplier;
     private final int amountAbsorbers;
     private final int amountBrakePads;
     private final int amountHeadlights;
