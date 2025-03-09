@@ -23,7 +23,8 @@ public class CarComponentsStorage extends MCSimCore {
     private final DiscreteUniformRnd rndBrakePads;
     private final DiscreteEmpiricalRnd rndHeadlights;
 
-    private SupplyStrategy supplyStrategy;
+    private final SupplyStrategy supplyStrategy;
+    private boolean consoleLogs = false;
 
     public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy) {
         super(repCount);
@@ -42,10 +43,15 @@ public class CarComponentsStorage extends MCSimCore {
         // todo: here will be some method to load configuration
     }
 
+    /**
+     * @param on if <code>true</code> details of experiments will be written on console. Else, no details will be
+     *          displayed.
+     */
+    public void setConsoleLogs(boolean on) { this.consoleLogs = on; }
+
     @Override
     protected void experiment() {
-        boolean log = false;
-        if (log) System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
+        if (this.consoleLogs) System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
         int orderAbsorbers, orderBrakePads, orderHeadlights;
         double confidentiality, deliveryDecision;
         // costs can only increase, not decrease
@@ -56,15 +62,15 @@ public class CarComponentsStorage extends MCSimCore {
         int storedHeadlights = 0;
 
         for (int w = 1; w < OBSERVED_WEEKS+1; w++) { // week algorithm
-            if (log) System.out.println("  + WEEK-"+(w)+":");
+            if (this.consoleLogs) System.out.println("  + WEEK-"+(w)+":");
             for (int day = 1; day < 8; day++) {
-                if (log) this.printDayOfWeek(day);
+                if (this.consoleLogs) this.printDayOfWeek(day);
                 // mondayStrategy - contains strategy for choosing supplier & amount of ordered amounts
                 if (day == DayOfWeek.MONDAY.getValue()) {
 //                    // DELIVERY OF PRODUCTS [generated PERCENT PROBABILITIES of delivery success
-                    if (log) System.out.print("\n         ^-- INTRA-DAY:");
+                    if (this.consoleLogs) System.out.print("\n         ^-- INTRA-DAY:");
 
-                    SupplyStrategy.SupplierResult res = this.supplyStrategy.supply(w, log);
+                    SupplyStrategy.SupplierResult res = this.supplyStrategy.supply(w, this.consoleLogs);
                     if (res.areProductsDelivered()) { // order is supplied
                         storedAbsorbers += res.getSuppliedAbsorbers();
                         storedBrakePads += res.getSuppliedBrakePads();
@@ -92,13 +98,13 @@ public class CarComponentsStorage extends MCSimCore {
                         costs += (-1)*(storedHeadlights)*PENALTY;
                         storedHeadlights = 0;
                     }
-                    if (log) System.out.printf("\n         ^-- INTRA-DAY: [required amounts: [A=%dx B=%dx H=%d]]",
+                    if (this.consoleLogs) System.out.printf("\n         ^-- INTRA-DAY: [required amounts: [A=%dx B=%dx H=%d]]",
                             orderAbsorbers, orderBrakePads, orderHeadlights);
                 }
 //                at the end of every day, we have to pay storing costs
                 costs += storedAbsorbers * STORAGE_COST_ABSORBERS + storedBrakePads * STORAGE_COST_BRAKE_PADS +
                             storedHeadlights * STORAGE_COST_HEADLIGHTS;
-                if (log) { System.out.printf("\n         ^-- ");
+                if (this.consoleLogs) { System.out.printf("\n         ^-- ");
                             this.printEndOfDayState(storedAbsorbers, storedBrakePads, storedHeadlights, costs);
                 }
             }
@@ -127,37 +133,5 @@ public class CarComponentsStorage extends MCSimCore {
     @Override
     protected void afterExperiment() {
 
-    }
-
-    public static void main(String[] args) {
-        final int defaultOrderA = 100; // absorbers
-        final int defaultOrderB = 200; // break pads
-        final int defaultOrderH = 150; // headlights
-        Random seedGen = new Random();
-        // supplier 1
-        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
-        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
-        Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
-        // supplier 2
-        ContinuosEmpiricalRnd rndConfSupplier2A = new ContinuosEmpiricalRnd(
-                new double[] {5, 10, 50, 70, 80},
-                new double[] {10, 50, 70, 80, 95},
-                new double[]{0.4, 0.3, 0.2, 0.06, 0.04}
-        );
-        ContinuosEmpiricalRnd rndConfSupplier2B = new ContinuosEmpiricalRnd(
-                new double[] {5, 10, 50, 70, 80},
-                new double[] {10, 50, 70, 80, 95},
-                new double[] {0.2, 0.4, 0.3, 0.06, 0.04}
-        );
-        Supplier supplier2 = new Supplier(16, rndConfSupplier2A, rndConfSupplier2B);
-        // strategy A
-        SupplyStrategy strategyA = new SingleSupply(supplier1, defaultOrderA, defaultOrderB, defaultOrderH);
-        // strategy B
-        SupplyStrategy strategyB = new SingleSupply(supplier2, defaultOrderA, defaultOrderB, defaultOrderH);
-        // simulation Monte Carlo for John trading car components
-        CarComponentsStorage ccsSim = new CarComponentsStorage(10_000_000, strategyA);
-//        GoodsManagement gm = new GoodsManagement(new Random(), 1_000_000);
-        ccsSim.simulate();
-        System.out.println("AVG costs [strategy A]: "+Math.ceil(ccsSim.getResult())+" [€]");
     }
 }
