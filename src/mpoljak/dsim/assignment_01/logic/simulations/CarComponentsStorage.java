@@ -8,7 +8,6 @@ import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
-import mpoljak.dsim.utils.SeedGen;
 
 import java.time.DayOfWeek;
 import java.util.Random;

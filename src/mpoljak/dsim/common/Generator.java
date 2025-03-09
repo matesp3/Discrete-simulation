@@ -1,9 +1,5 @@
 package mpoljak.dsim.common;
 
-import mpoljak.dsim.utils.SeedGen;
-
-import java.util.Random;
-
 /**
  * Common class for all number generators, which can be empirical or theoretical.
  */

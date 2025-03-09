@@ -1,7 +1,5 @@
 package mpoljak.dsim.assignment_01.logic.generators;
 
-import mpoljak.dsim.utils.SeedGen;
-
 import java.util.Random;
 
 public class DiscreteEmpiricalRnd extends EmpiricalRnd {

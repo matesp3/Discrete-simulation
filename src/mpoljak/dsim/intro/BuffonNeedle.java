@@ -3,8 +3,6 @@ package mpoljak.dsim.intro;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
 
-import java.util.Random;
-
 /**
  * Monte Carlo Simulation - Buffon's needle experiment.
  */

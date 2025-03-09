@@ -2,8 +2,6 @@ package mpoljak.dsim.intro;
 
 import mpoljak.dsim.common.MCSimCore;
 
-import java.util.Random;
-
 public class Main {
     public static void main(String[] args) {
         long repCount = 10_000_000;

@@ -4,8 +4,6 @@ import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.utils.DoubleComp;
 
-import java.util.Random;
-
 /**
  * Purpose of <code>Supplier</code> class is to generate decisions about delivery success by using generators of
  * desirable probability distribution and number of week.

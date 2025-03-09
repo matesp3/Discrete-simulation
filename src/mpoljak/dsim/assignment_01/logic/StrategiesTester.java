@@ -8,8 +8,6 @@ import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.simulations.CarComponentsStorage;
 import mpoljak.dsim.utils.SeedGen;
 
-import java.util.Random;
-
 public class StrategiesTester {
     private static final int DEFAULT_ORDER_A = 100; // absorbers
     private static final int DEFAULT_ORDER_B = 200; // break pads
