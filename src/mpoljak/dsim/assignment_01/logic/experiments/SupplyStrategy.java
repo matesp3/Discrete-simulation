@@ -11,8 +11,8 @@ public abstract class SupplyStrategy {
     }
 
     /**
-     * Covers algorithm of decision whether to supply in specified <code>week</code> based on internal probability
-     * distribution.
+     * This is an algorithm of decision whether to supply in specified <code>week</code> based on internal probability
+     * distribution of chosen week's supplier.
      * @param week number of observed week
      * @param printDecisionDetails gives details through console about generated probability of delivery success in
      *                             percents and about reality, if delivery was successful.
@@ -25,10 +25,10 @@ public abstract class SupplyStrategy {
      * Implemented as Crate (design pattern) for retrieving results of <code>SupplierStrategy.supply()</code> method.
      */
     public static class SupplierResult {
-        protected int suppliedAbsorbers;
-        protected int suppliedBrakePads;
-        protected int suppliedHeadlights;
-        protected boolean productsDelivered;
+        private int suppliedAbsorbers;
+        private int suppliedBrakePads;
+        private int suppliedHeadlights;
+        private boolean productsDelivered;
 
         public SupplierResult() {
             this.resetResults();
@@ -67,6 +67,19 @@ public abstract class SupplyStrategy {
             this.suppliedBrakePads = 0;
             this.suppliedHeadlights = 0;
             this.productsDelivered = false;
+        }
+
+        /**
+         * Sets delivered amounts to specified numbers and sets delivery as successful.
+         * @param amountA absorbers
+         * @param amountB brake pads
+         * @param amountH headlights
+         */
+        protected void setDeliveredAmounts(int amountA, int amountB, int amountH) {
+            this.suppliedAbsorbers = amountA;
+            this.suppliedBrakePads = amountB;
+            this.suppliedHeadlights = amountH;
+            this.productsDelivered = true;
         }
     }
 }
