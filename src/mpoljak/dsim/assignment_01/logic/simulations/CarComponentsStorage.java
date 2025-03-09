@@ -1,18 +1,19 @@
-package mpoljak.dsim.assignment_01.simulations;
+package mpoljak.dsim.assignment_01.logic.simulations;
 
-import mpoljak.dsim.assignment_01.experiments.SingleSupply;
-import mpoljak.dsim.assignment_01.experiments.Supplier;
-import mpoljak.dsim.assignment_01.experiments.SupplyStrategy;
-import mpoljak.dsim.assignment_01.generators.ContinuosEmpiricalRnd;
-import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
-import mpoljak.dsim.assignment_01.generators.DiscreteEmpiricalRnd;
-import mpoljak.dsim.assignment_01.generators.DiscreteUniformRnd;
+import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
+import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
+import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
+import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
+import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
+import mpoljak.dsim.assignment_01.logic.generators.DiscreteEmpiricalRnd;
+import mpoljak.dsim.assignment_01.logic.generators.DiscreteUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
+import mpoljak.dsim.utils.SeedGen;
 
 import java.time.DayOfWeek;
 import java.util.Random;
 
-public class GoodsManagement extends MCSimCore {
+public class CarComponentsStorage extends MCSimCore {
     private final static double STORAGE_COST_ABSORBERS = 0.2; // € per DAY per product
     private final static double STORAGE_COST_BRAKE_PADS = 0.3; // € per DAY per product
     private final static double STORAGE_COST_HEADLIGHTS = 0.25; // € per DAY per product
@@ -25,16 +26,16 @@ public class GoodsManagement extends MCSimCore {
 
     private SupplyStrategy supplyStrategy;
 
-    public GoodsManagement(Random seedGen, long repCount, SupplyStrategy supplyStrategy) {
+    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy) {
         super(repCount);
 
         if (supplyStrategy == null)
             throw new IllegalArgumentException("Supply strategy not provided");
 
         this.supplyStrategy = supplyStrategy;
-        this.rndAbsorbers = new DiscreteUniformRnd(seedGen, 50, 100);
-        this.rndBrakePads = new DiscreteUniformRnd(seedGen, 60, 250);
-        this.rndHeadlights = new DiscreteEmpiricalRnd(seedGen,
+        this.rndAbsorbers = new DiscreteUniformRnd(50, 100);
+        this.rndBrakePads = new DiscreteUniformRnd(60, 250);
+        this.rndHeadlights = new DiscreteEmpiricalRnd(
                 new double[]{30, 60, 100, 140},
                 new double[]{60, 100, 140, 160},
                 new double[]{0.2, 0.4, 0.3, 0.1}
@@ -135,29 +136,29 @@ public class GoodsManagement extends MCSimCore {
         final int defaultOrderH = 150; // headlights
         Random seedGen = new Random();
         // supplier 1
-        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(seedGen, 10, 70); // first 10 weeks only
-        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(seedGen, 30, 95); // from week 11
-        Supplier supplier1 = new Supplier(seedGen, 11, rndConfSupplier1A, rndConfSupplier1B);
+        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
+        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
+        Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
         // supplier 2
-        ContinuosEmpiricalRnd rndConfSupplier2A = new ContinuosEmpiricalRnd(seedGen,
+        ContinuosEmpiricalRnd rndConfSupplier2A = new ContinuosEmpiricalRnd(
                 new double[] {5, 10, 50, 70, 80},
                 new double[] {10, 50, 70, 80, 95},
                 new double[]{0.4, 0.3, 0.2, 0.06, 0.04}
         );
-        ContinuosEmpiricalRnd rndConfSupplier2B = new ContinuosEmpiricalRnd(seedGen,
+        ContinuosEmpiricalRnd rndConfSupplier2B = new ContinuosEmpiricalRnd(
                 new double[] {5, 10, 50, 70, 80},
                 new double[] {10, 50, 70, 80, 95},
                 new double[] {0.2, 0.4, 0.3, 0.06, 0.04}
         );
-        Supplier supplier2 = new Supplier(seedGen, 16, rndConfSupplier2A, rndConfSupplier2B);
+        Supplier supplier2 = new Supplier(16, rndConfSupplier2A, rndConfSupplier2B);
         // strategy A
         SupplyStrategy strategyA = new SingleSupply(supplier1, defaultOrderA, defaultOrderB, defaultOrderH);
         // strategy B
         SupplyStrategy strategyB = new SingleSupply(supplier2, defaultOrderA, defaultOrderB, defaultOrderH);
         // simulation Monte Carlo for John trading car components
-        GoodsManagement gmSim = new GoodsManagement(new Random(), 10_000_000, strategyA);
+        CarComponentsStorage ccsSim = new CarComponentsStorage(10_000_000, strategyA);
 //        GoodsManagement gm = new GoodsManagement(new Random(), 1_000_000);
-        gmSim.simulate();
-        System.out.println("avg costs [strategy A]: "+gmSim.getResult());
+        ccsSim.simulate();
+        System.out.println("AVG costs [strategy A]: "+Math.ceil(ccsSim.getResult())+" [€]");
     }
 }

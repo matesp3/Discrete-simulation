@@ -1,4 +1,4 @@
-package mpoljak.dsim.assignment_01.experiments;
+package mpoljak.dsim.assignment_01.logic.experiments;
 
 public class SingleSupply extends SupplyStrategy {
     private final Supplier supplier;

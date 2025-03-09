@@ -11,6 +11,7 @@ public class SeedGen {
     protected SeedGen() {
         this.rand = new Random(); // in case of debugging, just set seed
     }
+
     public static SeedGen getInstance() {
         if (instance == null) {
             synchronized (SeedGen.class) {
@@ -20,5 +21,9 @@ public class SeedGen {
             }
         }
         return instance;
+    }
+
+    public long nextSeed() {
+        return this.rand.nextLong();
     }
 }

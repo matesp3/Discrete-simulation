@@ -1,6 +1,7 @@
-package mpoljak.dsim.assignment_01.generators;
+package mpoljak.dsim.assignment_01.logic.generators;
 
 import mpoljak.dsim.common.Generator;
+import mpoljak.dsim.utils.SeedGen;
 
 import java.rmi.UnexpectedException;
 import java.util.ArrayList;
@@ -12,12 +13,10 @@ public class DiscreteUniformRnd extends Generator {
     private final int max;
     /**
      * Generator of discrete values (integers) from interval <<code>minValue</code>,<code>maxValue</code>>.
-     * @param seedGen generator that is used to initialize all instance's inner generators with 'proper' seed
      * @param minValue minimal value of interval from which are values generated. This value is included.
      * @param maxValue maximal value of interval. This value is included also.
      */
-    public DiscreteUniformRnd(Random seedGen, int minValue, int maxValue) {
-        super(seedGen);
+    public DiscreteUniformRnd(int minValue, int maxValue) {
         if (minValue  < 0)
             throw new IllegalArgumentException("minValue cannot be negative");
         if (maxValue <= 0)
@@ -25,7 +24,7 @@ public class DiscreteUniformRnd extends Generator {
         if (minValue >= maxValue)
             throw new IllegalArgumentException("maxValue must be greater than minValue");
 
-        this.rand = new Random(seedGen.nextLong());
+        this.rand = new Random(SeedGen.getInstance().nextSeed());
         this.min = minValue;
         this.max = maxValue + 1;
     }
@@ -43,7 +42,7 @@ public class DiscreteUniformRnd extends Generator {
         int min = 1;
         int max = 7;
         ArrayList<Integer> uniqueGenVals = new ArrayList<>(max-min+1);
-        DiscreteUniformRnd rnd = new DiscreteUniformRnd(new Random(), min, max);
+        DiscreteUniformRnd rnd = new DiscreteUniformRnd(min, max);
 
         for (int i = 0; i < reps; i++) {
             int val = (int) rnd.sample();
@@ -81,7 +80,7 @@ public class DiscreteUniformRnd extends Generator {
         final int n = 50_000;
         int min = 50;
         int max = 100;
-        DiscreteUniformRnd rnd = new DiscreteUniformRnd(new Random(), min, max);
+        DiscreteUniformRnd rnd = new DiscreteUniformRnd(min, max);
         for (int i = 0; i < n; i++) {
             System.out.println(rnd.sample());
         }
