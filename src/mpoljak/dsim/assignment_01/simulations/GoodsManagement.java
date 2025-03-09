@@ -1,5 +1,8 @@
 package mpoljak.dsim.assignment_01.simulations;
 
+import mpoljak.dsim.assignment_01.experiments.SingleSupply;
+import mpoljak.dsim.assignment_01.experiments.Supplier;
+import mpoljak.dsim.assignment_01.experiments.SupplyStrategy;
 import mpoljak.dsim.assignment_01.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.generators.DiscreteEmpiricalRnd;
@@ -16,26 +19,21 @@ public class GoodsManagement extends MCSimCore {
     private final static double STORAGE_COST_BRAKE_PADS = 0.3; // € per DAY per product
     private final static double STORAGE_COST_HEADLIGHTS = 0.25; // € per DAY per product
     private final static double PENALTY = 0.3;  // € per product of whatever type
-    private final static int ORDER_AMOUNT_ABSORBERS = 100;
-    private final static int ORDER_AMOUNT_BRAKE_PADS = 200;
-    private final static int ORDER_AMOUNT_HEADLIGHTS = 150;
     private final static int OBSERVED_WEEKS = 30;
 
     private final DiscreteUniformRnd rndAbsorbers;
     private final DiscreteUniformRnd rndBrakePads;
     private final DiscreteEmpiricalRnd rndHeadlights;
 
-    private final ContinuosUniformRnd rndConfSupplier1A;
-    private final ContinuosUniformRnd rndConfSupplier1B;
-    private final ContinuosEmpiricalRnd rndConfSupplier2A;
-    private final ContinuosEmpiricalRnd rndConfSupplier2B;
+    private SupplyStrategy supplyStrategy;
 
-    private final ContinuosUniformRnd rndDeliverySuccessA;
-    private final ContinuosUniformRnd rndDeliverySuccessB;
-
-    public GoodsManagement(Random seedGen, long repCount) {
+    public GoodsManagement(Random seedGen, long repCount, SupplyStrategy supplyStrategy) {
         super(repCount);
 
+        if (supplyStrategy == null)
+            throw new IllegalArgumentException("Supply strategy not provided");
+
+        this.supplyStrategy = supplyStrategy;
         this.rndAbsorbers = new DiscreteUniformRnd(seedGen, 50, 100);
         this.rndBrakePads = new DiscreteUniformRnd(seedGen, 60, 250);
         this.rndHeadlights = new DiscreteEmpiricalRnd(seedGen,
@@ -43,21 +41,6 @@ public class GoodsManagement extends MCSimCore {
                 new double[]{60, 100, 140, 160},
                 new double[]{0.2, 0.4, 0.3, 0.1}
         );
-        this.rndConfSupplier1A = new ContinuosUniformRnd(seedGen, 10, 70); // first 10 weeks only
-        this.rndConfSupplier1B = new ContinuosUniformRnd(seedGen, 30, 95); // from week 11
-        this.rndConfSupplier2A = new ContinuosEmpiricalRnd(seedGen,
-                new double[] {5, 10, 50, 70, 80},
-                new double[] {10, 50, 70, 80, 95},
-                new double[]{0.4, 0.3, 0.2, 0.06, 0.04}
-        );
-        this.rndConfSupplier2B = new ContinuosEmpiricalRnd(seedGen,
-                new double[] {5, 10, 50, 70, 80},
-                new double[] {10, 50, 70, 80, 95},
-                new double[] {0.2, 0.4, 0.3, 0.06, 0.04}
-        );
-        this.rndDeliverySuccessA = new ContinuosUniformRnd(seedGen, 0, 100);
-        this.rndDeliverySuccessB = new ContinuosUniformRnd(seedGen, 0, 100);
-
         // todo: here will be some method to load configuration
     }
 
@@ -68,37 +51,27 @@ public class GoodsManagement extends MCSimCore {
         int orderAbsorbers, orderBrakePads, orderHeadlights;
         double confidentiality, deliveryDecision;
         // costs can only increase, not decrease
-        double costs = 0; // costs for storing (after morning) products & for not providing wanted amount of products on friday
+        double costs = 0; // costs for storing (after morning) of products & for not providing desired amount of products on friday
         // todo mozem v semestralke spomenut, ze najlepsie by bolo nevyrabat nic, ale potrebujeme uspokojit zakaznika
         int storedAbsorbers = 0;
         int storedBrakePads = 0;
         int storedHeadlights = 0;
 
-        for (int w = 0; w < OBSERVED_WEEKS; w++) { // week algorithm
-            if (log) System.out.println("  + WEEK-"+(w+1)+":");
+        for (int w = 1; w < OBSERVED_WEEKS+1; w++) { // week algorithm
+            if (log) System.out.println("  + WEEK-"+(w)+":");
             for (int day = 1; day < 8; day++) {
                 if (log) this.printDayOfWeek(day);
                 // mondayStrategy - contains strategy for choosing supplier & amount of ordered amounts
                 if (day == DayOfWeek.MONDAY.getValue()) {
 //                    // DELIVERY OF PRODUCTS [generated PERCENT PROBABILITIES of delivery success
-                    if (w < 10) {  // season: A. 3 is the first week of B confidentiality
-//                    if ( < ) // '<' bcs first value is in 0.0, so we have to exclude last one
-                        confidentiality =  this.rndConfSupplier1A.sample();
-                        deliveryDecision = this.rndDeliverySuccessA.sample();
-                    }
-                    else {          // season: B
-                        confidentiality =  this.rndConfSupplier1B.sample();  // todo this could be wrapped into SupplierClass, so that we can implement STRATEGY design pattern
-                        deliveryDecision = this.rndDeliverySuccessB.sample();
-                    }
+                    if (log) System.out.print("\n         ^-- INTRA-DAY:");
 
-                    if (DoubleComp.compare(deliveryDecision, confidentiality) == -1) { // order is supplied
-                        storedAbsorbers += ORDER_AMOUNT_ABSORBERS;
-                        storedBrakePads += ORDER_AMOUNT_BRAKE_PADS;
-                        storedHeadlights += ORDER_AMOUNT_HEADLIGHTS;
+                    SupplyStrategy.SupplierResult res = this.supplyStrategy.supply(w, log);
+                    if (res.areProductsDelivered()) { // order is supplied
+                        storedAbsorbers += res.getSuppliedAbsorbers();
+                        storedBrakePads += res.getSuppliedBrakePads();
+                        storedHeadlights += res.getSuppliedHeadlights();
                     }   // else -> ROLLBACK operation of week order, if it's not delivered on Monday -> stored amounts not changed
-
-                    if (log) System.out.printf("\n         ^-- INTRA-DAY: (reality=%.02f < confidence=%.02f%%) => supplied=%B",
-                            deliveryDecision, confidentiality, (DoubleComp.compare(deliveryDecision, confidentiality) == -1));
                 }
                 else if (day == DayOfWeek.FRIDAY.getValue()) {
 //                     SELLING PRODUCTS [generated AMOUNTS of products ORDERED by CUSTOMER]
@@ -121,7 +94,7 @@ public class GoodsManagement extends MCSimCore {
                         costs += (-1)*(storedHeadlights)*PENALTY;
                         storedHeadlights = 0;
                     }
-                    if (log) System.out.printf("\n         ^-- INTRA-DAY: [required amounts: [A=%d  B=%d  H=%d]]",
+                    if (log) System.out.printf("\n         ^-- INTRA-DAY: [required amounts: [A=%dx B=%dx H=%d]]",
                             orderAbsorbers, orderBrakePads, orderHeadlights);
                 }
 //                at the end of every day, we have to pay storing costs
@@ -136,7 +109,7 @@ public class GoodsManagement extends MCSimCore {
     }
 
     private void printEndOfDayState(int amountA, int amountB, int amountH, double costs) {
-        System.out.printf("EVENING: [costs=%.2f  STORED: [A=%d   B=%d    H=%d]]\n"
+        System.out.printf("EVENING: [costs=%.2f  STORED: [A=%dx B=%dx H=%dx]]\n"
                 , costs, amountA, amountB, amountH);
     }
     private void printDayOfWeek(int day) {
@@ -159,8 +132,34 @@ public class GoodsManagement extends MCSimCore {
     }
 
     public static void main(String[] args) {
-        GoodsManagement gm = new GoodsManagement(new Random(), 1_000_000);
-        gm.simulate();
-        System.out.println("avg costs [strategy A]: "+gm.getResult());
+        final int defaultOrderA = 100; // absorbers
+        final int defaultOrderB = 200; // break pads
+        final int defaultOrderH = 150; // headlights
+        Random seedGen = new Random();
+        // supplier 1
+        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(seedGen, 10, 70); // first 10 weeks only
+        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(seedGen, 30, 95); // from week 11
+        Supplier supplier1 = new Supplier(seedGen, 11, rndConfSupplier1A, rndConfSupplier1B);
+        // supplier 2
+        ContinuosEmpiricalRnd rndConfSupplier2A = new ContinuosEmpiricalRnd(seedGen,
+                new double[] {5, 10, 50, 70, 80},
+                new double[] {10, 50, 70, 80, 95},
+                new double[]{0.4, 0.3, 0.2, 0.06, 0.04}
+        );
+        ContinuosEmpiricalRnd rndConfSupplier2B = new ContinuosEmpiricalRnd(seedGen,
+                new double[] {5, 10, 50, 70, 80},
+                new double[] {10, 50, 70, 80, 95},
+                new double[] {0.2, 0.4, 0.3, 0.06, 0.04}
+        );
+        Supplier supplier2 = new Supplier(seedGen, 16, rndConfSupplier2A, rndConfSupplier2B);
+        // strategy A
+        SupplyStrategy strategyA = new SingleSupply(supplier1, defaultOrderA, defaultOrderB, defaultOrderH);
+        // strategy B
+        SupplyStrategy strategyB = new SingleSupply(supplier2, defaultOrderA, defaultOrderB, defaultOrderH);
+        // simulation Monte Carlo for John trading car components
+        GoodsManagement gmSim = new GoodsManagement(new Random(), 10_000_000, strategyA);
+//        GoodsManagement gm = new GoodsManagement(new Random(), 1_000_000);
+        gmSim.simulate();
+        System.out.println("avg costs [strategy A]: "+gmSim.getResult());
     }
 }
