@@ -1,10 +1,7 @@
 package mpoljak.dsim.intro;
 
-import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
+import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.MCSimCore;
-import mpoljak.dsim.common.SimCore;
-
-import java.util.Random;
 
 /**
  * Monte Carlo Simulation - Buffon's needle experiment.
@@ -17,14 +14,14 @@ public class BuffonNeedle extends MCSimCore {
     double d;
     double l;
 
-    public BuffonNeedle(Random seedGenerator, long replications, double needleLength, double linesDist) {
+    public BuffonNeedle(long replications, double needleLength, double linesDist) {
         super(replications);
         this.d = linesDist;
         this.l = needleLength;
 //        this.genNeedle = new Random(seedGenerator.nextLong());
-        this.genNeedle = new ContinuosUniformRnd(seedGenerator, 0, 1);
+        this.genNeedle = new ContinuosUniformRnd(0, 1);
 //        this.genAngle = new Random(seedGenerator.nextLong());
-        this.genAngle = new ContinuosUniformRnd(seedGenerator, 0, 1);
+        this.genAngle = new ContinuosUniformRnd(0, 1);
     }
 
     @Override

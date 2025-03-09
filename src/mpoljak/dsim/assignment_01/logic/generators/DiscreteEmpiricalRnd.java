@@ -1,4 +1,4 @@
-package mpoljak.dsim.assignment_01.generators;
+package mpoljak.dsim.assignment_01.logic.generators;
 
 import java.util.Random;
 
@@ -10,13 +10,12 @@ public class DiscreteEmpiricalRnd extends EmpiricalRnd {
      * corresponds to i-th element of <code>upperBounds</code> array and i-th probability of
      * <code>intervalProbabilities</code> array.
      *
-     * @param seedGen               generator that is used to initialize all instance's inner generators with 'proper' seed
      * @param lowerBounds           minimal interval values. They are INCLUDED.
      * @param upperBounds           maximum interval values. They are EXCLUDED.
      * @param intervalProbabilities i-th element is probability to generate values from i-th interval
      */
-    public DiscreteEmpiricalRnd(Random seedGen, double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
-        super(seedGen, lowerBounds, upperBounds, intervalProbabilities);
+    public DiscreteEmpiricalRnd(double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
+        super(lowerBounds, upperBounds, intervalProbabilities);
         for (int i = 0; i < lowerBounds.length; i++) {
             if (lowerBounds[i] != Math.floor(lowerBounds[i]) || upperBounds[i] != Math.ceil(upperBounds[i]))
                 throw new IllegalArgumentException("Found value in lower or uppers bound's array, that is not discrete");
@@ -38,7 +37,6 @@ public class DiscreteEmpiricalRnd extends EmpiricalRnd {
         int n = 50_000;
         // generate n values
         DiscreteEmpiricalRnd rnd = new DiscreteEmpiricalRnd(
-                new Random(),
                 new double[]{30, 60, 100.0, 140},
                 new double[]{60, 100, 140, 160},
                 new double[]{0.2, 0.4, 0.3, 0.1}

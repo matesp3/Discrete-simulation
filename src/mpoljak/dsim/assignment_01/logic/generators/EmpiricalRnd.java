@@ -1,7 +1,8 @@
-package mpoljak.dsim.assignment_01.generators;
+package mpoljak.dsim.assignment_01.logic.generators;
 
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.utils.DoubleComp;
+import mpoljak.dsim.utils.SeedGen;
 
 import java.util.Random;
 
@@ -18,13 +19,11 @@ public abstract class EmpiricalRnd extends Generator {
      * upper bounds and their probabilities. I-th element of <code>lowerBounds</code> array is lower bound that
      * corresponds to i-th element of <code>upperBounds</code> array and i-th probability of
      * <code>intervalProbabilities</code> array.
-     * @param seedGen generator that is used to initialize all instance's inner generators with 'proper' seed
      * @param lowerBounds minimal interval values. They are INCLUDED.
      * @param upperBounds maximum interval values. They are EXCLUDED.
      * @param intervalProbabilities i-th element is probability to generate values from i-th interval
      */
-    public EmpiricalRnd(Random seedGen, double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
-        super(seedGen);
+    public EmpiricalRnd(double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
         if (lowerBounds == null || upperBounds == null || intervalProbabilities == null)
             throw new IllegalArgumentException("Arrays cannot be null");
         if (lowerBounds.length != upperBounds.length && intervalProbabilities.length != lowerBounds.length)
@@ -44,10 +43,11 @@ public abstract class EmpiricalRnd extends Generator {
         System.arraycopy(upperBounds, 0, this.upper, 0, lowerBounds.length);
 
         // generators initialization
-        this.rndIntervalPicker = new Random(seedGen.nextLong());
+        SeedGen seedGen = SeedGen.getInstance();
+        this.rndIntervalPicker = new Random(seedGen.nextSeed());
         this.valGen = new Random[lowerBounds.length];
         for (int i = 0; i < this.valGen.length; i++) {
-            this.valGen[i] = new Random(seedGen.nextLong());
+            this.valGen[i] = new Random(seedGen.nextSeed());
         }
     }
 

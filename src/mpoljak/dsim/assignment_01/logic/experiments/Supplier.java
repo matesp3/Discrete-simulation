@@ -1,10 +1,8 @@
-package mpoljak.dsim.assignment_01.experiments;
+package mpoljak.dsim.assignment_01.logic.experiments;
 
-import mpoljak.dsim.assignment_01.generators.ContinuosUniformRnd;
+import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.utils.DoubleComp;
-
-import java.util.Random;
 
 /**
  * Purpose of <code>Supplier</code> class is to generate decisions about delivery success by using generators of
@@ -20,7 +18,6 @@ public class Supplier {
     private final ContinuosUniformRnd rndDeliverySuccessB; // generator of reality starting on threshold week
 
     /**
-     * @param seedGen generator of seeds
      * @param thresholdWeek first week, when will be used probability distribution specified by
      *                      <code>rndConfDelivery2</code>.
      * @param rndConfDelivery1 probability distribution of percent confidence for generating delivery decisions until
@@ -28,12 +25,12 @@ public class Supplier {
      * @param rndConfDelivery2 probability distribution of percent confidence for generating delivery decisions  from
      *                         week <code>thresholdWeek</code>
      */
-    public Supplier(Random seedGen, int thresholdWeek, Generator rndConfDelivery1, Generator rndConfDelivery2) {
+    public Supplier(int thresholdWeek, Generator rndConfDelivery1, Generator rndConfDelivery2) {
         this.thresholdWeek = thresholdWeek;
         this.rndConfSupplier1A = rndConfDelivery1;
         this.rndConfSupplier1B = rndConfDelivery2;
-        this.rndDeliverySuccessA = new ContinuosUniformRnd(seedGen, 0, 100);
-        this.rndDeliverySuccessB = new ContinuosUniformRnd(seedGen, 0, 100);
+        this.rndDeliverySuccessA = new ContinuosUniformRnd(0, 100);
+        this.rndDeliverySuccessB = new ContinuosUniformRnd(0, 100);
     }
 
     /**

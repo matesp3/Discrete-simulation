@@ -1,4 +1,4 @@
-package mpoljak.dsim.assignment_01.experiments;
+package mpoljak.dsim.assignment_01.logic.experiments;
 
 /**
  * Strategy of supply based on week number and probability of potential success in delivering.
