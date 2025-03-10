@@ -1,12 +1,14 @@
 package mpoljak.dsim.common;
 
-import java.util.Random;
+import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 
 public abstract class SimCore {
+    protected final SimulationTask simTask;
     private final long repCount;
     private long currentRep;
 
-    public SimCore(long replicationsCount) {
+    public SimCore(long replicationsCount, SimulationTask simTask) {
+        this.simTask = simTask;
         this.currentRep = 0;
         this.repCount = replicationsCount;
     }
@@ -32,6 +34,12 @@ public abstract class SimCore {
         this.currentRep = 0;            // reset
         this.beforeSimulation();        // hook - before sim
         for (int i = 0; i < this.repCount; i++) {
+//            v--- concurrency work
+            if (this.simTask != null && this.simTask.isCancelled()) {
+                System.out.println("\n          !!! SIMULATION CANCELLED !!!");
+                break;
+            }
+//            ^--- concurrency work
             this.currentRep++;
             this.beforeExperiment();    // hook - before rep
             this.experiment();          // main stuff

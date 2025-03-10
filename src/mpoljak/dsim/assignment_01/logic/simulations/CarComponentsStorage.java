@@ -1,5 +1,6 @@
 package mpoljak.dsim.assignment_01.logic.simulations;
 
+import mpoljak.dsim.assignment_01.Main;
 import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
 import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
@@ -7,6 +8,7 @@ import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteUniformRnd;
+import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.common.MCSimCore;
 
 import java.time.DayOfWeek;
@@ -24,10 +26,10 @@ public class CarComponentsStorage extends MCSimCore {
     private final DiscreteEmpiricalRnd rndHeadlights;
 
     private final SupplyStrategy supplyStrategy;
-    private boolean consoleLogs = false;
+    private boolean consoleLogs = true;
 
-    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy) {
-        super(repCount);
+    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy, SimulationTask simTask) {
+        super(repCount, simTask);
 
         if (supplyStrategy == null)
             throw new IllegalArgumentException("Supply strategy not provided");

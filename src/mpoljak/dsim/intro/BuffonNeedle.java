@@ -1,6 +1,8 @@
 package mpoljak.dsim.intro;
 
+import mpoljak.dsim.assignment_01.Main;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
+import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.common.MCSimCore;
 
 /**
@@ -14,8 +16,8 @@ public class BuffonNeedle extends MCSimCore {
     double d;
     double l;
 
-    public BuffonNeedle(long replications, double needleLength, double linesDist) {
-        super(replications);
+    public BuffonNeedle(long replications, double needleLength, double linesDist, SimulationTask simTask) {
+        super(replications, simTask);
         this.d = linesDist;
         this.l = needleLength;
 //        this.genNeedle = new Random(seedGenerator.nextLong());
