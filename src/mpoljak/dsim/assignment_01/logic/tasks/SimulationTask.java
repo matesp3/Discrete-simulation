@@ -5,11 +5,12 @@ import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.simulations.CarComponentsStorage;
+import mpoljak.dsim.common.ICloneable;
 import mpoljak.dsim.utils.SeedGen;
 
 import javax.swing.*;
 
-public class SimulationTask extends SwingWorker<Void, SimulationTask.ReplicationResults> {
+public class SimulationTask extends SwingWorker<Void, SimulationTask.ReplicationResults> implements ICloneable<SimulationTask> {
     @Override
     protected Void doInBackground() throws Exception {
             /* TODO: do konstruktora simulacie si skusit poslat odkaz na tento task a v metode simulate() kontrolovat
@@ -18,7 +19,6 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
                     Vzorovy kod: https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/concurrency/FlipperProject/src/concurrency/Flipper.java
             */
         System.out.println("    *** S I M U L A T I O N   S T A R T E D ***");
-        SeedGen seedGen = SeedGen.getInstance();
         // supplier 1
         ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
         ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
@@ -29,6 +29,11 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         CarComponentsStorage ccsSim = new CarComponentsStorage(1000, strategyA, this);
         ccsSim.simulate();
         return null;
+    }
+
+    @Override
+    public SimulationTask cloneInstance() {
+        return new SimulationTask();
     }
 
     /**
