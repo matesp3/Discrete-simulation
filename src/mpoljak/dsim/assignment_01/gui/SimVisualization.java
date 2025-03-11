@@ -13,6 +13,7 @@ public class SimVisualization extends JFrame implements ActionListener {
     // constants
     private static final int CANVAS_WIDTH = 1400;
     private static final int CANVAS_HEIGHT = 840;
+    private static final int TXT_FIELD_HEIGHT = 22;
     // colors
     private final Color colBg = new Color(148, 172, 204);
     private final Color colBgContent = new Color(193, 193, 193);
@@ -69,6 +70,9 @@ public class SimVisualization extends JFrame implements ActionListener {
             this.setBtnEnabled(this.btnStop, false);
             this.setBtnEnabled(this.btnStart,true);
         }
+        else if (e.getActionCommand().equals("Show 1 rep")) {
+            // todo show 1 replication
+        }
     }
 
     private JButton createBtn(String caption) {
@@ -82,15 +86,22 @@ public class SimVisualization extends JFrame implements ActionListener {
         return btn;
     }
 
+    private void setBtnEnabled(JButton btn, boolean enabled) {
+        btn.setBackground(enabled ? this.colBtn : this.colBtnDisabled);
+        btn.setEnabled(enabled);
+    }
+
     private JLabel createLabel(String caption) {
         JLabel label = new JLabel(caption);
         label.setForeground(this.colTextFont);
         return label;
     }
 
-    private void setBtnEnabled(JButton btn, boolean enabled) {
-        btn.setBackground(enabled ? this.colBtn : this.colBtnDisabled);
-        btn.setEnabled(enabled);
+    private JTextField createTextInput(int expectedLettersCount) {
+        JTextField txtField = new JTextField();
+//        txtField.setSize(new Dimension(width, TXT_FIELD_HEIGHT));
+        txtField.setColumns( (int)((5.0/7.0)*expectedLettersCount)+1 );
+        return txtField;
     }
 
     private void createMainLayout() {
@@ -136,14 +147,23 @@ public class SimVisualization extends JFrame implements ActionListener {
         this.btnStart = this.createBtn("Start");
         this.btnStop = this.createBtn("Stop");
 
-        this.northPanel.add(this.btnStart, consNorthPanel);
-        this.northPanel.add(this.btnStop, consNorthPanel);
+        this.northPanel.add(this.btnStart, this.consNorthPanel);
+        this.northPanel.add(this.btnStop, this.consNorthPanel);
         this.setBtnEnabled(this.btnStop, false);
 
         JLabel lblRepCount = this.createLabel("Replications:");
-        this.northPanel.add(lblRepCount, consNorthPanel);
+        this.northPanel.add(lblRepCount, this.consNorthPanel);
+
+        JTextField inputRepCount = this.createTextInput(10);
+        this.northPanel.add(inputRepCount, this.consNorthPanel);
+
+        JLabel lblStrategies = this.createLabel("Strategies selection:");
+        this.northPanel.add(lblStrategies, this.consNorthPanel);
 
         JComboBox<String> strategiesBox = this.createStrategySelection();
-        this.northPanel.add(strategiesBox, consNorthPanel);
+        this.northPanel.add(strategiesBox, this.consNorthPanel);
+
+        JButton btn1Rep = this.createBtn("Show 1 rep");
+        this.northPanel.add(btn1Rep, this.consNorthPanel);
     }
 }

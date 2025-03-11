@@ -37,6 +37,6 @@ public class SimController {
                 break;
             }
         }
-        System.out.println("Set Strategy: "+ this.strategy+". ID = "+strategyID);
+//        System.out.println("Set Strategy: "+ this.strategy+". ID = "+strategyID);
     }
 }
