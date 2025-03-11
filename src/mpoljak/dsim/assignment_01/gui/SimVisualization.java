@@ -1,6 +1,5 @@
 package mpoljak.dsim.assignment_01.gui;
 
-import mpoljak.dsim.assignment_01.Main;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 
 import javax.swing.*;
