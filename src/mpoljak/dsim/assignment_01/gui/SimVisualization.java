@@ -14,6 +14,8 @@ public class SimVisualization extends JFrame implements ActionListener {
     private final JButton btnStart;
     private final JButton btnStop;
     private final GridBagConstraints constraints;
+    private final Color col1 = new Color(43, 201, 201);
+    private final Color col2 = new Color(66, 227, 54);
 
     private final SimulationTask simTask;
 
@@ -42,11 +44,24 @@ public class SimVisualization extends JFrame implements ActionListener {
         Color frameColor = new Color(5, 4, 56);
         this.getContentPane().setBackground(frameColor);
 //      ---- components
-        this.btnStart = new JButton("Start");
-        this.btnStop = new JButton("Stop");
-        this.btnStop.setEnabled(false);
+        this.btnStart = createBtn("Start");
+        this.btnStop = createBtn("Stop");
+
+//        this.btnStop.setEnabled(false);
         mainPanel.add(btnStart, constraints);
         mainPanel.add(btnStop, constraints);
+        JPanel rectangle = new JPanel();
+        rectangle.setSize(100, 50);
+        rectangle.setBackground(col1);
+        JButton btn = new JButton("Toggler");
+        btn.addActionListener(e->{
+            if (rectangle.getBackground() == col1)
+                rectangle.setBackground(col2);
+            else
+                rectangle.setBackground(col1);
+        });
+        mainPanel.add(btn, constraints);
+        mainPanel.add(rectangle, constraints);
 //      ---- set all visible
         this.pack(); // probably used when dimensions are not set??
         this.setVisible(true);
@@ -55,17 +70,17 @@ public class SimVisualization extends JFrame implements ActionListener {
 
     private JButton createBtn(String btnName) {
         JButton btn = new JButton(btnName);
-        Color btnColor = new Color(150, 28, 28);
+        Color btnColor = new Color(210, 94, 94);
         btn.setBackground(btnColor);
+//        btn.addActionListener(e-> System.out.println("clicked"));
         btn.setActionCommand(btnName);
         btn.addActionListener(this);
-//        btn.setForeground(Color.BLACK);
+        btn.setForeground(Color.BLACK);
         return btn;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("Do you even work??");
         if (e.getActionCommand().equals("Start")) {
             this.btnStop.setEnabled(true);
             this.btnStart.setEnabled(false);
