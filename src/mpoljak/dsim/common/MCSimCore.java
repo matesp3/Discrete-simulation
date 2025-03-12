@@ -1,5 +1,7 @@
 package mpoljak.dsim.common;
 
+import mpoljak.dsim.assignment_01.Main;
+import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.utils.DoubleComp;
 
 /**
@@ -8,8 +10,8 @@ import mpoljak.dsim.utils.DoubleComp;
 public abstract class MCSimCore extends SimCore {
     private double accumulatedVal;
 
-    public MCSimCore(long repCount) {
-        super(repCount);
+    public MCSimCore(long repCount, SimulationTask simTask) {
+        super(repCount, simTask);
         this.resetAccumulation();
     }
 
@@ -17,7 +19,7 @@ public abstract class MCSimCore extends SimCore {
      * @return result of the Monte Carlo simulation, which is a probability of the observed event by this instance.
      */
     public double getResult() {
-        return this.accumulatedVal / this.getRepCount();
+        return this.accumulatedVal / this.getCurrentReplication();
     }
 
     /**
@@ -33,6 +35,7 @@ public abstract class MCSimCore extends SimCore {
     @Override
     protected void beforeSimulation() {
         this.resetAccumulation();
+        super.beforeSimulation();
     }
 
     /**

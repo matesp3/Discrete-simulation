@@ -7,7 +7,7 @@ public class Main {
         long repCount = 10_000_000;
         double d = 5;
         double l = 4;
-        MCSimCore mc = new BuffonNeedle(repCount, l, d ); // Monte carlo simulation
+        MCSimCore mc = new BuffonNeedle(repCount, l, d, null); // Monte carlo simulation
         mc.simulate();
         double prob = mc.getResult();
         double pi = (2 * l) / (d * prob);
