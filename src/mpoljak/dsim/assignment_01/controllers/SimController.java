@@ -10,11 +10,11 @@ import mpoljak.dsim.utils.DoubleComp;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
-import java.awt.event.ActionEvent;
+import java.io.File;
 
 public class SimController {
     private static final String[] STRATEGIES = {"strategy A", "strategy B", "strategy C", "strategy D",
-            "own strategy 1", "custom strategy"};
+            "Matej's strategy 1", "custom strategy"};
     private static final int DEFAULT_STRATEGY = 0;
 
     /**
@@ -26,6 +26,10 @@ public class SimController {
         return strategs;
     }
 
+    public static String getCustomStrategyID() {
+        return "custom strategy";
+    }
+
     public static String getDefaultStrategyID() {
         return STRATEGIES[DEFAULT_STRATEGY];
     }
@@ -34,10 +38,12 @@ public class SimController {
     private SimVisualization gui;
     private XYSeriesCollection xyDatasetAll;
     private XYSeriesCollection xyDataset1Rep;
+    private File customStrategyFile;
     private int strategy;
     private boolean running; // created because it didn't work with isDone(), when it didn't even start/
 
     public SimController(SimVisualization gui) {
+        this.customStrategyFile = null;
         this.strategy = DEFAULT_STRATEGY;
         this.running = false;
         this.gui = gui;
@@ -79,10 +85,18 @@ public class SimController {
 //        System.out.println("Set Strategy: "+ this.strategy+". ID = "+strategyID);
     }
 
+    /**
+     *
+     * @param customFile file from which will be loaded custom strategy when simulation will be launched
+     */
+    public void setFileCustomStrategy(File customFile) {
+        this.customStrategyFile = customFile;
+    }
+
     public void startSimulation(int replications, double percentageOmission) {
         if (this.simTask.isDone())
             this.simTask = this.simTask.cloneInstance();
-        this.simTask.setStrategy(this.assembleStrategy(STRATEGIES[this.strategy])); // todo <--- doplnit strategie
+        this.simTask.setStrategy(this.assembleStrategy(STRATEGIES[this.strategy]));
         int threshold =  (int)( replications * (percentageOmission/100.0));
         this.simTask.setOmittedReps(threshold);
         int nthVal = DoubleComp.compare((replications-threshold)/1000.0, 1.0) == -1 ? 1 : (replications-threshold)/1000; // (replications/1000.0 < 1.0)
@@ -126,6 +140,12 @@ public class SimController {
                 ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
                 Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
                 return new SingleSupply(supplier1, 100, 200, 150);
+            case "strategy B":
+            case "strategy C":
+            case "strategy D":
+            case "Matej's strategy 1":
+            case "custom strategy":
+//                System.out.println("Exists? "+this.customStrategyFile.exists()+"    path="+customStrategyFile.getPath());
             default:
                 return null;
         }

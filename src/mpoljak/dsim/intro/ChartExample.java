@@ -68,7 +68,5 @@ public class ChartExample {
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
-
-        //todo urobit okno s kontajnerom, ktory ma vnoreny graf a bude to interaktivne na pridavanie cisiel
     }
 }

@@ -55,7 +55,7 @@ public abstract class SimCore {
         for (int i = 0; i < this.repCount; i++) {
 //            v--- concurrency work
             if (this.simTask != null && this.simTask.isCancelled()) {
-                System.out.println("\n          !!! SIMULATION CANCELLED !!!");
+//                System.out.println("\n          !!! SIMULATION CANCELLED !!!");
                 break;
             }
 //            ^--- concurrency work
