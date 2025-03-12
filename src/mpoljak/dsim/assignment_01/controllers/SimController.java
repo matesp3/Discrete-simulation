@@ -1,5 +1,6 @@
 package mpoljak.dsim.assignment_01.controllers;
 
+import mpoljak.dsim.assignment_01.gui.SimVisualization;
 import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
 import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
@@ -7,6 +8,8 @@ import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+
+import java.awt.event.ActionEvent;
 
 public class SimController {
     private static final String[] STRATEGIES = {"strategy A", "strategy B", "strategy C", "strategy D",
@@ -27,40 +30,42 @@ public class SimController {
     }
 //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     private SimulationTask simTask;
-    private XYSeriesCollection xyDataset;
+    private SimVisualization gui;
+    private XYSeriesCollection xyDatasetAll;
+    private XYSeriesCollection xyDataset1Rep;
     private int strategy;
+    private boolean running; // created because it didn't work with isDone(), when it didn't even start/
 
-    public SimController() {
+    public SimController(SimVisualization gui) {
         ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
         ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
         Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
         SupplyStrategy strategyA = new SingleSupply(supplier1, 100, 200, 150);
 //       -   -   -   ^- default strategy  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+        this.gui = gui;
         this.simTask = new SimulationTask(strategyA, this);
         this.strategy = DEFAULT_STRATEGY;
-        XYSeries xySeries = new XYSeries("sim-dataset");
-        this.xyDataset = new XYSeriesCollection(xySeries);
+        this.running = false;
+
+        this.xyDatasetAll = new XYSeriesCollection(null);
+        this.xyDataset1Rep = new XYSeriesCollection(null);
     }
 
     public XYSeriesCollection getSimulationDataset() {
-        return this.xyDataset;
+        return this.xyDatasetAll;
     }
 
     public XYSeriesCollection get1RepDataset() {
-        XYSeries xySeries = new XYSeries("1-rep dataset");
-        xySeries.add(1, 5.5);
-        xySeries.add(2, 6.5);
-        xySeries.add(3, 7.5);
-        xySeries.add(4, 4);
-        return new XYSeriesCollection(xySeries);
+        return this.xyDataset1Rep;
     }
 
     public void addValueToSimDataset(long x, double y) {
-        this.xyDataset.getSeries(0).add(x, y);
+        this.xyDatasetAll.getSeries(0).add(x, y);
+        System.out.printf("x=%d, y=%.2f\n", x, y);
     }
 
-    public void addValueTo1RepDataset(int x, double y) {
-
+    public void addValueTo1RepDataset(double x, double y) {
+        this.xyDataset1Rep.getSeries(0).add(x, y);
     }
 
     /**
@@ -83,17 +88,33 @@ public class SimController {
         if (this.simTask.isDone())
             this.simTask = this.simTask.cloneInstance();
 //        this.simTask.setStrategy(this.assembleStrategy(STRATEGIES[this.strategy])); // todo <--- doplnit strategie
+        System.out.println("execution started");
+        XYSeries xySeriesAll = new XYSeries("Averages per replications");
+        this.xyDatasetAll.removeAllSeries();
+        this.xyDatasetAll.addSeries(xySeriesAll);
+
+        XYSeries xySeries1Rep = new XYSeries("One replication process");
+        this.xyDataset1Rep.removeAllSeries();
+        this.xyDataset1Rep.addSeries(xySeries1Rep);
+
         this.simTask.execute();
+        this.running = true;
     }
 
     public void terminateSimulation() {
-        if (!this.simTask.isCancelled()) {
+        if (!this.simTask.isDone()) {
             this.simTask.cancel(true);
+            this.running = false;
         }
     }
 
     public boolean isSimulationRunning() {
-        return !this.simTask.isCancelled();
+        return this.running;
+    }
+
+    public void onSimulationEnd() {
+        this.running = false;
+        this.gui.eventOccurred(SimVisualization.UPDATE_EVENT.SIM_END);
     }
 
     private SupplyStrategy assembleStrategy(String strategyID) {

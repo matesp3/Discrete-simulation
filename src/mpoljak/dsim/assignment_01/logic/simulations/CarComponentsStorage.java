@@ -1,18 +1,14 @@
 package mpoljak.dsim.assignment_01.logic.simulations;
 
-import mpoljak.dsim.assignment_01.Main;
-import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
-import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.DiscreteUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.common.MCSimCore;
 
 import java.time.DayOfWeek;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CarComponentsStorage extends MCSimCore {
     private final static double STORAGE_COST_ABSORBERS = 0.2; // € per DAY per product
@@ -26,6 +22,7 @@ public class CarComponentsStorage extends MCSimCore {
     private final DiscreteEmpiricalRnd rndHeadlights;
 
     private final SupplyStrategy supplyStrategy;
+    private final List<IMcExpMetaResultsCollector> expDataCollectors;
     private boolean consoleLogs = true;
 
     public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy, SimulationTask simTask) {
@@ -42,6 +39,9 @@ public class CarComponentsStorage extends MCSimCore {
                 new double[]{60, 100, 140, 160},
                 new double[]{0.2, 0.4, 0.3, 0.1}
         );
+//      -- -- --V  added due to one replication trend
+        this.expDataCollectors = new ArrayList<>();
+//      -- -- --^  added due to one replication trend
         // todo: here will be some method to load configuration
     }
 
@@ -50,6 +50,20 @@ public class CarComponentsStorage extends MCSimCore {
      *          displayed.
      */
     public void setConsoleLogs(boolean on) { this.consoleLogs = on; }
+
+    /**
+     * Stores collector, which will be used to collect meta results of single Monte Carlo experiment.
+     * @param collector collector of data calculated in single Monte Carlo experiment
+     */
+    public void addExperimentDataCollecting(IMcExpMetaResultsCollector collector) { // may become abstract in SimCore.class later.
+        if (collector == null)
+            return;
+        for (IMcExpMetaResultsCollector c : this.expDataCollectors) {
+            if (c == collector)
+                return;
+        }
+        this.expDataCollectors.add(collector);
+    }
 
     @Override
     protected void experiment() {
@@ -108,6 +122,10 @@ public class CarComponentsStorage extends MCSimCore {
                             storedHeadlights * STORAGE_COST_HEADLIGHTS;
                 if (this.consoleLogs) { System.out.printf("\n         ^-- ");
                             this.printEndOfDayState(storedAbsorbers, storedBrakePads, storedHeadlights, costs);
+                }
+                if (!this.expDataCollectors.isEmpty()) {
+                    for (IMcExpMetaResultsCollector collector : this.expDataCollectors)
+                        collector.collectResult((w - 1) * 7 + day, costs);
                 }
             }
         }

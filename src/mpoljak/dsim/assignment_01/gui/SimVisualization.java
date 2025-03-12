@@ -15,6 +15,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class SimVisualization extends JFrame implements ActionListener {
+    public enum UPDATE_EVENT {
+        SIM_END, SIM_CANCELLED
+    }
 // --- GUI vars
     // constants
     private static final int CANVAS_WIDTH = 1800;
@@ -41,8 +44,8 @@ public class SimVisualization extends JFrame implements ActionListener {
 // --- LOGIC providers vars
     private SimController simController;
 
-    public SimVisualization(SimController controller) {
-        this.simController = controller;
+    public SimVisualization() {
+        this.simController = new SimController(this);
 //      ---- app icon
 //    ImageIcon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/GeoApp-icon.png");
 //    this.setIconImage(icon.getImage());
@@ -63,24 +66,21 @@ public class SimVisualization extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getActionCommand().equals("Start")) {
             this.setBtnEnabled(this.btnStop, true);
-            this.setBtnEnabled(this.btnStart,false);
-            this.simController.startSimulation();
+            boolean running =this.simController.isSimulationRunning();
+            if (!running)
+                this.simController.startSimulation();
         }
         else if (e.getActionCommand().equals("Stop")) {
-            this.simController.terminateSimulation();
-            this.setBtnEnabled(this.btnStop, false);
-            this.setBtnEnabled(this.btnStart,true);
+            if (this.simController.isSimulationRunning()) {
+                this.simController.terminateSimulation();
+                this.setBtnEnabled(this.btnStop, false);
+            }
         }
-        else if (e.getActionCommand().equals("Show 1 rep")) {
-            if (!this.centerPanel.getComponent(0).isVisible()) {
-                this.centerPanel.getComponent(0).setVisible(true); // sim chart
-                this.centerPanel.getComponent(1).setVisible(false); // 1-rep chart
-            }
-            else {
-                this.centerPanel.getComponent(0).setVisible(false); // sim chart
-                this.centerPanel.getComponent(1).setVisible(true); // 1-rep chart
-            }
+    }
 
+    public void eventOccurred(UPDATE_EVENT event) {
+        if (event == UPDATE_EVENT.SIM_END) {
+            this.setBtnEnabled(this.btnStop, false);
         }
     }
 
@@ -167,6 +167,7 @@ public class SimVisualization extends JFrame implements ActionListener {
         NumberAxis domain1 = (NumberAxis) xyPlot1.getDomainAxis();
         domain1.setVerticalTickLabels(true);
         domain1.setAutoRange(true);
+
         return chartPanel;
     }
 

@@ -32,10 +32,11 @@ public abstract class SimCore {
     }
 
     /**
-     *
+     * Stores <code>command</code>, which will be invoked when it's time (defined by
+     * <code>SimCommand.getCommandType()</code>) will come.
      * @param command to be executed in time specified by type of command <code>SimCommand.SimCommandType</code>.
      */
-    public void registerCommand(SimCommand command) {
+    public void storeCommand(SimCommand command) {
         if (command == null)
             return;
         for (SimCommand simCommand : this.commands) {
