@@ -1,9 +1,11 @@
 package mpoljak.dsim.assignment_01.controllers;
 
 import mpoljak.dsim.assignment_01.gui.SimVisualization;
+import mpoljak.dsim.assignment_01.logic.experiments.AlternatingSupply;
 import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
 import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
+import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.utils.DoubleComp;
@@ -16,7 +18,6 @@ public class SimController {
     private static final String[] STRATEGIES = {"strategy A", "strategy B", "strategy C", "strategy D",
             "Matej's strategy 1", "custom strategy"};
     private static final int DEFAULT_STRATEGY = 0;
-
     /**
      * @return IDs of all existing strategies, that can be used
      */
@@ -33,7 +34,15 @@ public class SimController {
     public static String getDefaultStrategyID() {
         return STRATEGIES[DEFAULT_STRATEGY];
     }
-//  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+
+    //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+    private final ContinuosUniformRnd rndConfSupplier1A;
+    private final ContinuosUniformRnd rndConfSupplier1B;
+    private final ContinuosEmpiricalRnd rndConfSupplier2A;
+    private final ContinuosEmpiricalRnd rndConfSupplier2B;
+    private final Supplier supplier1;
+    private final Supplier supplier2;
+
     private SimulationTask simTask;
     private SimVisualization gui;
     private XYSeriesCollection xyDatasetAll;
@@ -43,6 +52,16 @@ public class SimController {
     private boolean running; // created because it didn't work with isDone(), when it didn't even start/
 
     public SimController(SimVisualization gui) {
+        //      --- strategies vars
+        this.rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
+        this.rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
+        this.supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
+        this.rndConfSupplier2A = new ContinuosEmpiricalRnd(
+                new double[] {5, 10, 50, 70, 80}, new double[] {10, 50, 70, 80, 95}, new double[]{0.4, 0.3, 0.2, 0.06, 0.04});
+        this.rndConfSupplier2B = new ContinuosEmpiricalRnd(
+                new double[] {5, 10, 50, 70, 80}, new double[] {10, 50, 70, 80, 95}, new double[] {0.2, 0.4, 0.3, 0.06, 0.04});
+        this.supplier2 = new Supplier(16, rndConfSupplier2A, rndConfSupplier2B);
+        //      --- task vars
         this.customStrategyFile = null;
         this.strategy = DEFAULT_STRATEGY;
         this.running = false;
@@ -133,18 +152,19 @@ public class SimController {
     }
 
     private SupplyStrategy assembleStrategy(String strategyID) {
-        // todo: implement strategies
         switch (strategyID) {
             case "strategy A":
-                ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
-                ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
-                Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
-                return new SingleSupply(supplier1, 100, 200, 150);
+                return new SingleSupply(this.supplier1, 100, 200, 150);
             case "strategy B":
+                return new SingleSupply(this.supplier2, 100, 200, 150);
             case "strategy C":
+                return new AlternatingSupply(this.supplier1, this.supplier2, 100, 200, 150);
             case "strategy D":
+                return new AlternatingSupply(this.supplier2, this.supplier1, 100, 200, 150);
             case "Matej's strategy 1":
+                // todo Matej's strategy
             case "custom strategy":
+                // todo custom file strategy
 //                System.out.println("Exists? "+this.customStrategyFile.exists()+"    path="+customStrategyFile.getPath());
             default:
                 return null;

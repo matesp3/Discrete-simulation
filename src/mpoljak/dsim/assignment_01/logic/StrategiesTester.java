@@ -33,7 +33,7 @@ public class StrategiesTester {
         SupplyStrategy strategyB = new SingleSupply(supplier2, DEFAULT_ORDER_A, DEFAULT_ORDER_B, DEFAULT_ORDER_H);
         SupplyStrategy strategyC = new AlternatingSupply(supplier1, supplier2, DEFAULT_ORDER_A, DEFAULT_ORDER_B, DEFAULT_ORDER_H);
         SupplyStrategy strategyD = new AlternatingSupply(supplier2, supplier1, DEFAULT_ORDER_A, DEFAULT_ORDER_B, DEFAULT_ORDER_H);
-        int replications = 10_000_000;
+        int replications = 100_000;
         // tests execution
         testSimulation("strategy A", strategyA, replications);
         testSimulation("strategy B", strategyB, replications);
@@ -44,6 +44,7 @@ public class StrategiesTester {
     private static void testSimulation(String strategyName, SupplyStrategy strategy, int replications) {
         // simulation Monte Carlo for John trading car components
         CarComponentsStorage ccsSim = new CarComponentsStorage(replications, strategy, null);
+        ccsSim.setConsoleLogs(false);
         ccsSim.simulate();
         System.out.println(" * AVG costs ("+strategyName+"): "+Math.ceil(ccsSim.getResult())+" [€]");
     }
