@@ -13,13 +13,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 public class SimVisualization extends JFrame implements ActionListener {
+
     public enum UPDATE_EVENT {
         SIM_END, SIM_CANCELLED
     }
 // --- GUI vars
     // constants
+    private static final String DIR_IMAGES = System.getProperty("user.dir") + "/images/";
+    private static final String DIR_FILES = System.getProperty("user.dir") + "/files/";
+    private static final String PATH_DEFAULT_STRATEGY = System.getProperty("user.dir") + "/files/custom_strategy.csv";
     private static final int CANVAS_WIDTH = 1800;
     private static final int CANVAS_HEIGHT = 840;
     private static final int DEFAULT_REPLICATIONS = 100_000;
@@ -40,17 +46,21 @@ public class SimVisualization extends JFrame implements ActionListener {
     // buttons
     private JButton btnStart;
     private JButton btnStop;
+    private JButton btnLoad;
     // input text fields
     private JTextField inputRepCount;
     private JTextField inputPercOmitted;
 // --- LOGIC providers vars
     private SimController simController;
+    private String customFilePath;
 
     public SimVisualization() {
         this.simController = new SimController(this);
+        this.createPathsAndFiles();
+        this.customFilePath = PATH_DEFAULT_STRATEGY;
 //      ---- app icon
-//    ImageIcon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/GeoApp-icon.png");
-//    this.setIconImage(icon.getImage());
+        ImageIcon icon = new ImageIcon(DIR_IMAGES+"/app-logo.png");
+        this.setIconImage(icon.getImage());
         this.createMainLayout();
         this.setSize(CANVAS_WIDTH, CANVAS_HEIGHT);
         this.setResizable(false); // if I don't want client to resize window
@@ -62,6 +72,12 @@ public class SimVisualization extends JFrame implements ActionListener {
 //      ---- set all visible
 //        this.pack();
         this.setVisible(true);
+    }
+
+    public void eventOccurred(UPDATE_EVENT event) {
+        if (event == UPDATE_EVENT.SIM_END) {
+            this.setBtnEnabled(this.btnStop, false);
+        }
     }
 
     @Override
@@ -83,11 +99,23 @@ public class SimVisualization extends JFrame implements ActionListener {
                 this.setBtnEnabled(this.btnStop, false);
             }
         }
+        else if (e.getActionCommand().equals("load custom")) {
+            this.processFileFromDialog();
+        }
     }
 
-    public void eventOccurred(UPDATE_EVENT event) {
-        if (event == UPDATE_EVENT.SIM_END) {
-            this.setBtnEnabled(this.btnStop, false);
+    private void createPathsAndFiles() {
+        File f = new File(DIR_FILES);
+        f.mkdirs();
+        f = new File(DIR_IMAGES);
+        f.mkdirs();
+        f = new File(PATH_DEFAULT_STRATEGY);
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -153,6 +181,8 @@ public class SimVisualization extends JFrame implements ActionListener {
                 JComboBox<String> comboBox = (JComboBox<String>) e.getSource();
                 String selectedStrategy = (String) comboBox.getSelectedItem();
                 simController.setStrategy(selectedStrategy);
+                btnLoad.setVisible(
+                        (selectedStrategy==null ? "" : selectedStrategy).equals(SimController.getCustomStrategyID()));
             }
         });
         return strategiesBox;
@@ -180,9 +210,9 @@ public class SimVisualization extends JFrame implements ActionListener {
 
     private void createChartArea() {
         int chartXYWidth1 = (int) ((6.0/10)*CANVAS_WIDTH - 20);
-        int chartXYHeight1 = 680;
+        int chartXYHeight1 = 720;
         int chartXYWidth2 = CANVAS_WIDTH - 40 - chartXYWidth1;
-        int chartXYHeight2 = 680;
+        int chartXYHeight2 = 720;
         XYSeriesCollection dataset = this.simController.getSimulationDataset();
 
         JFreeChart chart = ChartFactory.createScatterPlot("30-weeks average costs", "replications",
@@ -197,6 +227,22 @@ public class SimVisualization extends JFrame implements ActionListener {
         this.centerPanel.add(chartPanel);
         this.centerPanel.add(chartPanel1Rep);
         chartPanel1Rep.setVisible(false);
+    }
+
+    private void processFileFromDialog() {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+//        fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        fc.setCurrentDirectory(new File(
+                new File(this.customFilePath).exists() ? this.customFilePath : System.getProperty("user.home")
+        ));
+
+        int result = fc.showOpenDialog(this);
+
+        if (result == JFileChooser.APPROVE_OPTION) {
+            this.simController.setFileCustomStrategy(fc.getSelectedFile());
+            this.customFilePath = fc.getSelectedFile().getAbsolutePath();
+        }
     }
 
     private void createFunctionalities() {
@@ -218,6 +264,15 @@ public class SimVisualization extends JFrame implements ActionListener {
 
         JComboBox<String> strategiesBox = this.createStrategySelection();
         this.northPanel.add(strategiesBox, this.consNorthPanel);
+
+        Icon icon = new ImageIcon(DIR_IMAGES+"/file-icon.png");
+        this.btnLoad = new JButton(icon);
+        this.btnLoad.setActionCommand("load custom");
+        this.btnLoad.setPreferredSize(new Dimension(24,25));
+        this.btnLoad.addActionListener(this);
+        this.btnLoad.setVisible(false);
+        this.btnLoad.setToolTipText("Load custom strategy from file");
+        this.northPanel.add(this.btnLoad, this.consNorthPanel);
 
         JCheckBox check1Rep = new JCheckBox("Show 1 rep");
         check1Rep.setSelected(false);
