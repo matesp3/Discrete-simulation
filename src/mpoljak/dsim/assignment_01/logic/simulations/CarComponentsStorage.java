@@ -121,19 +121,4 @@ public class CarComponentsStorage extends MCSimCore {
     private void printDayOfWeek(int day) {
         System.out.printf("       %s", DayOfWeek.of(day).name().substring(0, 3));
     }
-
-    @Override
-    protected void afterSimulation() {
-
-    }
-
-    @Override
-    protected void beforeExperiment() {
-
-    }
-
-    @Override
-    protected void afterExperiment() {
-
-    }
 }

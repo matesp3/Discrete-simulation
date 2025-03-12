@@ -2,8 +2,11 @@ package mpoljak.dsim.common;
 
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 
+import java.util.ArrayList;
+
 public abstract class SimCore {
     protected final SimulationTask simTask;
+    private final ArrayList<SimCommand> commands;
     private final long repCount;
     private long currentRep;
 
@@ -11,6 +14,7 @@ public abstract class SimCore {
         this.simTask = simTask;
         this.currentRep = 0;
         this.repCount = replicationsCount;
+        this.commands = new ArrayList<>();
     }
 
     /**
@@ -25,6 +29,20 @@ public abstract class SimCore {
      */
     public long getRepCount() {
         return this.repCount;
+    }
+
+    /**
+     *
+     * @param command to be executed in time specified by type of command <code>SimCommand.SimCommandType</code>.
+     */
+    public void registerCommand(SimCommand command) {
+        if (command == null)
+            return;
+        for (SimCommand simCommand : this.commands) {
+            if (simCommand == command)
+                return;
+        }
+        this.commands.add(command);
     }
 
     /**
@@ -49,8 +67,23 @@ public abstract class SimCore {
     }
 
     protected abstract void experiment();
-    protected abstract void beforeSimulation();
-    protected abstract void afterSimulation();
-    protected abstract void beforeExperiment();
-    protected abstract void afterExperiment();
+    protected void beforeSimulation() {
+        this.executeCommandsOfType(SimCommand.SimCommandType.BEFORE_SIM);
+    }
+    protected void afterSimulation() {
+        this.executeCommandsOfType(SimCommand.SimCommandType.AFTER_SIM);
+    }
+    protected void beforeExperiment() {
+        this.executeCommandsOfType(SimCommand.SimCommandType.BEFORE_EXP);
+    }
+    protected void afterExperiment() {
+        this.executeCommandsOfType(SimCommand.SimCommandType.AFTER_EXP);
+    }
+
+    private void executeCommandsOfType(SimCommand.SimCommandType type) {
+        for (SimCommand command : this.commands) {
+            if (command.getCommandType().compareTo(type) == 0)
+                command.invoke();
+        }
+    }
 }

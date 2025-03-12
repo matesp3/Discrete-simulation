@@ -1,7 +1,13 @@
 package mpoljak.dsim.assignment_01.gui;
 
 import mpoljak.dsim.assignment_01.controllers.SimController;
-import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.data.xy.XYSeriesCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,9 +17,8 @@ import java.awt.event.ActionListener;
 public class SimVisualization extends JFrame implements ActionListener {
 // --- GUI vars
     // constants
-    private static final int CANVAS_WIDTH = 1400;
+    private static final int CANVAS_WIDTH = 1800;
     private static final int CANVAS_HEIGHT = 840;
-    private static final int TXT_FIELD_HEIGHT = 22;
     // colors
     private final Color colBg = new Color(148, 172, 204);
     private final Color colBgContent = new Color(193, 193, 193);
@@ -34,12 +39,10 @@ public class SimVisualization extends JFrame implements ActionListener {
     private JTextField txtRepCount;
     private JTextField txtPercentsOmitted;
 // --- LOGIC providers vars
-    private SimulationTask simTask;
     private SimController simController;
 
-    public SimVisualization(SimulationTask simTask) {
-        this.simController = new SimController(); // todo: this instance should be passed as constructor param
-        this.simTask = simTask;
+    public SimVisualization(SimController controller) {
+        this.simController = controller;
 //      ---- app icon
 //    ImageIcon icon = new ImageIcon(System.getProperty("user.dir")+"/GeoApp_imgs/GeoApp-icon.png");
 //    this.setIconImage(icon.getImage());
@@ -61,17 +64,23 @@ public class SimVisualization extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("Start")) {
             this.setBtnEnabled(this.btnStop, true);
             this.setBtnEnabled(this.btnStart,false);
-            if (this.simTask.isCancelled())
-                this.simTask = this.simTask.cloneInstance();
-            this.simTask.execute();
+            this.simController.startSimulation();
         }
         else if (e.getActionCommand().equals("Stop")) {
-            this.simTask.cancel(true);
+            this.simController.terminateSimulation();
             this.setBtnEnabled(this.btnStop, false);
             this.setBtnEnabled(this.btnStart,true);
         }
         else if (e.getActionCommand().equals("Show 1 rep")) {
-            // todo show 1 replication
+            if (!this.centerPanel.getComponent(0).isVisible()) {
+                this.centerPanel.getComponent(0).setVisible(true); // sim chart
+                this.centerPanel.getComponent(1).setVisible(false); // 1-rep chart
+            }
+            else {
+                this.centerPanel.getComponent(0).setVisible(false); // sim chart
+                this.centerPanel.getComponent(1).setVisible(true); // 1-rep chart
+            }
+
         }
     }
 
@@ -142,8 +151,47 @@ public class SimVisualization extends JFrame implements ActionListener {
         return strategiesBox;
     }
 
+    private ChartPanel createChartPanel(int width, int height, Color samplesColor, JFreeChart chart) {
+        // Anonymous classes: https://www.baeldung.com/java-anonymous-classes
+        ChartPanel chartPanel = new ChartPanel(chart) { // inpired by: https://stackoverflow.com/a/49124028
+            public Dimension getPreferredSize() {
+                return new Dimension(width, height);
+            }
+        };
+        XYPlot xyPlot1 = (XYPlot) chart.getPlot();
+        xyPlot1.setDomainCrosshairVisible(true);    // inspired by: https://stackoverflow.com/a/7208723
+        xyPlot1.setRangeCrosshairVisible(true);
+        XYItemRenderer renderer1 = xyPlot1.getRenderer();
+        if (samplesColor != null)
+            renderer1.setSeriesPaint(0, samplesColor);
+        NumberAxis domain1 = (NumberAxis) xyPlot1.getDomainAxis();
+        domain1.setVerticalTickLabels(true);
+        domain1.setAutoRange(true);
+        return chartPanel;
+    }
+
+    private void createChartArea() {
+        int chartXYWidth1 = (int) ((6.0/10)*CANVAS_WIDTH - 20);
+        int chartXYHeight1 = 680;
+        int chartXYWidth2 = CANVAS_WIDTH - 40 - chartXYWidth1;
+        int chartXYHeight2 = 680;
+        XYSeriesCollection dataset = this.simController.getSimulationDataset();
+
+        JFreeChart chart = ChartFactory.createScatterPlot("30-weeks average costs", "replications",
+                "costs[€]", dataset);
+        ChartPanel chartPanel = this.createChartPanel(chartXYWidth1, chartXYHeight1, this.colBtn, chart);
+
+        XYSeriesCollection dataset1Rep = this.simController.get1RepDataset();
+        JFreeChart chart1Rep = ChartFactory.createScatterPlot("1. replication - DAILY avg costs", "replications",
+                "costs[€]", dataset1Rep);
+        ChartPanel chartPanel1Rep = this.createChartPanel(chartXYWidth2, chartXYHeight2, this.colBtn, chart1Rep);
+
+        this.centerPanel.add(chartPanel);
+        this.centerPanel.add(chartPanel1Rep);
+        chartPanel1Rep.setVisible(false);
+    }
+
     private void createFunctionalities() {
-//      ---- components
         this.btnStart = this.createBtn("Start");
         this.btnStop = this.createBtn("Stop");
 
@@ -163,7 +211,19 @@ public class SimVisualization extends JFrame implements ActionListener {
         JComboBox<String> strategiesBox = this.createStrategySelection();
         this.northPanel.add(strategiesBox, this.consNorthPanel);
 
-        JButton btn1Rep = this.createBtn("Show 1 rep");
-        this.northPanel.add(btn1Rep, this.consNorthPanel);
+        JCheckBox check1Rep = new JCheckBox("Show 1 rep");
+        check1Rep.setSelected(false);
+        check1Rep.addActionListener(e -> {
+            this.centerPanel.getComponent(1).setVisible(check1Rep.isSelected());
+        });
+        this.northPanel.add(check1Rep, this.consNorthPanel);
+
+        JLabel labelPercOmitted = this.createLabel("Replications omitted [%]:");
+        this.northPanel.add(labelPercOmitted, this.consNorthPanel);
+
+        JTextField inputPercOmitted = this.createTextInput(3);
+        this.northPanel.add(inputPercOmitted, this.consNorthPanel);
+
+        this.createChartArea();
     }
 }

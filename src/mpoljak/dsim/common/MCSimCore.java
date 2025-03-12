@@ -19,7 +19,7 @@ public abstract class MCSimCore extends SimCore {
      * @return result of the Monte Carlo simulation, which is a probability of the observed event by this instance.
      */
     public double getResult() {
-        return this.accumulatedVal / this.getRepCount();
+        return this.accumulatedVal / this.getCurrentReplication();
     }
 
     /**
@@ -35,6 +35,7 @@ public abstract class MCSimCore extends SimCore {
     @Override
     protected void beforeSimulation() {
         this.resetAccumulation();
+        super.beforeSimulation();
     }
 
     /**
