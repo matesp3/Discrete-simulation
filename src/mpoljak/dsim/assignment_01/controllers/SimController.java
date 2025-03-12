@@ -1,10 +1,7 @@
 package mpoljak.dsim.assignment_01.controllers;
 
 import mpoljak.dsim.assignment_01.gui.SimVisualization;
-import mpoljak.dsim.assignment_01.logic.experiments.AlternatingSupply;
-import mpoljak.dsim.assignment_01.logic.experiments.SingleSupply;
-import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
-import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
+import mpoljak.dsim.assignment_01.logic.experiments.*;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
@@ -164,8 +161,7 @@ public class SimController {
             case "Matej's strategy 1":
                 // todo Matej's strategy
             case "custom strategy":
-                // todo custom file strategy
-//                System.out.println("Exists? "+this.customStrategyFile.exists()+"    path="+customStrategyFile.getPath());
+                return new CustomSupply(this.customStrategyFile, this.supplier1, this.supplier2);
             default:
                 return null;
         }
