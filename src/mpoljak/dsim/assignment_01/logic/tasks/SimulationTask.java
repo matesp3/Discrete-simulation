@@ -12,12 +12,18 @@ import javax.swing.*;
 public class SimulationTask extends SwingWorker<Void, SimulationTask.ReplicationResults> implements ICloneable<SimulationTask> {
     private SupplyStrategy strategy;
     private final SimController controller;
+    private int replications;
+    private int nthVal;
+    private int omittedReps;
 
     public SimulationTask(SupplyStrategy defaultStrategy, SimController controller) {
         if (defaultStrategy == null)
             throw new IllegalArgumentException("Default strategy not provided (null)");
-        this.strategy = defaultStrategy;
         this.controller = controller;
+        this.strategy = defaultStrategy;    // default
+        this.replications = 100_000;        // default
+        this.nthVal = this.replications / 1000; // default
+        this.omittedReps = (int) (this.replications * 0.1);
     }
 
     public void setStrategy(SupplyStrategy strategy) {
@@ -26,12 +32,28 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         this.strategy = strategy;
     }
 
+    public void setReplications(int replications) {
+        this.replications = replications;
+    }
+
+    public void setNthVal(int nthVal) {
+        this.nthVal = nthVal;
+    }
+
+    public void setOmittedReps(int omittedReps) {
+        this.omittedReps = omittedReps;
+    }
+
     @Override
     public SimulationTask cloneInstance() {
         return new SimulationTask(this.strategy, this.controller);
     }
     @Override
     protected Void doInBackground() throws Exception {
+        // simulation Monte Carlo for John trading car components
+        CarComponentsStorage ccsSim = createSimulationTask();
+        ccsSim.simulate();
+        return null;
             /* + concurrency in java:
                     https://docs.oracle.com/javase/tutorial/uiswing/concurrency/cancel.html
                     https://stackoverflow.com/questions/3028842/how-can-swing-dialogs-even-work
@@ -39,21 +61,16 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
                + example code:
                     https://docs.oracle.com/javase/tutorial/displayCode.html?code=https://docs.oracle.com/javase/tutorial/uiswing/examples/concurrency/FlipperProject/src/concurrency/Flipper.java
             */
-        System.out.println("    *** S I M U L A T I O N   S T A R T E D ***");
-        
-        // simulation Monte Carlo for John trading car components
-        CarComponentsStorage ccsSim = createSimulationTask();
-        ccsSim.simulate();
-        return null;
+//        System.out.println("    *** S I M U L A T I O N   S T A R T E D ***");
     }
 
     private CarComponentsStorage createSimulationTask() {
-        CarComponentsStorage ccsSim = new CarComponentsStorage(1000, this.strategy, this);
+        CarComponentsStorage ccsSim = new CarComponentsStorage(this.replications, this.strategy, this);
 
         SimCommand chartUpdating = new SimCommand(SimCommand.SimCommandType.AFTER_EXP) {
             @Override
             public void invoke() {
-//                if (ccsSim.getCurrentReplication() % 20 == 0)
+                if (ccsSim.getCurrentReplication() > omittedReps && ccsSim.getCurrentReplication() % nthVal == 0)
                     controller.addValueToSimDataset(ccsSim.getCurrentReplication(), ccsSim.getResult());
             }
         };
@@ -62,7 +79,7 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         SimCommand consoleLogging = new SimCommand(SimCommand.SimCommandType.BEFORE_SIM) {
             @Override
             public void invoke() {
-                ccsSim.setConsoleLogs(true);
+                ccsSim.setConsoleLogs(false);
             }
         };
         ccsSim.storeCommand(consoleLogging);

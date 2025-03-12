@@ -6,6 +6,7 @@ import mpoljak.dsim.assignment_01.logic.experiments.Supplier;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
 import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
+import mpoljak.dsim.utils.DoubleComp;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 
@@ -37,15 +38,10 @@ public class SimController {
     private boolean running; // created because it didn't work with isDone(), when it didn't even start/
 
     public SimController(SimVisualization gui) {
-        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
-        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
-        Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
-        SupplyStrategy strategyA = new SingleSupply(supplier1, 100, 200, 150);
-//       -   -   -   ^- default strategy  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
-        this.gui = gui;
-        this.simTask = new SimulationTask(strategyA, this);
         this.strategy = DEFAULT_STRATEGY;
         this.running = false;
+        this.gui = gui;
+        this.simTask = new SimulationTask(this.assembleStrategy(STRATEGIES[this.strategy]), this);
 
         this.xyDatasetAll = new XYSeriesCollection(null);
         this.xyDataset1Rep = new XYSeriesCollection(null);
@@ -61,7 +57,6 @@ public class SimController {
 
     public void addValueToSimDataset(long x, double y) {
         this.xyDatasetAll.getSeries(0).add(x, y);
-        System.out.printf("x=%d, y=%.2f\n", x, y);
     }
 
     public void addValueTo1RepDataset(double x, double y) {
@@ -84,11 +79,17 @@ public class SimController {
 //        System.out.println("Set Strategy: "+ this.strategy+". ID = "+strategyID);
     }
 
-    public void startSimulation() {
+    public void startSimulation(int replications, double percentageOmission) {
         if (this.simTask.isDone())
             this.simTask = this.simTask.cloneInstance();
-//        this.simTask.setStrategy(this.assembleStrategy(STRATEGIES[this.strategy])); // todo <--- doplnit strategie
-        System.out.println("execution started");
+        this.simTask.setStrategy(this.assembleStrategy(STRATEGIES[this.strategy])); // todo <--- doplnit strategie
+        int threshold =  (int)( replications * (percentageOmission/100.0));
+        this.simTask.setOmittedReps(threshold);
+        int nthVal = DoubleComp.compare((replications-threshold)/1000.0, 1.0) == -1 ? 1 : (replications-threshold)/1000; // (replications/1000.0 < 1.0)
+        this.simTask.setNthVal(nthVal);
+        this.simTask.setReplications(replications);
+//        System.out.printf("reps=%d  omitted=%d  nthVal=%d", replications, threshold, nthVal);
+
         XYSeries xySeriesAll = new XYSeries("Averages per replications");
         this.xyDatasetAll.removeAllSeries();
         this.xyDatasetAll.addSeries(xySeriesAll);
@@ -121,6 +122,10 @@ public class SimController {
         // todo: implement strategies
         switch (strategyID) {
             case "strategy A":
+                ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
+                ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
+                Supplier supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
+                return new SingleSupply(supplier1, 100, 200, 150);
             default:
                 return null;
         }

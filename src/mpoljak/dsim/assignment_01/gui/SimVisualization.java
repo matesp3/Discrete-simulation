@@ -22,6 +22,8 @@ public class SimVisualization extends JFrame implements ActionListener {
     // constants
     private static final int CANVAS_WIDTH = 1800;
     private static final int CANVAS_HEIGHT = 840;
+    private static final int DEFAULT_REPLICATIONS = 100_000;
+    private static final double DEFAULT_PERCENTS_OMM = 10;
     // colors
     private final Color colBg = new Color(148, 172, 204);
     private final Color colBgContent = new Color(193, 193, 193);
@@ -38,9 +40,9 @@ public class SimVisualization extends JFrame implements ActionListener {
     // buttons
     private JButton btnStart;
     private JButton btnStop;
-    // text fields
-    private JTextField txtRepCount;
-    private JTextField txtPercentsOmitted;
+    // input text fields
+    private JTextField inputRepCount;
+    private JTextField inputPercOmitted;
 // --- LOGIC providers vars
     private SimController simController;
 
@@ -58,7 +60,7 @@ public class SimVisualization extends JFrame implements ActionListener {
 
         this.createFunctionalities();
 //      ---- set all visible
-//        this.pack(); // probably used when dimensions are not set??
+//        this.pack();
         this.setVisible(true);
     }
 
@@ -67,8 +69,13 @@ public class SimVisualization extends JFrame implements ActionListener {
         if (e.getActionCommand().equals("Start")) {
             this.setBtnEnabled(this.btnStop, true);
             boolean running =this.simController.isSimulationRunning();
-            if (!running)
-                this.simController.startSimulation();
+            if (!running) {
+                int reps = this.inputRepCount.getText().isBlank() ? DEFAULT_REPLICATIONS
+                        : Integer.parseInt(this.inputRepCount.getText());
+                double percentsOmitted = this.inputPercOmitted.getText().isBlank() ? DEFAULT_PERCENTS_OMM
+                        : Double.parseDouble(this.inputPercOmitted.getText().replaceAll(",", "."));
+                this.simController.startSimulation(reps, percentsOmitted);
+            }
         }
         else if (e.getActionCommand().equals("Stop")) {
             if (this.simController.isSimulationRunning()) {
@@ -106,8 +113,8 @@ public class SimVisualization extends JFrame implements ActionListener {
         return label;
     }
 
-    private JTextField createTextInput(int expectedLettersCount) {
-        JTextField txtField = new JTextField();
+    private JTextField createTextInput(int expectedLettersCount, String hintText) {
+        JTextField txtField = new JTextField(hintText);
 //        txtField.setSize(new Dimension(width, TXT_FIELD_HEIGHT));
         txtField.setColumns( (int)((5.0/7.0)*expectedLettersCount)+1 );
         return txtField;
@@ -203,8 +210,8 @@ public class SimVisualization extends JFrame implements ActionListener {
         JLabel lblRepCount = this.createLabel("Replications:");
         this.northPanel.add(lblRepCount, this.consNorthPanel);
 
-        JTextField inputRepCount = this.createTextInput(10);
-        this.northPanel.add(inputRepCount, this.consNorthPanel);
+        this.inputRepCount = this.createTextInput(10, String.valueOf(DEFAULT_REPLICATIONS));
+        this.northPanel.add(this.inputRepCount, this.consNorthPanel);
 
         JLabel lblStrategies = this.createLabel("Strategies selection:");
         this.northPanel.add(lblStrategies, this.consNorthPanel);
@@ -222,8 +229,8 @@ public class SimVisualization extends JFrame implements ActionListener {
         JLabel labelPercOmitted = this.createLabel("Replications omitted [%]:");
         this.northPanel.add(labelPercOmitted, this.consNorthPanel);
 
-        JTextField inputPercOmitted = this.createTextInput(3);
-        this.northPanel.add(inputPercOmitted, this.consNorthPanel);
+        this.inputPercOmitted = this.createTextInput(3, String.valueOf(DEFAULT_PERCENTS_OMM));
+        this.northPanel.add(this.inputPercOmitted, this.consNorthPanel);
 
         this.createChartArea();
     }
