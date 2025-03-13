@@ -13,7 +13,7 @@ import java.io.File;
 
 public class SimController {
     private static final String[] STRATEGIES = {"strategy A", "strategy B", "strategy C", "strategy D",
-            "Matej's strategy 1", "custom strategy"};
+            "strategy E", "strategy F", "strategy G (Y,Y,X)", "Best B [100,100,100]", "custom strategy"};
     private static final int DEFAULT_STRATEGY = 0;
     /**
      * @return IDs of all existing strategies, that can be used
@@ -158,8 +158,14 @@ public class SimController {
                 return new AlternatingSupply(this.supplier1, this.supplier2, 100, 200, 150);
             case "strategy D":
                 return new AlternatingSupply(this.supplier2, this.supplier1, 100, 200, 150);
-            case "Matej's strategy 1":
-                // todo Matej's strategy
+            case "strategy E":
+                return new HalfSeasonSupply(this.supplier1, this.supplier2, 100, 200, 150);
+            case "strategy F":
+                return new HalfSeasonSupply(this.supplier2, this.supplier1, 100, 200, 150);
+            case "strategy G (Y,Y,X)":
+                return new GreaterSeasonProbSupply(this.supplier1, this.supplier2, new int[]{2,2,1}, 100, 200, 150);
+            case "Best B [100,100,100]":
+                return new SingleSupply(this.supplier2, 100, 100, 100);
             case "custom strategy":
                 return new CustomSupply(this.customStrategyFile, this.supplier1, this.supplier2);
             default:
