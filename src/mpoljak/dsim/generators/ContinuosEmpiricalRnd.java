@@ -1,8 +1,8 @@
-package mpoljak.dsim.assignment_01.logic.generators;
+package mpoljak.dsim.generators;
 
 import java.util.Random;
 
-public class DiscreteEmpiricalRnd extends EmpiricalRnd {
+public class ContinuosEmpiricalRnd extends EmpiricalRnd {
     /**
      * Generator for empirical probability. Suppose, generator consists of <code>n</code> intervals and
      * therefore <code>n</code> probabilities. These <code>n</code> intervals are characterized by their lower bounds,
@@ -14,18 +14,13 @@ public class DiscreteEmpiricalRnd extends EmpiricalRnd {
      * @param upperBounds           maximum interval values. They are EXCLUDED.
      * @param intervalProbabilities i-th element is probability to generate values from i-th interval
      */
-    public DiscreteEmpiricalRnd(double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
+    public ContinuosEmpiricalRnd(double[] lowerBounds, double[] upperBounds, double[] intervalProbabilities) {
         super(lowerBounds, upperBounds, intervalProbabilities);
-        for (int i = 0; i < lowerBounds.length; i++) {
-            if (lowerBounds[i] != Math.floor(lowerBounds[i]) || upperBounds[i] != Math.ceil(upperBounds[i]))
-                throw new IllegalArgumentException("Found value in lower or uppers bound's array, that is not discrete");
-        }
-
     }
 
     @Override
     protected double generateSample(double min, double max, Random valGen) {
-        return valGen.nextInt((int)max-(int)min) + min;
+        return valGen.nextDouble()*(max-min) + min;
     }
     //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
 
@@ -36,10 +31,13 @@ public class DiscreteEmpiricalRnd extends EmpiricalRnd {
     private static void printForTest() {
         int n = 50_000;
         // generate n values
-        DiscreteEmpiricalRnd rnd = new DiscreteEmpiricalRnd(
-                new double[]{30, 60, 100.0, 140},
-                new double[]{60, 100, 140, 160},
-                new double[]{0.2, 0.4, 0.3, 0.1}
+        ContinuosEmpiricalRnd rnd = new ContinuosEmpiricalRnd(
+                new double[]{5, 10, 50, 70, 80},      // supplier 1 - until week 15
+                new double[]{10, 50, 70, 80, 95},
+                new double[]{0.4, 0.3, 0.2, 0.06, 0.04}
+//                new double[]{5, 10, 50, 70, 80},        // supplier 1 - from week 16
+//                new double[]{10, 50, 70, 80, 95},
+//                new double[]{0.2, 0.4, 0.3, 0.06, 0.04}
         );
         for (int i = 0; i < n; i++)
             System.out.println(rnd.sample());

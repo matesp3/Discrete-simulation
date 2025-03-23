@@ -1,8 +1,8 @@
 package mpoljak.dsim.assignment_01.logic;
 
 import mpoljak.dsim.assignment_01.logic.experiments.*;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
+import mpoljak.dsim.generators.ContinuosEmpiricalRnd;
+import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.simulations.CarComponentsStorage;
 import mpoljak.dsim.utils.SeedGen;
 
