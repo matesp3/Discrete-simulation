@@ -1,8 +1,8 @@
 package mpoljak.dsim.assignment_01.logic.simulations;
 
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
-import mpoljak.dsim.assignment_01.logic.generators.DiscreteEmpiricalRnd;
-import mpoljak.dsim.assignment_01.logic.generators.DiscreteUniformRnd;
+import mpoljak.dsim.generators.DiscreteEmpiricalRnd;
+import mpoljak.dsim.generators.DiscreteUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.common.MCSimCore;
 
@@ -42,7 +42,6 @@ public class CarComponentsStorage extends MCSimCore {
 //      -- -- --V  added due to one replication trend
         this.expDataCollectors = new ArrayList<>();
 //      -- -- --^  added due to one replication trend
-        // todo: here will be some method to load configuration
     }
 
     /**

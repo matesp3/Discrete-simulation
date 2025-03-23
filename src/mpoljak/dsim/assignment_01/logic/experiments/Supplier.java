@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_01.logic.experiments;
 
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
+import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.utils.DoubleComp;
 

@@ -1,4 +1,4 @@
-package mpoljak.dsim.assignment_01.logic.generators;
+package mpoljak.dsim.generators;
 
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.utils.SeedGen;

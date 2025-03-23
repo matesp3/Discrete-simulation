@@ -2,8 +2,8 @@ package mpoljak.dsim.assignment_01.controllers;
 
 import mpoljak.dsim.assignment_01.gui.SimVisualization;
 import mpoljak.dsim.assignment_01.logic.experiments.*;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosEmpiricalRnd;
-import mpoljak.dsim.assignment_01.logic.generators.ContinuosUniformRnd;
+import mpoljak.dsim.generators.ContinuosEmpiricalRnd;
+import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.utils.DoubleComp;
 import org.jfree.data.xy.XYSeries;
