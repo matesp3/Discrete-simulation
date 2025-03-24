@@ -1,15 +1,15 @@
 package mpoljak.dsim.assignment_02.controllers;
 
-import mpoljak.dsim.assignment_02.logic.Sim;
+import mpoljak.dsim.assignment_02.logic.EventSim;
 
 /**
  * Controller is used for communication with business logic (some type of Simulation).
  */
 public class SimController {
-    private Sim sim;
+    private EventSim sim;
     private boolean simRunning; // true if it's stopped, also
 
-    public SimController(Sim simulation) {
+    public SimController(EventSim simulation) {
         this.sim = simulation;
         this.simRunning = false;
     }
@@ -21,20 +21,20 @@ public class SimController {
     public void launchSimulation() {
         Runnable r = () -> {
             try {
-                sim.costlyOperation();
+                sim.simulate();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         };
-        Thread t = new Thread(r, "Main Sim thread");
+        Thread t = new Thread(r, "Thread-Main");
         t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = true;
     }
 
     public void terminateSimulation() {
-        Runnable r = () -> sim.setEnded(true);
-        Thread t = new Thread(r, "Terminate Sim thread");
+        Runnable r = () -> sim.endSimulation();
+        Thread t = new Thread(r, "Thread-Cancel");
         t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = false;
@@ -54,7 +54,7 @@ public class SimController {
                 sim.setPaused(paused);
             }
         };
-        Thread t = new Thread(r, (paused ? "Pause" : "Resume")+" Sim Thread");
+        Thread t = new Thread(r, "Thread-"+(paused ? "Pause" : "Resume"));
         t.setDaemon(true); // if GUI ends, simulation also
         t.start();
     }
