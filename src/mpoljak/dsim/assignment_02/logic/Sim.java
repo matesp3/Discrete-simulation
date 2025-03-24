@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_02.logic;
 
-import mpoljak.dsim.assignment_02.contracts.ISimDelegate;
+import mpoljak.dsim.common.ISimDelegate;
 
 import java.util.ArrayList;
 import java.util.List;

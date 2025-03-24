@@ -2,7 +2,7 @@ package mpoljak.dsim.intro;
 
 import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
-import mpoljak.dsim.common.MCSimCore;
+import mpoljak.dsim.assignment_01.logic.simulations.MCSimCore;
 
 /**
  * Monte Carlo Simulation - Buffon's needle experiment.

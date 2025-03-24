@@ -1,6 +1,6 @@
 package mpoljak.dsim.intro;
 
-import mpoljak.dsim.common.MCSimCore;
+import mpoljak.dsim.assignment_01.logic.simulations.MCSimCore;
 
 public class Main {
     public static void main(String[] args) {

@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_02.gui;
 
-import mpoljak.dsim.assignment_02.contracts.ISimDelegate;
+import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.assignment_02.logic.Sim;
 
