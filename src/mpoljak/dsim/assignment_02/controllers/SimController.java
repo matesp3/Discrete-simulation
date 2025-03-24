@@ -19,45 +19,23 @@ public class SimController {
     }
 
     public void launchSimulation() {
-//        SwingWorker<Void, Void> task = new SwingWorker<Void, Void>() {
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                sim.costlyOperation();
-//                return null;
-//            }
-//        };
-//        task.execute();
-
-        Runnable r = new Runnable() {
-            public void run() {
-                try {
-                    sim.costlyOperation();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        Runnable r = () -> {
+            try {
+                sim.costlyOperation();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         };
         Thread t = new Thread(r, "Main Sim thread");
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = true;
     }
 
     public void terminateSimulation() {
-//        SwingWorker<Void, Void> task = new SwingWorker<Void, Void>() {
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                sim.setEnded(true);
-//                return null;
-//            }
-//        };
-//        task.execute();
-
-        Runnable r = new Runnable() {
-            public void run() {
-                sim.setEnded(true);
-            }
-        };
+        Runnable r = () -> sim.setEnded(true);
         Thread t = new Thread(r, "Terminate Sim thread");
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = false;
     }
@@ -76,7 +54,8 @@ public class SimController {
                 sim.setPaused(paused);
             }
         };
-        Thread t = new Thread(r, (paused ? "Pause" : "Resume")+" Sim Thread]");
+        Thread t = new Thread(r, (paused ? "Pause" : "Resume")+" Sim Thread");
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
     }
 }

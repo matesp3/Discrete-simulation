@@ -15,7 +15,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     private final Color colBg = new Color(148, 172, 204);
     private final Color colBgContent = new Color(193, 193, 193);
     private final Color colBtn = new Color(81, 128, 197);
-    private final Color colBtnFont = new Color(228, 230, 236);
+    private final Color colBtnFont = new Color(255, 255, 255);
     private final Color colBtnDisabled = new Color(204, 226, 253);
     private final Color colBorder = new Color(152, 215, 232);
     private final Color colTextFont = new Color(3, 2, 108);
@@ -24,6 +24,9 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     private SimController simController;
     private boolean simPaused;
+    private JButton btnStart;
+    private JButton btnPause;
+    private JButton btnCancel;
 
     public GeneralWindow(Sim simulation) {
 //        ---- initialization of params of business logic
@@ -34,6 +37,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.setSize(new Dimension(424,80));
         this.setLocationRelativeTo(null);
         this.setLayout(new FlowLayout(FlowLayout.CENTER));
+        this.setBackground(this.colBg);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        ----- window: components
         this.createComponents();
@@ -55,18 +59,28 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
         if (cmd.equals("Start")) {
-            if (! this.simController.isSimRunning())
+            if (! this.simController.isSimRunning()) {
                 this.simController.launchSimulation();
+                this.setBtnEnabled(this.btnStart, false);
+                this.setBtnEnabled(this.btnPause, true);
+                this.setBtnEnabled(this.btnCancel, true);
+            }
         }
-        else if (cmd.equals("Cancel"))
-                this.simController.terminateSimulation();
+        else if (cmd.equals("Cancel")) {
+            this.simController.terminateSimulation();
+            this.setBtnEnabled(this.btnStart, true);
+            this.setBtnEnabled(this.btnPause, false);
+            this.setBtnEnabled(this.btnCancel, false);
+            this.btnPause.setText("Pause");
+            this.simPaused = false;
+        }
         else if (cmd.equals("Pause")) {
             if (this.simPaused) {
                 this.simController.resumeSimulation();
-                ((JButton) e.getSource()).setText("Pause");
+                this.btnPause.setText("Pause");
             } else {
                 this.simController.pauseSimulation();
-                ((JButton) e.getSource()).setText("Resume");
+                this.btnPause.setText("Resume");
             }
             this.simPaused = !this.simPaused;
         }
@@ -74,19 +88,19 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     private void createComponents() {
         JLabel lblTitle = this.createLabel("Value: ");
-        this.add(lblTitle);
-
         this.lblVal = this.createLabel("0");
+        this.btnStart = this.createBtn("Start");
+        this.btnPause = this.createBtn("Pause");
+        this.btnCancel = this.createBtn("Cancel");
+
+        this.setBtnEnabled(btnPause, false);
+        this.setBtnEnabled(btnCancel, false);
+
+        this.add(lblTitle);
         this.add(lblVal);
-
-        JButton btnStart = this.createBtn("Start");
-        this.add(btnStart);
-
-        JButton btnPause = this.createBtn("Pause");
-        this.add(btnPause);
-
-        JButton btnCancel = this.createBtn("Cancel");
-        this.add(btnCancel);
+        this.add(this.btnStart);
+        this.add(this.btnPause);
+        this.add(this.btnCancel);
     }
 
     private JButton createBtn(String caption) {
