@@ -6,11 +6,13 @@ import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
 import mpoljak.dsim.assignment_01.logic.simulations.CarComponentsStorage;
 import mpoljak.dsim.common.ICloneable;
 import mpoljak.dsim.common.SimCommand;
+import mpoljak.dsim.common.SimCore;
 
 import javax.swing.*;
 
 public class SimulationTask extends SwingWorker<Void, SimulationTask.ReplicationResults> implements ICloneable<SimulationTask> {
     private SupplyStrategy strategy;
+    private SimCore sim;
     private final SimController controller;
     private int replications;
     private int nthVal;
@@ -24,6 +26,7 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         this.replications = 100_000;        // default
         this.nthVal = this.replications / 1000; // default
         this.omittedReps = (int) (this.replications * 0.1);
+        this.sim = null;
     }
 
     public void setStrategy(SupplyStrategy strategy) {
@@ -44,6 +47,17 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         this.omittedReps = omittedReps;
     }
 
+    public void endSimulation() {
+        Runnable r = () -> {
+            if (sim == null)
+                return;
+            sim.endSimulation();
+        };
+        Thread t = new Thread(r, "Thread end");
+        t.setDaemon(true);
+        t.start();
+    }
+
     @Override
     public SimulationTask cloneInstance() {
         return new SimulationTask(this.strategy, this.controller);
@@ -51,8 +65,8 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
     @Override
     protected Void doInBackground() throws Exception {
         // simulation Monte Carlo for John trading car components
-        CarComponentsStorage ccsSim = createSimulationTask();
-        ccsSim.simulate();
+        this.sim = createSimulationTask();
+        this.sim.simulate();
         return null;
             /* + concurrency in java:
                     https://docs.oracle.com/javase/tutorial/uiswing/concurrency/cancel.html
@@ -65,7 +79,7 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
     }
 
     private CarComponentsStorage createSimulationTask() {
-        CarComponentsStorage ccsSim = new CarComponentsStorage(this.replications, this.strategy, this);
+        CarComponentsStorage ccsSim = new CarComponentsStorage(this.replications, this.strategy);
 
         SimCommand chartUpdating = new SimCommand(SimCommand.SimCommandType.AFTER_EXP) {
             @Override
@@ -92,12 +106,9 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         };
         ccsSim.storeCommand(endingNotification);
 
-        IMcExpMetaResultsCollector dailyCostsCollector = new IMcExpMetaResultsCollector() {
-            @Override
-            public void collectResult(double x, double y) {
-                if (ccsSim.getCurrentReplication() == 1)
-                    controller.addValueTo1RepDataset(x, y);
-            }
+        IMcExpMetaResultsCollector dailyCostsCollector = (x, y) -> {
+            if (ccsSim.getCurrentReplication() == 1)
+                controller.addValueTo1RepDataset(x, y);
         };
         ccsSim.addExperimentDataCollecting(dailyCostsCollector);
 

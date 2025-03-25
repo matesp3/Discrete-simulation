@@ -3,8 +3,6 @@ package mpoljak.dsim.assignment_01.logic.simulations;
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
 import mpoljak.dsim.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.generators.DiscreteUniformRnd;
-import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
-import mpoljak.dsim.common.MCSimCore;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
@@ -25,8 +23,8 @@ public class CarComponentsStorage extends MCSimCore {
     private final List<IMcExpMetaResultsCollector> expDataCollectors;
     private boolean consoleLogs = true;
 
-    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy, SimulationTask simTask) {
-        super(repCount, simTask);
+    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy) {
+        super(repCount);
 
         if (supplyStrategy == null)
             throw new IllegalArgumentException("Supply strategy not provided");
@@ -68,7 +66,6 @@ public class CarComponentsStorage extends MCSimCore {
     protected void experiment() {
         if (this.consoleLogs) System.out.println(" E X P E R I M E N T ["+this.getCurrentReplication()+"]");
         int orderAbsorbers, orderBrakePads, orderHeadlights;
-        double confidentiality, deliveryDecision;
         // costs can only increase, not decrease
         double costs = 0; // costs for storing (after morning) of products & for not providing desired amount of products on friday
         // todo mozem v semestralke spomenut, ze najlepsie by bolo nevyrabat nic, ale potrebujeme uspokojit zakaznika
@@ -119,7 +116,7 @@ public class CarComponentsStorage extends MCSimCore {
 //                at the end of every day, we have to pay storing costs
                 costs += storedAbsorbers * STORAGE_COST_ABSORBERS + storedBrakePads * STORAGE_COST_BRAKE_PADS +
                             storedHeadlights * STORAGE_COST_HEADLIGHTS;
-                if (this.consoleLogs) { System.out.printf("\n         ^-- ");
+                if (this.consoleLogs) { System.out.print("\n         ^-- ");
                             this.printEndOfDayState(storedAbsorbers, storedBrakePads, storedHeadlights, costs);
                 }
                 if (!this.expDataCollectors.isEmpty()) {

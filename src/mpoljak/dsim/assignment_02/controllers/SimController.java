@@ -1,15 +1,15 @@
 package mpoljak.dsim.assignment_02.controllers;
 
-import mpoljak.dsim.assignment_02.logic.Sim;
+import mpoljak.dsim.common.SimCore;
 
 /**
  * Controller is used for communication with business logic (some type of Simulation).
  */
 public class SimController {
-    private Sim sim;
+    private final SimCore sim;
     private boolean simRunning; // true if it's stopped, also
 
-    public SimController(Sim simulation) {
+    public SimController(SimCore simulation) {
         this.sim = simulation;
         this.simRunning = false;
     }
@@ -19,45 +19,23 @@ public class SimController {
     }
 
     public void launchSimulation() {
-//        SwingWorker<Void, Void> task = new SwingWorker<Void, Void>() {
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                sim.costlyOperation();
-//                return null;
-//            }
-//        };
-//        task.execute();
-
-        Runnable r = new Runnable() {
-            public void run() {
-                try {
-                    sim.costlyOperation();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        Runnable r = () -> {
+            try {
+                sim.simulate();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
         };
-        Thread t = new Thread(r, "Main Sim thread");
+        Thread t = new Thread(r, "Thread-Main");
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = true;
     }
 
     public void terminateSimulation() {
-//        SwingWorker<Void, Void> task = new SwingWorker<Void, Void>() {
-//            @Override
-//            protected Void doInBackground() throws Exception {
-//                sim.setEnded(true);
-//                return null;
-//            }
-//        };
-//        task.execute();
-
-        Runnable r = new Runnable() {
-            public void run() {
-                sim.setEnded(true);
-            }
-        };
-        Thread t = new Thread(r, "Terminate Sim thread");
+        Runnable r = () -> sim.endSimulation();
+        Thread t = new Thread(r, "Thread-Cancel");
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
         this.simRunning = false;
     }
@@ -71,12 +49,9 @@ public class SimController {
     }
 
     private void setSimPaused(boolean paused) {
-        Runnable r = new Runnable() {
-            public void run() {
-                sim.setPaused(paused);
-            }
-        };
-        Thread t = new Thread(r, (paused ? "Pause" : "Resume")+" Sim Thread]");
+        Runnable r = () -> sim.setPaused(paused);
+        Thread t = new Thread(r, "Thread-"+(paused ? "Pause" : "Resume"));
+        t.setDaemon(true); // if GUI ends, simulation also
         t.start();
     }
 }

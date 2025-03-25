@@ -1,7 +1,6 @@
-package mpoljak.dsim.common;
+package mpoljak.dsim.assignment_01.logic.simulations;
 
-import mpoljak.dsim.assignment_01.Main;
-import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
+import mpoljak.dsim.common.SimCore;
 import mpoljak.dsim.utils.DoubleComp;
 
 /**
@@ -10,8 +9,8 @@ import mpoljak.dsim.utils.DoubleComp;
 public abstract class MCSimCore extends SimCore {
     private double accumulatedVal;
 
-    public MCSimCore(long repCount, SimulationTask simTask) {
-        super(repCount, simTask);
+    public MCSimCore(long repCount) {
+        super(repCount);
         this.resetAccumulation();
     }
 
