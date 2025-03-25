@@ -25,7 +25,7 @@ public class ExponentialRnd extends Generator {
     }
 
     private static void printForTest() {
-        int n = 5000;
+        int n = 10000;
         // generate n values
         ExponentialRnd rnd = new ExponentialRnd(2);
         for (int i = 0; i < n; i++)

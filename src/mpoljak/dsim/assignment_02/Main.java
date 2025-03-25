@@ -1,17 +1,19 @@
 package mpoljak.dsim.assignment_02;
 
 import mpoljak.dsim.assignment_02.gui.GeneralWindow;
-import mpoljak.dsim.common.SimCore;
+import mpoljak.dsim.assignment_02.logic.sim.EventSim;
 import mpoljak.dsim.common.SimResults;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        SimCore simulation = new TestSim(10);
+        EventSim simulation = new TestSim(10);
         SwingUtilities.invokeLater(() -> new GeneralWindow(simulation));
     }
-    public static class TestSim extends SimCore {
+
+
+    public static class TestSim extends EventSim {
         int val;
         public TestSim(long replicationsCount) {
             super(replicationsCount);
