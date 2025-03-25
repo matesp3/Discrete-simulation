@@ -3,6 +3,7 @@ package mpoljak.dsim.assignment_02.gui;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.common.SimCore;
+import mpoljak.dsim.common.SimResults;
 
 import javax.swing.*;
 import java.awt.*;
@@ -46,11 +47,11 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     }
 
     @Override
-    public void refresh(int val) {
+    public void update(SimResults res) {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                lblVal.setText(String.valueOf(val));
+                lblVal.setText(String.valueOf(res.getReplication()));
             }
         });
     }

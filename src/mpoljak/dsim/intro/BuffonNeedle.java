@@ -1,5 +1,6 @@
 package mpoljak.dsim.intro;
 
+import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.assignment_01.logic.simulations.MCSimCore;
 
@@ -36,6 +37,11 @@ public class BuffonNeedle extends MCSimCore {
             This is paradox, which only occurs in programming. Buffon didn't need to generate angle. */
         double experimentResult = (y + this.l * Math.sin(alfaRad)) >= this.d ? 1.0 : 0.0; // Math.sin works with radians, not degrees
         this.cumulate(experimentResult);
+    }
+
+    @Override
+    protected SimResults getLastResults() {
+        return null;
     }
 
     @Override
