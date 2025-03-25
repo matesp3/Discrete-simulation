@@ -15,8 +15,8 @@ public class BuffonNeedle extends MCSimCore {
     double d;
     double l;
 
-    public BuffonNeedle(long replications, double needleLength, double linesDist, SimulationTask simTask) {
-        super(replications, simTask);
+    public BuffonNeedle(long replications, double needleLength, double linesDist) {
+        super(replications);
         this.d = linesDist;
         this.l = needleLength;
 //        this.genNeedle = new Random(seedGenerator.nextLong());

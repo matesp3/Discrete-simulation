@@ -11,7 +11,7 @@ public class StrategiesTester {
     private static final int DEFAULT_ORDER_B = 200; // break pads
     private static final int DEFAULT_ORDER_H = 150; // headlights
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         SeedGen seedGen = SeedGen.getInstance();
         // supplier 1
         ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
@@ -71,9 +71,9 @@ public class StrategiesTester {
 
     }
 
-    private static void testSimulation(String strategyName, SupplyStrategy strategy, int replications) {
+    private static void testSimulation(String strategyName, SupplyStrategy strategy, int replications) throws InterruptedException {
         // simulation Monte Carlo for John trading car components
-        CarComponentsStorage ccsSim = new CarComponentsStorage(replications, strategy, null);
+        CarComponentsStorage ccsSim = new CarComponentsStorage(replications, strategy);
         ccsSim.setConsoleLogs(false);
         ccsSim.simulate();
         System.out.println(" * AVG costs ("+strategyName+"): "+Math.ceil(ccsSim.getResult())+" [€]");

@@ -24,8 +24,8 @@ public class CarComponentsStorage extends MCSimCore {
     private final List<IMcExpMetaResultsCollector> expDataCollectors;
     private boolean consoleLogs = true;
 
-    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy, SimulationTask simTask) {
-        super(repCount, simTask);
+    public CarComponentsStorage(long repCount, SupplyStrategy supplyStrategy) {
+        super(repCount);
 
         if (supplyStrategy == null)
             throw new IllegalArgumentException("Supply strategy not provided");

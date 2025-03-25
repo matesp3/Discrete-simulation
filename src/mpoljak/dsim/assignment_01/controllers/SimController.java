@@ -32,31 +32,27 @@ public class SimController {
         return STRATEGIES[DEFAULT_STRATEGY];
     }
 
-    //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
-    private final ContinuosUniformRnd rndConfSupplier1A;
-    private final ContinuosUniformRnd rndConfSupplier1B;
-    private final ContinuosEmpiricalRnd rndConfSupplier2A;
-    private final ContinuosEmpiricalRnd rndConfSupplier2B;
     private final Supplier supplier1;
     private final Supplier supplier2;
 
     private SimulationTask simTask;
-    private SimVisualization gui;
-    private XYSeriesCollection xyDatasetAll;
-    private XYSeriesCollection xyDataset1Rep;
+    private final SimVisualization gui;
+    private final XYSeriesCollection xyDatasetAll;
+    private final XYSeriesCollection xyDataset1Rep;
     private File customStrategyFile;
     private int strategy;
     private boolean running; // created because it didn't work with isDone(), when it didn't even start/
 
     public SimController(SimVisualization gui) {
         //      --- strategies vars
-        this.rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
-        this.rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
+        //  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+        ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
+        ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11
         this.supplier1 = new Supplier(11, rndConfSupplier1A, rndConfSupplier1B);
-        this.rndConfSupplier2A = new ContinuosEmpiricalRnd(
-                new double[] {5, 10, 50, 70, 80}, new double[] {10, 50, 70, 80, 95}, new double[]{0.4, 0.3, 0.2, 0.06, 0.04});
-        this.rndConfSupplier2B = new ContinuosEmpiricalRnd(
-                new double[] {5, 10, 50, 70, 80}, new double[] {10, 50, 70, 80, 95}, new double[] {0.2, 0.4, 0.3, 0.06, 0.04});
+        ContinuosEmpiricalRnd rndConfSupplier2A = new ContinuosEmpiricalRnd(
+                new double[]{5, 10, 50, 70, 80}, new double[]{10, 50, 70, 80, 95}, new double[]{0.4, 0.3, 0.2, 0.06, 0.04});
+        ContinuosEmpiricalRnd rndConfSupplier2B = new ContinuosEmpiricalRnd(
+                new double[]{5, 10, 50, 70, 80}, new double[]{10, 50, 70, 80, 95}, new double[]{0.2, 0.4, 0.3, 0.06, 0.04});
         this.supplier2 = new Supplier(16, rndConfSupplier2A, rndConfSupplier2B);
         //      --- task vars
         this.customStrategyFile = null;
@@ -134,7 +130,7 @@ public class SimController {
 
     public void terminateSimulation() {
         if (!this.simTask.isDone()) {
-            this.simTask.cancel(true);
+            this.simTask.endSimulation();
             this.running = false;
         }
     }

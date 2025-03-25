@@ -2,7 +2,7 @@ package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
-import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.common.SimCore;
 
 import javax.swing.*;
 import java.awt.*;
@@ -28,7 +28,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     private JButton btnPause;
     private JButton btnCancel;
 
-    public GeneralWindow(EventSim simulation) {
+    public GeneralWindow(SimCore simulation) {
 //        ---- initialization of params of business logic
         simulation.registerDelegate(this);
         this.simController = new SimController(simulation);

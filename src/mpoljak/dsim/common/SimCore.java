@@ -1,12 +1,9 @@
-package mpoljak.dsim.assignment_02.logic;
-
-import mpoljak.dsim.common.ISimDelegate;
-import mpoljak.dsim.common.SimCommand;
+package mpoljak.dsim.common;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class EventSim {
+public abstract class SimCore {
     private final List<ISimDelegate> delegates;
     private final List<SimCommand> commands;
     private final long repCount;
@@ -14,7 +11,7 @@ public abstract class EventSim {
     private volatile boolean paused;
     private volatile boolean ended;
 
-    public EventSim(long replicationsCount) {
+    public SimCore(long replicationsCount) {
         this.currentRep = 0;
         this.repCount = replicationsCount;
         this.commands = new ArrayList<>();
@@ -92,26 +89,26 @@ public abstract class EventSim {
         System.out.println(Thread.currentThread().getName() + ": starting simulation...");
 
         this.beforeSimulation();        // hook - before sim
-        for (int i = 0; i < this.repCount; i++) {
+        for (int i = 0; (i < this.repCount && !this.ended); i++) {
             int sample = 0;
-            while (! this.ended) { // todo priority queue.isNotEmpty() & timeNotAtEnd()
+//            while (! this.ended) { // todo priority queue.isNotEmpty() & timeNotAtEnd()
                 synchronized (this) {
                     while (this.paused) { // while because of spurious wakeup
                         System.out.println(Thread.currentThread().getName() + ": going to sleep...");
                         this.wait(); // going to sleep
+
                         // after notification, thread is woken up and when it gets monitor, it continues here
                         System.out.println(Thread.currentThread().getName() + ": resumed!");
                     }
                 }
-                Thread.sleep(250);
-
+//                Thread.sleep(250);
                 this.beforeExperiment();    // hook - before rep
                 this.experiment();          // main stuff
                 // todo priorityQueue.poll().execute(); // event.experiment()
                 this.afterExperiment();     // hook - after rep
 
                 this.notifyDelegates(sample++); // todo this will go to the child's execute method
-            }
+//            }
             this.currentRep++;
         }
         this.afterSimulation();         // hook - after sim
@@ -129,8 +126,6 @@ public abstract class EventSim {
                 this.paused = false;
             }
         }
-        // todo clear priority queue
-        // todo add artificial events to the event calendar
         this.executeCommandsOfType(SimCommand.SimCommandType.BEFORE_SIM);
     }
     protected void afterSimulation() {

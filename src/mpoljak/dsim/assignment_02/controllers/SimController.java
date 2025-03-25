@@ -1,15 +1,15 @@
 package mpoljak.dsim.assignment_02.controllers;
 
-import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.common.SimCore;
 
 /**
  * Controller is used for communication with business logic (some type of Simulation).
  */
 public class SimController {
-    private EventSim sim;
+    private SimCore sim;
     private boolean simRunning; // true if it's stopped, also
 
-    public SimController(EventSim simulation) {
+    public SimController(SimCore simulation) {
         this.sim = simulation;
         this.simRunning = false;
     }
