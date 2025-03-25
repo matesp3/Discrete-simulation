@@ -1,6 +1,7 @@
 package mpoljak.dsim.assignment_01.logic.simulations;
 
 import mpoljak.dsim.assignment_01.logic.experiments.SupplyStrategy;
+import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.generators.DiscreteEmpiricalRnd;
 import mpoljak.dsim.generators.DiscreteUniformRnd;
 
@@ -126,6 +127,11 @@ public class CarComponentsStorage extends MCSimCore {
             }
         }
         this.cumulate(costs);
+    }
+
+    @Override
+    protected SimResults getLastResults() {
+        return null;
     }
 
     private void printEndOfDayState(int amountA, int amountB, int amountH, double costs) {

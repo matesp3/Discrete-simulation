@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SimCore {
+    private final Object pauseLock = new Object();
     private final List<ISimDelegate> delegates;
     private final List<SimCommand> commands;
     private final long repCount;
@@ -20,15 +21,21 @@ public abstract class SimCore {
         this.paused = false;
     }
 
-    public synchronized boolean isPaused() {
-        return this.paused;
+    public boolean isPaused() {
+        final boolean p;
+        synchronized (this.pauseLock) {
+            p = this.paused;
+        }
+        return p;
     }
 
-    public synchronized void setPaused(boolean pause) { // monitor is reference of this class instance
+    public void setPaused(boolean pause) {
         System.out.println(Thread.currentThread().getName() + ": value="+pause);
-        this.paused = pause;
-        if (!this.paused) {
-            this.notify();
+        synchronized (this.pauseLock) {
+            this.paused = pause;
+            if (!this.paused) {
+                this.pauseLock.notify();
+            }
         }
     }
 
@@ -45,9 +52,9 @@ public abstract class SimCore {
     public void endSimulation() {
         System.out.println(Thread.currentThread().getName() + ": cancelling simulation...");
         this.ended = true;
-        synchronized (this) {
+        synchronized (this.pauseLock) {
             this.paused = false;
-            this.notifyAll(); // finish work with all threads that have monitor of this class instance
+            this.pauseLock.notifyAll(); // finish work with all threads that have monitor of this class instance
         }
     }
 
@@ -90,37 +97,35 @@ public abstract class SimCore {
 
         this.beforeSimulation();        // hook - before sim
         for (int i = 0; (i < this.repCount && !this.ended); i++) {
-            int sample = 0;
-//            while (! this.ended) { // todo priority queue.isNotEmpty() & timeNotAtEnd()
-                synchronized (this) {
-                    while (this.paused) { // while because of spurious wakeup
-                        System.out.println(Thread.currentThread().getName() + ": going to sleep...");
-                        this.wait(); // going to sleep
-
-                        // after notification, thread is woken up and when it gets monitor, it continues here
-                        System.out.println(Thread.currentThread().getName() + ": resumed!");
-                    }
-                }
-//                Thread.sleep(250);
-                this.beforeExperiment();    // hook - before rep
-                this.experiment();          // main stuff
-                // todo priorityQueue.poll().execute(); // event.experiment()
-                this.afterExperiment();     // hook - after rep
-
-                this.notifyDelegates(sample++); // todo this will go to the child's execute method
-//            }
+            this.checkPauseCondition();
+            this.beforeExperiment();    // hook - before rep
+            this.experiment();          // main stuff
+            this.afterExperiment();     // hook - after rep
             this.currentRep++;
+//            this.notifyDelegates();
         }
         this.afterSimulation();         // hook - after sim
 
         System.out.println(Thread.currentThread().getName() + ": simulation ended successfully.");
     }
 
-    protected abstract void experiment();
+    protected final void checkPauseCondition() throws InterruptedException {
+        synchronized (this.pauseLock) {
+            while (this.paused) { // while because of spurious wakeup
+                System.out.println(Thread.currentThread().getName() + ": going to sleep...");
+                this.pauseLock.wait(); // going to sleep
+                // after notification, thread is woken up and when it gets monitor, it continues here
+                System.out.println(Thread.currentThread().getName() + ": resumed!");
+            }
+        }
+    }
+
+    protected abstract void experiment() throws InterruptedException;
+    protected abstract SimResults getLastResults();
 
     protected void beforeSimulation() {
         this.currentRep = 0;            // reset
-        synchronized (this) {
+        synchronized (this.pauseLock) {
             if (this.ended) {
                 this.ended = false;
                 this.paused = false;
@@ -134,20 +139,22 @@ public abstract class SimCore {
     protected void beforeExperiment() {
         this.executeCommandsOfType(SimCommand.SimCommandType.BEFORE_EXP);
     }
+
     protected void afterExperiment() {
         this.executeCommandsOfType(SimCommand.SimCommandType.AFTER_EXP);
+    }
+
+    protected final void notifyDelegates() {
+        SimResults r = this.getLastResults();
+        for (ISimDelegate d : this.delegates) {
+            d.update(r);
+        }
     }
 
     private void executeCommandsOfType(SimCommand.SimCommandType type) {
         for (SimCommand command : this.commands) {
             if (command.getCommandType().compareTo(type) == 0)
                 command.invoke();
-        }
-    }
-
-    private void notifyDelegates(int val) {
-        for (ISimDelegate d : this.delegates) {
-            d.refresh(val);
         }
     }
 
