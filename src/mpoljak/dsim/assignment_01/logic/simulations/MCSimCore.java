@@ -1,6 +1,5 @@
 package mpoljak.dsim.assignment_01.logic.simulations;
 
-import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.common.SimCore;
 import mpoljak.dsim.utils.DoubleComp;
 

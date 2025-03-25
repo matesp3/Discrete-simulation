@@ -12,7 +12,6 @@ public class StrategiesTester {
     private static final int DEFAULT_ORDER_H = 150; // headlights
 
     public static void main(String[] args) throws InterruptedException {
-        SeedGen seedGen = SeedGen.getInstance();
         // supplier 1
         ContinuosUniformRnd rndConfSupplier1A = new ContinuosUniformRnd(10, 70); // first 10 weeks only
         ContinuosUniformRnd rndConfSupplier1B = new ContinuosUniformRnd(30, 95); // from week 11

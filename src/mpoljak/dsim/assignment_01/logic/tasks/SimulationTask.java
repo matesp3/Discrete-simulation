@@ -106,12 +106,9 @@ public class SimulationTask extends SwingWorker<Void, SimulationTask.Replication
         };
         ccsSim.storeCommand(endingNotification);
 
-        IMcExpMetaResultsCollector dailyCostsCollector = new IMcExpMetaResultsCollector() {
-            @Override
-            public void collectResult(double x, double y) {
-                if (ccsSim.getCurrentReplication() == 1)
-                    controller.addValueTo1RepDataset(x, y);
-            }
+        IMcExpMetaResultsCollector dailyCostsCollector = (x, y) -> {
+            if (ccsSim.getCurrentReplication() == 1)
+                controller.addValueTo1RepDataset(x, y);
         };
         ccsSim.addExperimentDataCollecting(dailyCostsCollector);
 

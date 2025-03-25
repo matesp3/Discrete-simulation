@@ -1,7 +1,6 @@
 package mpoljak.dsim.intro;
 
 import mpoljak.dsim.generators.ContinuosUniformRnd;
-import mpoljak.dsim.assignment_01.logic.tasks.SimulationTask;
 import mpoljak.dsim.assignment_01.logic.simulations.MCSimCore;
 
 /**

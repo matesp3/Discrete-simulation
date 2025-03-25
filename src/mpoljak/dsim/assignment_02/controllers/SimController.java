@@ -6,7 +6,7 @@ import mpoljak.dsim.common.SimCore;
  * Controller is used for communication with business logic (some type of Simulation).
  */
 public class SimController {
-    private SimCore sim;
+    private final SimCore sim;
     private boolean simRunning; // true if it's stopped, also
 
     public SimController(SimCore simulation) {
@@ -49,11 +49,7 @@ public class SimController {
     }
 
     private void setSimPaused(boolean paused) {
-        Runnable r = new Runnable() {
-            public void run() {
-                sim.setPaused(paused);
-            }
-        };
+        Runnable r = () -> sim.setPaused(paused);
         Thread t = new Thread(r, "Thread-"+(paused ? "Pause" : "Resume"));
         t.setDaemon(true); // if GUI ends, simulation also
         t.start();
