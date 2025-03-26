@@ -38,7 +38,7 @@ public class TriangularRnd extends Generator {
     }
 
     private static void printForTest() {
-        int n = 5000;
+        int n = 10_000;
         // generate n values
         TriangularRnd rnd = new TriangularRnd(15, 50, 45);
         for (int i = 0; i < n; i++)

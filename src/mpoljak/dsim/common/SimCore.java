@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class SimCore {
-    private final Object pauseLock = new Object();
     private final List<ISimDelegate> delegates;
     private final List<SimCommand> commands;
     private final long repCount;
@@ -23,7 +22,7 @@ public abstract class SimCore {
 
     public boolean isPaused() {
         final boolean p;
-        synchronized (this.pauseLock) {
+        synchronized (this) {
             p = this.paused;
         }
         return p;
@@ -31,10 +30,10 @@ public abstract class SimCore {
 
     public void setPaused(boolean pause) {
         System.out.println(Thread.currentThread().getName() + ": value="+pause);
-        synchronized (this.pauseLock) {
+        synchronized (this) {
             this.paused = pause;
             if (!this.paused) {
-                this.pauseLock.notify();
+                this.notify();
             }
         }
     }
@@ -52,9 +51,9 @@ public abstract class SimCore {
     public void endSimulation() {
         System.out.println(Thread.currentThread().getName() + ": cancelling simulation...");
         this.ended = true;
-        synchronized (this.pauseLock) {
+        synchronized (this) {
             this.paused = false;
-            this.pauseLock.notifyAll(); // finish work with all threads that have monitor of this class instance
+            this.notifyAll(); // finish work with all threads that have monitor of this class instance
         }
     }
 
@@ -98,11 +97,10 @@ public abstract class SimCore {
         this.beforeSimulation();        // hook - before sim
         for (int i = 0; (i < this.repCount && !this.ended); i++) {
             this.checkPauseCondition();
+            this.currentRep++;
             this.beforeExperiment();    // hook - before rep
             this.experiment();          // main stuff
             this.afterExperiment();     // hook - after rep
-            this.currentRep++;
-//            this.notifyDelegates();
         }
         this.afterSimulation();         // hook - after sim
 
@@ -110,10 +108,10 @@ public abstract class SimCore {
     }
 
     protected final void checkPauseCondition() throws InterruptedException {
-        synchronized (this.pauseLock) {
+        synchronized (this) {
             while (this.paused) { // while because of spurious wakeup
                 System.out.println(Thread.currentThread().getName() + ": going to sleep...");
-                this.pauseLock.wait(); // going to sleep
+                this.wait(); // going to sleep
                 // after notification, thread is woken up and when it gets monitor, it continues here
                 System.out.println(Thread.currentThread().getName() + ": resumed!");
             }
@@ -125,7 +123,7 @@ public abstract class SimCore {
 
     protected void beforeSimulation() {
         this.currentRep = 0;            // reset
-        synchronized (this.pauseLock) {
+        synchronized (this) {
             if (this.ended) {
                 this.ended = false;
                 this.paused = false;

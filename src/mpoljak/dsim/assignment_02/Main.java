@@ -1,42 +1,14 @@
 package mpoljak.dsim.assignment_02;
 
 import mpoljak.dsim.assignment_02.gui.GeneralWindow;
-import mpoljak.dsim.common.SimCore;
-import mpoljak.dsim.common.SimResults;
+import mpoljak.dsim.assignment_02.logic.sim.EventSim;
+import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
 
 import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) {
-        SimCore simulation = new TestSim(10);
+        EventSim simulation = new TicketSelling(10,2);
         SwingUtilities.invokeLater(() -> new GeneralWindow(simulation));
-    }
-    public static class TestSim extends SimCore {
-        int val;
-        public TestSim(long replicationsCount) {
-            super(replicationsCount);
-            val = 0;
-        }
-
-        @Override
-        protected void experiment() throws InterruptedException {
-            int cnt = 0;
-            while (!this.isEnded() && cnt < 20) {
-                this.checkPauseCondition();
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                this.val = cnt;
-                cnt++;
-                this.notifyDelegates();
-            }
-        }
-
-        @Override
-        protected SimResults getLastResults() {
-            return new SimResults(val);
-        }
     }
 }
