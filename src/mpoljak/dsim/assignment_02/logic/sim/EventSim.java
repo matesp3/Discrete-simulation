@@ -47,6 +47,14 @@ public abstract class EventSim extends SimCore {
             this.shiftTime = shiftTime;
     }
 
+    public long getSleepTime() {
+        return this.sleepTime;
+    }
+
+    public void setSleepTime(long sleepTime) {
+        this.sleepTime = sleepTime;
+    }
+
     /**
      * @return current time of simulation
      */

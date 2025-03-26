@@ -30,7 +30,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     private JButton btnPause;
     private JButton btnCancel;
     private ResultViewer repInfo;
-    private ResultViewer timeInfo;
+    private ResultViewer dateTimeInfo;
     private ResultViewer busyInfo;
     private ResultViewer queueInfo;
     private ResultViewer eventInfo;
@@ -41,7 +41,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.simController = new SimController(simulation);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
-        this.setSize(new Dimension(600,400));
+        this.setSize(new Dimension(400,300));
         this.setLocationRelativeTo(null);
         this.setLayout(new FlowLayout(FlowLayout.CENTER));
         this.setBackground(this.colBg);
@@ -61,7 +61,13 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
                 repInfo.setValue(r.getReplication());
                 busyInfo.setValue(r.isWorkerBusy());
                 queueInfo.setValue(r.getQueueLength());
-                timeInfo.setValue(r.getTime(), -1);
+                double mins = r.getTime();
+                int day = (int) mins / (60*24) + 1;
+                mins -= (day-1) * 60*24;
+                int hours = (int) Math.floor(mins/60.0);
+                mins -= (hours) * 60;
+                int min = (int)Math.ceil(mins);
+                dateTimeInfo.setValue(String.format("Day-%d %02d:%02d", day, (min == 60 ? hours+1 : hours)%24, min%60));
                 eventInfo.setValue(r.getEventId());
             }
         });
@@ -99,12 +105,6 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     }
 
     private void createComponents() {
-        this.repInfo = new ResultViewer("Replication");
-        this.timeInfo = new ResultViewer("Time");
-        this.busyInfo = new ResultViewer("Worker busy");
-        this.queueInfo = new ResultViewer("Queue length");
-        this.eventInfo = new ResultViewer("Event");
-
         this.btnStart = this.createBtn("Start");
         this.btnPause = this.createBtn("Pause");
         this.btnCancel = this.createBtn("Cancel");
@@ -112,14 +112,29 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.setBtnEnabled(btnPause, false);
         this.setBtnEnabled(btnCancel, false);
 
-        this.add(this.repInfo);
-        this.add(this.timeInfo);
-        this.add(this.busyInfo);
-        this.add(this.queueInfo);
-        this.add(this.eventInfo);
-        this.add(this.btnStart);
-        this.add(this.btnPause);
-        this.add(this.btnCancel);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.add(this.btnStart);
+        buttonPanel.add(this.btnPause);
+        buttonPanel.add(this.btnCancel);
+
+        this.repInfo = new ResultViewer("Replication");
+        this.dateTimeInfo = new ResultViewer("DateTime");
+        this.busyInfo = new ResultViewer("Worker busy");
+        this.queueInfo = new ResultViewer("Queue length");
+        this.eventInfo = new ResultViewer("Event");
+
+        JPanel infoBox = new JPanel();
+        infoBox.setLayout(new BoxLayout(infoBox, BoxLayout.Y_AXIS));
+
+        infoBox.add(buttonPanel);
+        infoBox.add(this.repInfo);
+        infoBox.add(this.dateTimeInfo);
+        infoBox.add(this.busyInfo);
+        infoBox.add(this.queueInfo);
+        infoBox.add(this.eventInfo);
+        this.add(infoBox);
+
     }
 
     private JButton createBtn(String caption) {

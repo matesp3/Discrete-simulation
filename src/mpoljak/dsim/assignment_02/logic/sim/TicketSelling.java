@@ -18,8 +18,9 @@ public class TicketSelling extends EventSim {
         this.rndArrivals = new ExponentialRnd(12); // 12 per 60 min  -> 1 per 5 minutes
         this.rndDurations = new ExponentialRnd(15); // 15 per 60 min -> 1 per 4 minutes
 
-        double minDuration = 60.0 / 15; // minutes
+        double minDuration = 15; // minutes
         this.setShiftTime(minDuration);
+        this.setSleepTime(500);
     }
 
     public void setWorkerFree() {
