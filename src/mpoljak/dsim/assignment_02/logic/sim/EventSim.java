@@ -10,9 +10,10 @@ import java.util.concurrent.PriorityBlockingQueue;
 public abstract class EventSim extends SimCore {
     private final PriorityBlockingQueue<DiscreteEvent> eventCal;
     private final double maxSimTime;
-    private double shiftTime = 500;
-    private long sleepTime = 250; // millis
+    private double shiftTime = 5;
+    private long sleepTime = 500; // millis
     private double simTime;
+    protected String currentEventId = null;
 
     public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
@@ -70,6 +71,7 @@ public abstract class EventSim extends SimCore {
                 throw new RuntimeException("Time causality violation.");
             if (DoubleComp.compare(event.getExecutionTime(), this.maxSimTime) == 1) // event.getExecutionTime() > this.maxSimTime
                 break;
+            this.currentEventId = event.getClass().getSimpleName();
             this.simTime = event.getExecutionTime();
             event.execute();
             this.notifyDelegates();
@@ -78,7 +80,7 @@ public abstract class EventSim extends SimCore {
 
     @Override
     protected SimResults getLastResults() {
-        return new SimResults(((long)this.simTime));
+        return new SimResults((this.eventCal.size()));
     }
 
     private static class SystemEvent extends DiscreteEvent {

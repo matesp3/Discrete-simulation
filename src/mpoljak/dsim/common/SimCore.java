@@ -97,10 +97,10 @@ public abstract class SimCore {
         this.beforeSimulation();        // hook - before sim
         for (int i = 0; (i < this.repCount && !this.ended); i++) {
             this.checkPauseCondition();
+            this.currentRep++;
             this.beforeExperiment();    // hook - before rep
             this.experiment();          // main stuff
             this.afterExperiment();     // hook - after rep
-            this.currentRep++;
         }
         this.afterSimulation();         // hook - after sim
 

@@ -1,5 +1,7 @@
 package mpoljak.dsim.assignment_02.gui;
 
+import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
+import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.common.SimCore;
@@ -13,21 +15,25 @@ import java.awt.event.ActionListener;
 public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, ActionListener {
 
     // colors
-    private final Color colBg = new Color(148, 172, 204);
-    private final Color colBgContent = new Color(193, 193, 193);
-    private final Color colBtn = new Color(81, 128, 197);
-    private final Color colBtnFont = new Color(255, 255, 255);
-    private final Color colBtnDisabled = new Color(204, 226, 253);
-    private final Color colBorder = new Color(152, 215, 232);
-    private final Color colTextFont = new Color(3, 2, 108);
-
-    private JLabel lblVal;
+    public static final Color colBg = new Color(148, 172, 204);
+    public static final Color colBgContent = new Color(193, 193, 193);
+    public static final Color colBtn = new Color(81, 128, 197);
+    public static final Color colBtnFont = new Color(255, 255, 255);
+    public static final Color colBtnDisabled = new Color(204, 226, 253);
+    public static final Color colBorder = new Color(152, 215, 232);
+    public static final Color colTextFont = new Color(3, 2, 108);
+    public static final Color colTextFont2 = new Color(18, 129, 248);
 
     private SimController simController;
     private boolean simPaused;
     private JButton btnStart;
     private JButton btnPause;
     private JButton btnCancel;
+    private ResultViewer repInfo;
+    private ResultViewer timeInfo;
+    private ResultViewer busyInfo;
+    private ResultViewer queueInfo;
+    private ResultViewer eventInfo;
 
     public GeneralWindow(SimCore simulation) {
 //        ---- initialization of params of business logic
@@ -35,7 +41,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.simController = new SimController(simulation);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
-        this.setSize(new Dimension(424,80));
+        this.setSize(new Dimension(600,400));
         this.setLocationRelativeTo(null);
         this.setLayout(new FlowLayout(FlowLayout.CENTER));
         this.setBackground(this.colBg);
@@ -48,10 +54,15 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     @Override
     public void update(SimResults res) {
+        TicketSelling.TicketSellRes r = (TicketSelling.TicketSellRes) res;
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                lblVal.setText(String.valueOf(res.getReplication()));
+                repInfo.setValue(r.getReplication());
+                busyInfo.setValue(r.isWorkerBusy());
+                queueInfo.setValue(r.getQueueLength());
+                timeInfo.setValue(r.getTime(), -1);
+                eventInfo.setValue(r.getEventId());
             }
         });
     }
@@ -88,8 +99,12 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     }
 
     private void createComponents() {
-        JLabel lblTitle = this.createLabel("Value: ");
-        this.lblVal = this.createLabel("0");
+        this.repInfo = new ResultViewer("Replication");
+        this.timeInfo = new ResultViewer("Time");
+        this.busyInfo = new ResultViewer("Worker busy");
+        this.queueInfo = new ResultViewer("Queue length");
+        this.eventInfo = new ResultViewer("Event");
+
         this.btnStart = this.createBtn("Start");
         this.btnPause = this.createBtn("Pause");
         this.btnCancel = this.createBtn("Cancel");
@@ -97,8 +112,11 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.setBtnEnabled(btnPause, false);
         this.setBtnEnabled(btnCancel, false);
 
-        this.add(lblTitle);
-        this.add(lblVal);
+        this.add(this.repInfo);
+        this.add(this.timeInfo);
+        this.add(this.busyInfo);
+        this.add(this.queueInfo);
+        this.add(this.eventInfo);
         this.add(this.btnStart);
         this.add(this.btnPause);
         this.add(this.btnCancel);
