@@ -1,5 +1,6 @@
 package mpoljak.dsim.assignment_02.logic.sim;
 
+import mpoljak.dsim.assignment_02.logic.events.DiscreteEvent;
 import mpoljak.dsim.common.SimCore;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.utils.DoubleComp;
@@ -8,15 +9,16 @@ import java.util.concurrent.PriorityBlockingQueue;
 
 public abstract class EventSim extends SimCore {
     private final PriorityBlockingQueue<DiscreteEvent> eventCal;
-    private double maxSimTime = 1_000_000;
+    private final double maxSimTime;
     private double shiftTime = 500;
     private long sleepTime = 250; // millis
     private double simTime;
 
-    public EventSim(long replicationsCount, int estCalCapacity) {
+    public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
         this.eventCal = new PriorityBlockingQueue<>(estCalCapacity, new DiscreteEvent.EventComparator());
         this.simTime = 0;
+        this.maxSimTime = maxTime;
     }
 
     /**
@@ -44,6 +46,13 @@ public abstract class EventSim extends SimCore {
             this.shiftTime = shiftTime;
     }
 
+    /**
+     * @return current time of simulation
+     */
+    public double getSimTime() {
+        return this.simTime;
+    }
+
     @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
@@ -62,8 +71,8 @@ public abstract class EventSim extends SimCore {
             if (DoubleComp.compare(event.getExecutionTime(), this.maxSimTime) == 1) // event.getExecutionTime() > this.maxSimTime
                 break;
             this.simTime = event.getExecutionTime();
-            event.execute(); // todo: prob. sim updated trough event to sim by getters and setters
-            this.notifyDelegates(); // change of sim time
+            event.execute();
+            this.notifyDelegates();
         }
     }
 
@@ -73,8 +82,11 @@ public abstract class EventSim extends SimCore {
     }
 
     private static class SystemEvent extends DiscreteEvent {
+        private final EventSim simCore;
+
         public SystemEvent(double executionTime, EventSim simCore) {
-            super(executionTime, simCore);
+            super(executionTime);
+            this.simCore = simCore;
         }
 
         public void execute() throws InterruptedException {
