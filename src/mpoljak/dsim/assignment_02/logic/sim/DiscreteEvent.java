@@ -20,18 +20,30 @@ public abstract class DiscreteEvent {
         }
     }
 
-    private final double executionTime;
+    protected EventSim simCore;
     private final int secondaryPriority;
-    private EventSim sim;
-    private Generator gen;
+    private double executionTime;
 
-    public DiscreteEvent(double executionTime, int secondaryPriority) {
+    public DiscreteEvent(double executionTime, int secondaryPriority, EventSim simCore) {
         this.executionTime = executionTime;
         this.secondaryPriority = secondaryPriority;
+        this.simCore = simCore;
+    }
+
+    public DiscreteEvent(double executionTime, EventSim simCore) {
+        this(executionTime, -1, simCore);
     }
 
     public double getExecutionTime() {
         return this.executionTime;
+    }
+
+    /**
+     * Sets new time of event execution.
+     * @param executionTime new time of event execution
+     */
+    public void setExecutionTime(double executionTime) {
+        this.executionTime = executionTime;
     }
 
     /**
@@ -41,12 +53,9 @@ public abstract class DiscreteEvent {
         return this.secondaryPriority;
     }
 
-    public DiscreteEvent(double executionTime) {
-        this(executionTime, -1);
-    }
+    public abstract void execute() throws InterruptedException;
 
-    public abstract void execute();
-
+//  -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     public static void main(String[] args) throws InterruptedException {
         Generator rnd = new DiscreteUniformRnd(1,20);
         PriorityBlockingQueue<DiscreteEvent> queue =
@@ -67,7 +76,7 @@ public abstract class DiscreteEvent {
 
     public static class TestEvent extends DiscreteEvent {
         public TestEvent(double executionTime) {
-            super(executionTime);
+            super(executionTime, null);
         }
         @Override
         public void execute() {}

@@ -16,29 +16,29 @@ public class Main {
     public static class TestSim extends EventSim {
         int val;
         public TestSim(long replicationsCount) {
-            super(replicationsCount);
+            super(replicationsCount,1);
             val = 0;
         }
 
-        @Override
-        protected void experiment() throws InterruptedException {
-            int cnt = 0;
-            while (!this.isEnded() && cnt < 20) {
-                this.checkPauseCondition();
-                try {
-                    Thread.sleep(250);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                this.val = cnt;
-                cnt++;
-                this.notifyDelegates();
-            }
-        }
+//        @Override
+//        protected void experiment() throws InterruptedException {
+//            int cnt = 0;
+//            while (!this.isEnded() && cnt < 20) {
+//                this.checkPauseCondition();
+////                try {
+////                    Thread.sleep(250);
+////                } catch (InterruptedException e) {
+////                    throw new RuntimeException(e);
+////                }
+//                this.val = cnt;
+//                cnt++;
+//                this.notifyDelegates();
+//            }
+//        }
 
         @Override
         protected SimResults getLastResults() {
-            return new SimResults(val);
+            return super.getLastResults();
         }
     }
 }
