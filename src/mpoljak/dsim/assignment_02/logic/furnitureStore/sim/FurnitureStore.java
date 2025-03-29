@@ -8,7 +8,6 @@ import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.generators.ExponentialRnd;
 import mpoljak.dsim.generators.TriangularRnd;
 
-import java.util.Arrays;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 

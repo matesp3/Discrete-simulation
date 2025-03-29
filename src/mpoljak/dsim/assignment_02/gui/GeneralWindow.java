@@ -24,7 +24,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     public static final Color colTextFont = new Color(3, 2, 108);
     public static final Color colTextFont2 = new Color(18, 129, 248);
 
-    private SimController simController;
+    private final SimController simController;
     private boolean simPaused;
     private JButton btnStart;
     private JButton btnPause;
@@ -55,21 +55,18 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     @Override
     public void update(SimResults res) {
         TicketSelling.TicketSellRes r = (TicketSelling.TicketSellRes) res;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                repInfo.setValue(r.getReplication());
-                busyInfo.setValue(r.isWorkerBusy());
-                queueInfo.setValue(r.getQueueLength());
-                double mins = r.getTime();
-                int day = (int) mins / (60*24) + 1;
-                mins -= (day-1) * 60*24;
-                int hours = (int) Math.floor(mins/60.0);
-                mins -= (hours) * 60;
-                int min = (int)Math.ceil(mins);
-                dateTimeInfo.setValue(String.format("Day-%d %02d:%02d", day, (min == 60 ? hours+1 : hours)%24, min%60));
-                eventInfo.setValue(r.getEventId());
-            }
+        SwingUtilities.invokeLater(() -> {
+            repInfo.setValue(r.getReplication());
+            busyInfo.setValue(r.isWorkerBusy());
+            queueInfo.setValue(r.getQueueLength());
+            double mins = r.getTime();
+            int day = (int) mins / (60*24) + 1;
+            mins -= (day-1) * 60*24;
+            int hours = (int) Math.floor(mins/60.0);
+            mins -= (hours) * 60;
+            int min = (int)Math.ceil(mins);
+            dateTimeInfo.setValue(String.format("Day-%d %02d:%02d", day, (min == 60 ? hours+1 : hours)%24, min%60));
+            eventInfo.setValue(r.getEventId());
         });
     }
 
@@ -139,23 +136,23 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     private JButton createBtn(String caption) {
         JButton btn = new JButton(caption);
-        btn.setBackground(this.colBtn);
+        btn.setBackground(colBtn);
         btn.setActionCommand(caption);
         btn.addActionListener(this);
-        btn.setForeground(this.colBtnFont);
+        btn.setForeground(colBtnFont);
 //        btn.setBorder(BorderFactory.createLineBorder(this.colBorder));
 //        btn.setSize(50, 30);
         return btn;
     }
 
     private void setBtnEnabled(JButton btn, boolean enabled) {
-        btn.setBackground(enabled ? this.colBtn : this.colBtnDisabled);
+        btn.setBackground(enabled ? colBtn : colBtnDisabled);
         btn.setEnabled(enabled);
     }
 
     private JLabel createLabel(String caption) {
         JLabel label = new JLabel(caption);
-        label.setForeground(this.colTextFont);
+        label.setForeground(colTextFont);
         return label;
     }
 

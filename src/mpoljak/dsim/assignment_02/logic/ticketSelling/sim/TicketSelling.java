@@ -8,8 +8,8 @@ import mpoljak.dsim.generators.ExponentialRnd;
 public class TicketSelling extends EventSim {
     private int queueLength;
     private boolean workerBusy;
-    private ExponentialRnd rndArrivals;
-    private ExponentialRnd rndDurations;
+    private final ExponentialRnd rndArrivals;
+    private final ExponentialRnd rndDurations;
 
     public TicketSelling(long replicationsCount, int estCalCapacity) {
         super(replicationsCount, estCalCapacity, 100000);
@@ -93,10 +93,6 @@ public class TicketSelling extends EventSim {
 
         public int getQueueLength() {
             return queueLength;
-        }
-
-        public void setQueueLength(int queueLength) {
-            this.queueLength = queueLength;
         }
 
         public boolean isWorkerBusy() {
