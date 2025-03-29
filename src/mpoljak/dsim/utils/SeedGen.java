@@ -9,7 +9,7 @@ public class SeedGen {
     private final Random rand;
 
     protected SeedGen() {
-        this.rand = new Random(); // in case of debugging, just set seed
+        this.rand = new Random(1); // in case of debugging, just set seed
     }
 
     public static SeedGen getInstance() {
