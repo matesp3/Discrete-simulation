@@ -1,7 +1,7 @@
-package mpoljak.dsim.assignment_02.logic.events.furnitureStore;
+package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
-import mpoljak.dsim.assignment_02.logic.events.DiscreteEvent;
-import mpoljak.dsim.assignment_02.logic.sim.FurnitureStore;
+import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStore;
 
 public abstract class FurnitureStoreEvent extends DiscreteEvent {
     protected FurnitureStore simCore;

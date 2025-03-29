@@ -1,8 +1,8 @@
 package mpoljak.dsim.assignment_02;
 
 import mpoljak.dsim.assignment_02.gui.GeneralWindow;
-import mpoljak.dsim.assignment_02.logic.sim.EventSim;
-import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSelling;
 
 import javax.swing.*;
 

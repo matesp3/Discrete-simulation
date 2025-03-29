@@ -1,7 +1,7 @@
 package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
-import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSelling;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.common.SimCore;

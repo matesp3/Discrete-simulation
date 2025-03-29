@@ -1,6 +1,5 @@
-package mpoljak.dsim.assignment_02.logic.sim;
+package mpoljak.dsim.assignment_02.logic;
 
-import mpoljak.dsim.assignment_02.logic.events.DiscreteEvent;
 import mpoljak.dsim.common.SimCore;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.utils.DoubleComp;

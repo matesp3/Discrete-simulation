@@ -1,6 +1,7 @@
-package mpoljak.dsim.assignment_02.logic.sim;
+package mpoljak.dsim.assignment_02.logic.ticketSelling.sim;
 
-import mpoljak.dsim.assignment_02.logic.events.ticketSelling.CustomerArrival;
+import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.events.CustomerArrival;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.generators.ExponentialRnd;
 
