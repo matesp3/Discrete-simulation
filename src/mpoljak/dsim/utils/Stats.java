@@ -37,7 +37,7 @@ public abstract class Stats {
         return String.format("Stats:\n  * sum=%.03f\n  * count=%.03f\n  * mean=%.03f",
                 this.getSum(), this.count, this.getMean());
     }
-//  -   -   -   -   -   -   -   ARI AVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+//  -   -   -   -   -   -   -   ARI WAVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     public static class ArithmeticAvg extends Stats {
         /**
          * Adds new sample to this statistics.
@@ -54,7 +54,7 @@ public abstract class Stats {
             return "ArithmeticAvg "+ super.toString();
         }
     }
-//  -   -   -   -   -   -   -   ARI AVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+//  -   -   -   -   -   -   -   ARI WAVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     public static class WeightedAvg extends Stats {
         /**
          * Adds new sample with its corresponding weight to this statistics.
@@ -129,7 +129,7 @@ public abstract class Stats {
 
         @Override
         public String toString() {
-            return String.format("CI: * sum^2=%.3f\n  * var=%.3f" + "\n  * stdev=%.3f\n  * halfWidth=%.3f",
+            return String.format("CI:\n * sum^2=%.3f\n  * var=%.3f" + "\n  * stdev=%.3f\n  * halfWidth=%.3f",
                     this.sumOfSquares, this.getVariance(), this.getStdDev(), this.getHalfWidthCI());
         }
     }
