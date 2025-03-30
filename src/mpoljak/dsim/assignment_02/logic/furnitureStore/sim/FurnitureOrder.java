@@ -1,6 +1,10 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
+import mpoljak.dsim.utils.DoubleComp;
+
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class FurnitureOrder {
     public enum FurnitureType {
@@ -9,6 +13,40 @@ public class FurnitureOrder {
     public enum TechStep {
         WOOD_PREPARATION, CARVING, STAINING, ASSEMBLING, FIT_INSTALLATION
     }
+
+    public static class OrderWithPriority {
+        private FurnitureOrder order;
+        private int priority;
+
+        public OrderWithPriority(int priority, FurnitureOrder order) {
+            this.order = order;
+            this.priority = priority;
+        }
+
+        @Override
+        public String toString() {
+            return "OrderWPr{" +
+                    " pr=" + priority +
+                    "; created=" + order.timeOfCreation +
+                    '}';
+        }
+    }
+
+    public static class OrderComparator implements Comparator<FurnitureOrder> {
+        @Override
+        public int compare(FurnitureOrder o1, FurnitureOrder o2) {
+            return DoubleComp.compare(o1.timeOfCreation, o2.timeOfCreation);
+        }
+    }
+
+    public static class PrOrderComparator implements Comparator<OrderWithPriority> {
+        @Override
+        public int compare(OrderWithPriority o1, OrderWithPriority o2) {
+            int cmp = Integer.compare(o1.priority, o2.priority);
+            return cmp != 0 ? cmp : DoubleComp.compare(o1.order.timeOfCreation, o2.order.timeOfCreation);
+        }
+    }
+
     private final double[] techStepsStart;
     private final double[] techStepsEnd;
     private final FurnitureType furnitureType;
@@ -98,7 +136,7 @@ public class FurnitureOrder {
                 : TechStep.ASSEMBLING.ordinal();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         FurnitureOrder order = new FurnitureOrder(2.0, FurnitureType.CHAIR);
         order.setTechStepStart(TechStep.WOOD_PREPARATION, 4.5);
         order.setTechStepEnd(TechStep.WOOD_PREPARATION, 5.8);
@@ -117,5 +155,44 @@ public class FurnitureOrder {
         System.out.println("Complete dur:"+order.getOverallProcessingTime());
         System.out.println("Completion time:"+order.getTimeOfOrderCompletion());
         System.out.println(order);
+
+        System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER");
+        PriorityBlockingQueue<FurnitureOrder> orders = new PriorityBlockingQueue<>(10,
+                new FurnitureOrder.OrderComparator());
+        orders.add(new FurnitureOrder(4.0, FurnitureOrder.FurnitureType.CHAIR));
+        orders.add(new FurnitureOrder(1.0, FurnitureOrder.FurnitureType.CHAIR));
+        orders.add(new FurnitureOrder(3.0, FurnitureOrder.FurnitureType.CHAIR));
+        orders.add(new FurnitureOrder(0.0, FurnitureOrder.FurnitureType.CHAIR));
+        orders.add(new FurnitureOrder(2.0, FurnitureOrder.FurnitureType.CHAIR));
+        System.out.println(orders);
+        System.out.println("   * Take:"+orders.take());
+        System.out.println(orders);
+        System.out.println("   * Take:"+orders.take());
+        System.out.println(orders);
+        System.out.println("   * Take:"+orders.take());
+        System.out.println(orders);
+        System.out.println("   * Take:"+orders.take());
+        System.out.println(orders);
+        System.out.println("   * Take:"+orders.take());
+        System.out.println(orders); // ok
+        System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER WITH PRIORITY");
+        PriorityBlockingQueue<FurnitureOrder.OrderWithPriority> prOrders = new PriorityBlockingQueue<>(10,
+                new FurnitureOrder.PrOrderComparator());
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(4.0, FurnitureOrder.FurnitureType.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(1.0, FurnitureOrder.FurnitureType.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(3.0, FurnitureOrder.FurnitureType.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(0.0, FurnitureOrder.FurnitureType.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(2.0, FurnitureOrder.FurnitureType.CHAIR)));
+        System.out.println(prOrders);
+        System.out.println("   * Take:"+prOrders.take());
+        System.out.println(prOrders);
+        System.out.println("   * Take:"+prOrders.take());
+        System.out.println(prOrders);
+        System.out.println("   * Take:"+prOrders.take());
+        System.out.println(prOrders);
+        System.out.println("   * Take:"+prOrders.take());
+        System.out.println(prOrders);
+        System.out.println("   * Take:"+prOrders.take());
+        System.out.println(prOrders); // ok
     }
 }

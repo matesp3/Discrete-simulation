@@ -10,6 +10,7 @@ import mpoljak.dsim.generators.TriangularRnd;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 
 public class FurnitureStore extends EventSim {
     // generators
@@ -91,7 +92,13 @@ public class FurnitureStore extends EventSim {
         return this.deskManager.isAnyDeskAvailable();
     }
 
-    public static void main(String[] args) {
+    public class OrderWithPriority {
+        private FurnitureOrder order;
+        private int priority;
+    }
+
+//    - -   -   -   -   -   -   - testing... ---v
+    public static void main(String[] args) throws InterruptedException {
 
     }
 }
