@@ -1,18 +1,28 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
 import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStore;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
 public abstract class FurnitureStoreEvent extends DiscreteEvent {
-    protected FurnitureStore simCore;
+    protected final FurnitureStoreSim sim;
+    protected final FurnitureOrder order;
+    protected final Carpenter carpenter;
 
-    public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureStore simCore) {
+    public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureStoreSim simCore,
+                               FurnitureOrder order, Carpenter carpenter) {
         super(executionTime, secondaryPriority);
-        this.simCore = simCore;
+        this.sim = simCore;
+        this.order = order;
+        this.carpenter = carpenter;
     }
 
-    public FurnitureStoreEvent(double executionTime, FurnitureStore simCore) {
+    public FurnitureStoreEvent(double executionTime, FurnitureStoreSim simCore,
+                               FurnitureOrder order, Carpenter carpenter) {
         super(executionTime);
-        this.simCore = simCore;
+        this.sim = simCore;
+        this.order = order;
+        this.carpenter = carpenter;
     }
 }

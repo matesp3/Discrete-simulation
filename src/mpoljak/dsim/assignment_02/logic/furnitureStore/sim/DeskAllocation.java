@@ -1,29 +1,27 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DeskAllocation {
-    private final String[] desks;
+    private final ArrayList<Carpenter> desks;
     private int firstFree;
 
     public DeskAllocation(int amountOfDesks) {
-        this.desks = new String[amountOfDesks];
+        this.desks = new ArrayList<>(amountOfDesks*2);
+        for (int i = 0; i < amountOfDesks*2; i++) {
+            this.desks.add(null);
+        }
         this.firstFree = 0;
     }
 
-    public boolean isAnyDeskAvailable() {
-        return this.firstFree > -1;
-    }
-
-    public void setDeskFree(int deskId, String userIdentity) {
-        if (deskId < 0 || deskId >= this.desks.length)
+    public void setDeskFree(int deskId, Carpenter userIdentity) {
+        if (deskId < 0 || deskId >= this.desks.size())
             throw new IllegalArgumentException("Desk ID " + deskId + " does not exist");
-        if (this.desks[deskId] == null)
-            throw new RuntimeException("Desk with ID="+deskId+" is already empty.");
-        if (!this.desks[deskId].equalsIgnoreCase(userIdentity))
-            throw new IllegalArgumentException("Violation of desk freeing. Identity of applicant is different from "
-                    + "desk's current user");
-        this.desks[deskId] = null;
+        if (this.desks.get(deskId) != userIdentity)
+            throw new IllegalArgumentException("Violation of desk freeing. This identity cannot free desk that doesn't"
+                    + " belong to him ");
+        this.desks.set(deskId, null);
         if (this.firstFree == -1 || deskId < this.firstFree)
             this.firstFree = deskId;
     }
@@ -32,15 +30,20 @@ public class DeskAllocation {
      * @return <code>-1</code> if there was no free desk to occupy or <code>applicantIdentity</code> not provided,
      * else <code>ID</code> of assigned desk (strategy of assigning is an internal logic).
      */
-    public int occupyDesk(String applicantIdentity) {
-        if (applicantIdentity == null || applicantIdentity.isBlank() || this.firstFree == -1)
-            return -1;
+    public int occupyDesk(Carpenter applicantIdentity) {
+        if (applicantIdentity == null)
+            throw new NullPointerException("applicantIdentity is null");
+        if (this.firstFree == -1) {
+            this.desks.add(applicantIdentity);
+            return this.desks.size() - 1;
+        }
+
         int assigned = this.firstFree;
-        this.desks[assigned] = applicantIdentity;
+        this.desks.set(assigned, applicantIdentity);
 
         this.firstFree = -1;
-        for (int i = assigned; i < this.desks.length; i++) {
-            if (this.desks[i] == null) {
+        for (int i = assigned+1; i < this.desks.size(); i++) {
+            if (this.desks.get(i) == null) {
                 this.firstFree = i;
                 break;
             }
@@ -49,7 +52,7 @@ public class DeskAllocation {
     }
 
     public void freeAllDesks() {
-        Arrays.fill(this.desks, null);
+        this.desks.replaceAll(ignored -> null);
         this.firstFree = 0;
     }
 
@@ -57,7 +60,23 @@ public class DeskAllocation {
     public String toString() {
         return "DeskAllocation{" +
                 "firstFree=" + firstFree +
-                ", desks=" + Arrays.toString(desks) +
+                ", desks=" + this.desks +
                 '}';
+    }
+
+    public static void main(String[] args) {
+        DeskAllocation manager = new DeskAllocation(5);
+        manager.occupyDesk(new Carpenter(Carpenter.GROUP.A, 15));
+        Carpenter c = new Carpenter(Carpenter.GROUP.A, 9);
+        int deskID = manager.occupyDesk(c);
+        manager.occupyDesk(new Carpenter(Carpenter.GROUP.C, 2));
+        System.out.println(manager);
+        System.out.println("Removing "+c+" from desk["+deskID+"]");
+        manager.setDeskFree(deskID, c);
+        System.out.println(manager);
+        System.out.println("Freeing everything...");
+        manager.freeAllDesks();
+        System.out.println(manager);
+        // ok
     }
 }

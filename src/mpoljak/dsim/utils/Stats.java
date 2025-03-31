@@ -32,6 +32,12 @@ public abstract class Stats {
         return this.samplesCount;
     }
 
+    public void reset() {
+        this.sum = 0;
+        this.count = 0;
+        this.samplesCount = 0;
+    }
+
     @Override
     public String toString() {
         return String.format("Stats:\n  * sum=%.03f\n  * count=%.03f\n  * mean=%.03f",
@@ -120,11 +126,17 @@ public abstract class Stats {
         /**
          * @return half-width of 95% confidence interval.
          */
-        protected double getHalfWidthCI() {
+        public double getHalfWidthCI() {
             if (this.count < 30)
                 throw new RuntimeException("Cannot compute confidence interval for only "+this.count+ " samples." +
                         " There must be at least 30 samples.");
             return (this.getStdDev() * T_ALFA) / Math.sqrt(this.count);
+        }
+
+        @Override
+        public void reset() {
+            super.reset();
+            this.sumOfSquares = 0;
         }
 
         @Override
@@ -155,6 +167,7 @@ public abstract class Stats {
         System.out.println(ci);
         double[] interval = ci.getCI();
         System.out.printf("Confidence interval: <%.03f   |%.03f|   %.03f>", interval[0], ci.getMean(), interval[1]);
+//        ci.reset();
     }
 
 }
