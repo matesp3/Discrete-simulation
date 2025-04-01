@@ -7,22 +7,19 @@ import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
 public abstract class FurnitureStoreEvent extends DiscreteEvent {
     protected final FurnitureStoreSim sim;
-    protected final FurnitureOrder order;
     protected final Carpenter carpenter;
 
     public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureStoreSim simCore,
-                               FurnitureOrder order, Carpenter carpenter) {
+                               Carpenter carpenter) {
         super(executionTime, secondaryPriority);
         this.sim = simCore;
-        this.order = order;
         this.carpenter = carpenter;
     }
 
     public FurnitureStoreEvent(double executionTime, FurnitureStoreSim simCore,
-                               FurnitureOrder order, Carpenter carpenter) {
+                               Carpenter carpenter) {
         super(executionTime);
         this.sim = simCore;
-        this.order = order;
         this.carpenter = carpenter;
     }
 }

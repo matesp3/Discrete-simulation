@@ -80,6 +80,11 @@ public abstract class DiscreteEvent {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("tim=%d sec_pr=%d", (int)this.getExecutionTime(), this.getSecondaryPriority() );
+    }
+
     public static class TestEvent extends DiscreteEvent {
 
         public TestEvent(double executionTime) {

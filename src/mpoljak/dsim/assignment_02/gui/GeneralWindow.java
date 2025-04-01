@@ -1,7 +1,7 @@
 package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
-import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.common.SimCore;
@@ -58,7 +58,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
          todo: 0. implement simCore.receiveUpdates(<? extends SimResults> results)
          todo: 1.typecast:find out class type => 2. call proper method based on component => 3. find proper component from list by ID or name => 4. update component
          */
-        TicketSelling.TicketSellRes r = (TicketSelling.TicketSellRes) res;
+        TicketSellingSim.TicketSellRes r = (TicketSellingSim.TicketSellRes) res;
         SwingUtilities.invokeLater(() -> {
             repInfo.setValue(r.getReplication());
             busyInfo.setValue(r.isWorkerBusy());

@@ -2,34 +2,48 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
 import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
 public class TransferBetweenStorageAndHallBegin extends FurnitureStoreEvent {
-    public TransferBetweenStorageAndHallBegin(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, FurnitureOrder order, Carpenter carpenter) {
-        super(executionTime, secondaryPriority, simCore, order, carpenter);
+    public TransferBetweenStorageAndHallBegin(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
+        super(executionTime, secondaryPriority, simCore, carpenter);
     }
 
-    public TransferBetweenStorageAndHallBegin(double executionTime, FurnitureStoreSim simCore, FurnitureOrder order, Carpenter carpenter) {
-        super(executionTime, simCore, order, carpenter);
+    public TransferBetweenStorageAndHallBegin(double executionTime, FurnitureStoreSim simCore, Carpenter carpenter) {
+        super(executionTime, simCore, carpenter);
     }
 
     @Override
     public void execute() throws InterruptedException {
         /*
-         * 1. set carpenter's work begin time
+         * 1. generate time needed for transferring
+         * 2. determine event to be planned
+         * 3. plan the event
          */
-        DiscreteEvent plannedEvent = null;
-        double execTime = this.getExecutionTime() + this.sim.nextStorageAndHallTransferDuration();
-        switch (this.order.getNextTechStep()) {
+        // * 1. generate time needed for transferring
+        double startExecTime = this.getExecutionTime() + this.sim.nextStorageAndHallTransferDuration();
+        // * 2. determine event to be planned
+        DiscreteEvent plannedEvent;
+        switch (this.carpenter.getCurrentOrder().getNextTechStep()) {
             case WOOD_PREPARATION:
-                plannedEvent = new WoodPrepBegin(execTime, this.sim, this.order, this.carpenter);
-//                this.carpenter.startProcessingNewOrder(this.getExecutionTime());
+                plannedEvent = new WoodPrepBeginning(startExecTime, this.sim, this.carpenter);
                 break;
-                // todo other events planning
+            case CARVING:
+                plannedEvent = new CarvingBeginning(startExecTime, this.sim, this.carpenter);
+                break;
+            case STAINING:
+                plannedEvent = new StainingBeginning(startExecTime, this.sim, this.carpenter);
+                break;
+            case ASSEMBLING:
+                plannedEvent = new AssemblingBeginning(startExecTime, this.sim, this.carpenter);
+                break;
+            case FIT_INSTALLATION: // could be in the beginning, when only one wardrobe is being created and some carpenter is still in the storage
+                plannedEvent = new FitInstallationBeginning(startExecTime, this.sim, this.carpenter);
+                break;
             default:
                 plannedEvent = null;
         }
+        // * 3. plan the event
         this.sim.addToCalendar(plannedEvent);
     }
 }

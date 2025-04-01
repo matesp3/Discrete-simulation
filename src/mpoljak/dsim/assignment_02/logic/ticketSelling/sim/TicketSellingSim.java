@@ -5,13 +5,13 @@ import mpoljak.dsim.assignment_02.logic.ticketSelling.events.CustomerArrival;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.generators.ExponentialRnd;
 
-public class TicketSelling extends EventSim {
+public class TicketSellingSim extends EventSim {
     private int queueLength;
     private boolean workerBusy;
     private final ExponentialRnd rndArrivals;
     private final ExponentialRnd rndDurations;
 
-    public TicketSelling(long replicationsCount, int estCalCapacity) {
+    public TicketSellingSim(long replicationsCount, int estCalCapacity) {
         super(replicationsCount, estCalCapacity, 100000);
         this.workerBusy = false;
         this.queueLength = 0;

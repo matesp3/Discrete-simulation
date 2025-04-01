@@ -109,6 +109,13 @@ public class Carpenter {
     }
 
     /**
+     * @return order that is currently being processed by this carpenter's instance
+     */
+    public FurnitureOrder getCurrentOrder() {
+        return this.currentOrder;
+    }
+
+    /**
      * @return time of beginning of lastly processing order
      */
     public double getOrderProcessingBT() {

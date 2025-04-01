@@ -1,14 +1,14 @@
 package mpoljak.dsim.assignment_02.logic.ticketSelling.events;
 
-import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 
 public class CustomerArrival extends TicketSellingEvent {
 
-    public CustomerArrival(double executionTime, int secondaryPriority, TicketSelling simCore) {
+    public CustomerArrival(double executionTime, int secondaryPriority, TicketSellingSim simCore) {
         super(executionTime, secondaryPriority, simCore);
     }
 
-    public CustomerArrival(double executionTime, TicketSelling simCore) {
+    public CustomerArrival(double executionTime, TicketSellingSim simCore) {
         super(executionTime, simCore);
     }
 

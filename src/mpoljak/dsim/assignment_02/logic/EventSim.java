@@ -27,7 +27,7 @@ public abstract class EventSim extends SimCore {
      */
     public void addToCalendar(DiscreteEvent event) {
         if (event == null)
-            return;
+            throw new NullPointerException("Planned event can't be null");
         this.eventCal.add(event);
     }
 
