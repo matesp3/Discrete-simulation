@@ -26,12 +26,12 @@ public class OrderArrival extends FurnitureStoreEvent {
         // * 2. plan order's processing or enqueuing for waiting
         Carpenter carpenterA = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.A);
         if (carpenterA != null) {
-            if (carpenterA.getDeskID() == Carpenter.IN_STORAGE)
+            carpenterA.receiveOrder(newOrder, this.getExecutionTime());
+
+            if (carpenterA.getCurrentDeskID() == Carpenter.IN_STORAGE)
                 this.sim.addToCalendar(new WoodPrepBeginning(this.getExecutionTime(), this.sim, carpenterA));
             else
-                this.sim.addToCalendar(new TransferBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, carpenterA));
-
-            carpenterA.receiveOrder(newOrder, this.getExecutionTime(), this.sim.assignFreeDesk(carpenterA));
+                this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, carpenterA));
         }
         else {
             this.sim.enqueueForNextProcessing(newOrder);

@@ -56,6 +56,7 @@ public class FurnitureOrder {
     private final Product productType;
     private final double timeOfCreation;
     private final int orderID;
+    private int deskID;
     private TechStep nextTechStep;
 
     /**
@@ -65,6 +66,7 @@ public class FurnitureOrder {
      */
     public FurnitureOrder(int orderID, double timeOfOrderCreation, Product furnitureType) {
         this.orderID = orderID;
+        this.deskID = -1;
         this.timeOfCreation = timeOfOrderCreation;
         this.productType = furnitureType;
         this.techStepsBegin = new double[5];
@@ -74,8 +76,26 @@ public class FurnitureOrder {
         this.nextTechStep = TechStep.WOOD_PREPARATION;
     }
 
+    /**
+     * @return unique identifier of order
+     */
     public int getOrderID() {
         return this.orderID;
+    }
+
+
+    /**
+     * Sets desk ID to this order. On this desk ID will be all technological steps executed
+     */
+    public void setDeskID(int deskID) {
+        this.deskID = deskID;
+    }
+
+    /**
+     * @return desk ID on which are all technological steps of this order instance executed
+     */
+    public int getDeskID() {
+        return this.deskID;
     }
 
     public TechStep getNextTechStep() {
@@ -190,7 +210,7 @@ public class FurnitureOrder {
 
         System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER");
         PriorityBlockingQueue<FurnitureOrder> orders = new PriorityBlockingQueue<>(10,
-                new FurnitureOrder.OrderComparator());
+                new OrderComparator());
         orders.add(new FurnitureOrder(1,4.0, Product.CHAIR));
         orders.add(new FurnitureOrder(2,1.0, Product.CHAIR));
         orders.add(new FurnitureOrder(3,3.0, Product.CHAIR));
@@ -208,13 +228,13 @@ public class FurnitureOrder {
         System.out.println("   * Take:"+orders.take());
         System.out.println(orders); // ok
         System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER WITH PRIORITY");
-        PriorityBlockingQueue<FurnitureOrder.OrderWithPriority> prOrders = new PriorityBlockingQueue<>(10,
-                new FurnitureOrder.PrOrderComparator());
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(6,4.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(7,1.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(8,3.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(9,0.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(10,2.0, Product.CHAIR)));
+        PriorityBlockingQueue<OrderWithPriority> prOrders = new PriorityBlockingQueue<>(10,
+                new PrOrderComparator());
+        prOrders.add(new OrderWithPriority(1, new FurnitureOrder(6,4.0, Product.CHAIR)));
+        prOrders.add(new OrderWithPriority(1, new FurnitureOrder(7,1.0, Product.CHAIR)));
+        prOrders.add(new OrderWithPriority(0, new FurnitureOrder(8,3.0, Product.CHAIR)));
+        prOrders.add(new OrderWithPriority(1, new FurnitureOrder(9,0.0, Product.CHAIR)));
+        prOrders.add(new OrderWithPriority(0, new FurnitureOrder(10,2.0, Product.CHAIR)));
         System.out.println(prOrders);
         System.out.println("   * Take:"+prOrders.take());
         System.out.println(prOrders);

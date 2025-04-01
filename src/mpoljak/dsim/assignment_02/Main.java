@@ -3,7 +3,6 @@ package mpoljak.dsim.assignment_02;
 import mpoljak.dsim.assignment_02.gui.GeneralWindow;
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
-import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 
 import javax.swing.*;
 

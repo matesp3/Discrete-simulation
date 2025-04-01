@@ -24,17 +24,16 @@ public class Carpenter {
     }
 
     /**
-     * Carpenter receives {@code newOrder} on which will be executed specific technological step.
+     * Carpenter receives {@code newOrder} for which will be executed specific technological step.
      * @param timeOfStart simulation time of assigning {@code newOrder} to this carpenter's instance
      * @throws RuntimeException if Carpenter is already working
      * @throws IllegalArgumentException if order is null
      */
-    public void receiveOrder(FurnitureOrder newOrder, double timeOfStart, int deskID) {
+    public void receiveOrder(FurnitureOrder newOrder, double timeOfStart) {
         if (this.isWorking())
             throw new RuntimeException("Carpenter is still working.. Cannot start processing of new order");
         if (newOrder == null)
             throw new IllegalArgumentException("New order for processing not provided (newOrder=null)");
-        this.deskID = deskID;
         this.orderProcessingET = -1;
         this.orderProcessingBT = timeOfStart;
         this.currentOrder = newOrder;
@@ -87,6 +86,14 @@ public class Carpenter {
     }
 
     /**
+     * Sets new position of this carpenter.
+     * @param deskID deskID of assigned order or {@code Carpenter.IN_STORAGE} constant if he is located in storage
+     */
+    public void setCurrentDeskID(int deskID) {
+        this.deskID = deskID;
+    }
+
+    /**
      * @return group ID, in which is carpenter working.
      */
     public GROUP getGroup() {
@@ -101,10 +108,10 @@ public class Carpenter {
     }
 
     /**
-     * @return ID of desk where carpenter is standing right now or <code>IN_STORAGE</code> value if he is in wood
+     * @return ID of desk where carpenter is standing right now or {@code Carpenter.IN_STORAGE} value if he is in wood
      * storage.
      */
-    public int getDeskID() {
+    public int getCurrentDeskID() {
         return this.deskID;
     }
 
@@ -145,22 +152,23 @@ public class Carpenter {
     public static void main(String[] args) {
         Carpenter carpenter = new Carpenter(GROUP.A, 1);
         FurnitureOrder order = new FurnitureOrder(14, 0.25, FurnitureOrder.Product.CHAIR);
+        order.setDeskID(1);
         System.out.println(carpenter.getGroup());
         System.out.println(carpenter.isWorking());
         System.out.println(carpenter.getOrderProcessingBT());
-        carpenter.receiveOrder(order,5.0, 1);
+        carpenter.receiveOrder(order,5.0);
         System.out.println(carpenter.getOrderProcessingBT());
         System.out.println(carpenter.isWorking());
-//        System.out.println(carpenter.getLastOrderProcessingDuration()); // ok
+//        System.out.println(carpenter.getLastlyProcessedOrderDuration()); // ok
         carpenter.returnOrder(56.4);
         System.out.println(carpenter.getOrderProcessingET());
         System.out.println(carpenter.isWorking());
         System.out.println(carpenter.getLastlyProcessedOrderDuration());
-        carpenter.receiveOrder(order,60.0, 1);
+        carpenter.receiveOrder(order,60.0);
         System.out.println(carpenter.getOrderProcessingBT());
         System.out.println(carpenter.isWorking());
-//        System.out.println(carpenter.getLastWorkEnd());
-//        System.out.println(carpenter.getLastWorkDuration());
+//        System.out.println(carpenter.getOrderProcessingET());
+//        System.out.println(carpenter.getLastlyProcessedOrderDuration()); // ok
 
 //        System.out.println("compare(false, true): "+Boolean.compare(false, true));
 //        System.out.println("compare(true, true): "+Boolean.compare(true, true));

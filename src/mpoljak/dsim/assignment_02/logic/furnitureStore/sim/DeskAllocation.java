@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class DeskAllocation {
-    private final ArrayList<Carpenter> desks;
+    private final ArrayList<FurnitureOrder> desks;
     private int firstFree;
 
     public DeskAllocation(int amountOfDesks) {
@@ -15,7 +15,7 @@ public class DeskAllocation {
         this.firstFree = 0;
     }
 
-    public void setDeskFree(int deskId, Carpenter userIdentity) {
+    public void setDeskFree(int deskId, FurnitureOrder userIdentity) {
         if (deskId < 0 || deskId >= this.desks.size())
             throw new IllegalArgumentException("Desk ID " + deskId + " does not exist");
         if (this.desks.get(deskId) != userIdentity)
@@ -30,7 +30,7 @@ public class DeskAllocation {
      * @return <code>-1</code> if there was no free desk to occupy or <code>applicantIdentity</code> not provided,
      * else <code>ID</code> of assigned desk (strategy of assigning is an internal logic).
      */
-    public int occupyDesk(Carpenter applicantIdentity) {
+    public int occupyDesk(FurnitureOrder applicantIdentity) {
         if (applicantIdentity == null)
             throw new NullPointerException("applicantIdentity is null");
         if (this.firstFree == -1) {
@@ -66,13 +66,13 @@ public class DeskAllocation {
 
     public static void main(String[] args) {
         DeskAllocation manager = new DeskAllocation(5);
-        manager.occupyDesk(new Carpenter(Carpenter.GROUP.A, 15));
-        Carpenter c = new Carpenter(Carpenter.GROUP.A, 9);
-        int deskID = manager.occupyDesk(c);
-        manager.occupyDesk(new Carpenter(Carpenter.GROUP.C, 2));
+        manager.occupyDesk(new FurnitureOrder(1, 15, FurnitureOrder.Product.CHAIR));
+        FurnitureOrder o = new FurnitureOrder(2, 9, FurnitureOrder.Product.TABLE);
+        int deskID = manager.occupyDesk(o);
+        manager.occupyDesk(new FurnitureOrder(3, 2, FurnitureOrder.Product.WARDROBE));
         System.out.println(manager);
-        System.out.println("Removing "+c+" from desk["+deskID+"]");
-        manager.setDeskFree(deskID, c);
+        System.out.println("Removing "+o+" from desk["+deskID+"]");
+        manager.setDeskFree(deskID, o);
         System.out.println(manager);
         System.out.println("Freeing everything...");
         manager.freeAllDesks();

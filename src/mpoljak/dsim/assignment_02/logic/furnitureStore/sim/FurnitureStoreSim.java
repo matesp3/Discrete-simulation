@@ -25,7 +25,7 @@ public class FurnitureStoreSim extends EventSim {
     private final Generator rndOrderType;
     private final Generator rndFromStorageTransfer;
     private final Generator rndWoodPreparation;
-    private final Generator rndDeskTransfer;
+    private final Generator rndDeskMoving;
     // furniture creating - table
     private final Generator rndCarvingTable;
     private final Generator rndStainingTable;
@@ -59,7 +59,7 @@ public class FurnitureStoreSim extends EventSim {
         this.rndOrderType = new ContinuosUniformRnd(0, 100); // generates percentages of probability of order's type
         this.rndFromStorageTransfer = new TriangularRnd(1, 8, 2); // (60s, 480s, 120s)
         this.rndWoodPreparation = new TriangularRnd(5, 15, 500.0/60.0); // (300s, 900s, 500s)
-        this.rndDeskTransfer = new TriangularRnd(2, 500.0/60.0, 2.5); // (120s, 500s, 150s)
+        this.rndDeskMoving = new TriangularRnd(2, 500.0/60.0, 2.5); // (120s, 500s, 150s)
 
         this.rndCarvingTable = new ContinuosEmpiricalRnd(new double[] {10, 25}, new double[] {25, 50}, new double[] {0.6, 0.4});
         this.rndStainingTable = new ContinuosUniformRnd(200, 610);
@@ -119,7 +119,7 @@ public class FurnitureStoreSim extends EventSim {
      * @return <code>ID</code> of assigned desk, or <code>-1</code> if there was no free desk to occupy or
      * <code>requesterId</code> not provided.
      */
-    public int assignFreeDesk(Carpenter requesterId) {
+    public int assignFreeDesk(FurnitureOrder requesterId) {
         return this.deskManager.occupyDesk(requesterId);
     }
 
@@ -127,7 +127,7 @@ public class FurnitureStoreSim extends EventSim {
      * @param deskId desk to be set as free
      * @param requesterId ID to which was desk previously assigned
      */
-    public void releaseDesk(int deskId, Carpenter requesterId) {
+    public void releaseDesk(int deskId, FurnitureOrder requesterId) {
         this.deskManager.setDeskFree(deskId, requesterId);
     }
 
@@ -188,8 +188,8 @@ public class FurnitureStoreSim extends EventSim {
     /**
      * @return generated time needed to move from one desk to another desk
      */
-    public double nextDeskTransferDuration() {
-        return this.rndDeskTransfer.sample();
+    public double nextDeskMovingDuration() {
+        return this.rndDeskMoving.sample();
     }
 
     /**
@@ -248,7 +248,7 @@ public class FurnitureStoreSim extends EventSim {
      * @return carpenter with the highest priority from {@code group} of free carpenters or {@code null} if no available
      */
     public Carpenter getFirstFreeCarpenter(Carpenter.GROUP group) {
-        Queue<Carpenter> freeCarpenters = this.getRelevantQueue(group);
+        Queue<Carpenter> freeCarpenters = this.getRelevantCarpenterQueue(group);
         return freeCarpenters.poll(); // retrieves carpenter with the lowest ID
     }
 
@@ -260,10 +260,10 @@ public class FurnitureStoreSim extends EventSim {
      * @return carpenter's instance of group <code>group</code> or {@code null} if no available
      */
     public Carpenter getFreeCarpenterWithPreference(Carpenter.GROUP group, int deskID) {
-        Queue<Carpenter> freeCarpenters = this.getRelevantQueue(group);
+        Queue<Carpenter> freeCarpenters = this.getRelevantCarpenterQueue(group);
         Carpenter best = null;
         for (Carpenter c : freeCarpenters) {
-            if (c.getDeskID() == deskID && (best == null || c.getCarpenterId() < best.getCarpenterId()))
+            if (c.getCurrentDeskID() == deskID && (best == null || c.getCarpenterId() < best.getCarpenterId()))
                 best = c;
         }
         if (best == null) // unable to find by the preference
@@ -273,16 +273,17 @@ public class FurnitureStoreSim extends EventSim {
     }
 
     /**
-     * Enqueues carpenter who ended his task to its corresponding group.
+     * Enqueues carpenter who ended his task to its corresponding group of free carpenters.
      */
     public void returnCarpenter(Carpenter carpenter) {
         if (carpenter == null)
             return;
-        this.getRelevantQueue(carpenter.getGroup()).add(carpenter);
+        this.getRelevantCarpenterQueue(carpenter.getGroup()).add(carpenter);
     }
 
     /**
-     * @return Order with the highest priority to be processed by group <code>carpenterGroup</code>
+     * @return Order with the highest priority to be processed by group {@code carpenterGroup} or {@code null} if
+     * there's no waiting order for processing by group {@code carpenterGroup}
      */
     public FurnitureOrder getOrderForCarpenter(Carpenter.GROUP carpenterGroup) {
         switch (carpenterGroup) {
@@ -295,13 +296,29 @@ public class FurnitureStoreSim extends EventSim {
                     return null;
                 return this.ordersC.poll().getOrder();
         }
-        return null;
+        throw new IllegalArgumentException("Invalid carpenter group");
+    }
+
+    /**
+     * @return whether exists some order that is waiting for processing by specified {@code group}
+     */
+    public boolean hasWaitingOrder(Carpenter.GROUP group) {
+        if (group == Carpenter.GROUP.C)
+            return !this.ordersC.isEmpty();
+        return !(group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
+    }
+
+    /**
+     * @return whether is some carpenter of {@code group} available for new order processing
+     */
+    public boolean hasAvailableCarpenter(Carpenter.GROUP group) {
+        return !this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
     /**
      * @return queue of carpenters based on param <code>group</code>
      */
-    private Queue<Carpenter> getRelevantQueue(Carpenter.GROUP group) {
+    private Queue<Carpenter> getRelevantCarpenterQueue(Carpenter.GROUP group) {
         return group == Carpenter.GROUP.A ? this.freeA : (group == Carpenter.GROUP.B ? this.freeB : this.freeC);
     }
 
@@ -315,9 +332,10 @@ public class FurnitureStoreSim extends EventSim {
     public static void main(String[] args) throws InterruptedException {
         FurnitureStoreSim sim = new FurnitureStoreSim(1, 1, 2, 3);
         Carpenter carp = sim.getFirstFreeCarpenter(Carpenter.GROUP.C);
-        System.out.println("assigned order ID: "+sim.assignOrderID());
-        int deskID = sim.assignFreeDesk(carp);
-        sim.releaseDesk(deskID, carp);
+        FurnitureOrder order = new FurnitureOrder(sim.assignOrderID(), 5.4, FurnitureOrder.Product.TABLE);
+        int deskID = sim.assignFreeDesk(order);
+        order.setDeskID(deskID);
+        sim.releaseDesk(deskID, order);
         sim.returnCarpenter(carp); // ok
     }
 }

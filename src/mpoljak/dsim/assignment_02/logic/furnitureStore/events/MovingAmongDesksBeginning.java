@@ -4,33 +4,27 @@ import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
-public class TransferBetweenStorageAndHallBegin extends FurnitureStoreEvent {
-    public TransferBetweenStorageAndHallBegin(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
+public class MovingAmongDesksBeginning extends FurnitureStoreEvent {
+    public MovingAmongDesksBeginning(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }
 
-    public TransferBetweenStorageAndHallBegin(double executionTime, FurnitureStoreSim simCore, Carpenter carpenter) {
+    public MovingAmongDesksBeginning(double executionTime, FurnitureStoreSim simCore, Carpenter carpenter) {
         super(executionTime, simCore, carpenter);
     }
 
     @Override
     public void execute() throws InterruptedException {
         /*
-         * 1. generate time needed for transferring
+         * 1. generate time needed for moving among desks
          * 2. determine event to be planned
          * 3. plan the event
          */
         // * 1. generate time needed for transferring
-        double startExecTime = this.getExecutionTime() + this.sim.nextStorageAndHallTransferDuration();
+        double startExecTime = this.getExecutionTime() + this.sim.nextDeskMovingDuration();
         // * 2. determine event to be planned
-        DiscreteEvent plannedEvent;
+        FurnitureStoreEvent plannedEvent;
         switch (this.carpenter.getCurrentOrder().getNextTechStep()) {
-            case WOOD_PREPARATION:
-                plannedEvent = new WoodPrepBeginning(startExecTime, this.sim, this.carpenter);
-                break;
-            case CARVING:
-                plannedEvent = new CarvingBeginning(startExecTime, this.sim, this.carpenter);
-                break;
             case STAINING:
                 plannedEvent = new StainingBeginning(startExecTime, this.sim, this.carpenter);
                 break;
