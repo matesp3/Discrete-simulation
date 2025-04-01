@@ -16,11 +16,15 @@ public class TransferBetweenStorageAndHallBegin extends FurnitureStoreEvent {
 
     @Override
     public void execute() throws InterruptedException {
+        /*
+         * 1. set carpenter's work begin time
+         */
         DiscreteEvent plannedEvent = null;
         double execTime = this.getExecutionTime() + this.sim.nextStorageAndHallTransferDuration();
         switch (this.order.getNextTechStep()) {
             case WOOD_PREPARATION:
                 plannedEvent = new WoodPrepBegin(execTime, this.sim, this.order, this.carpenter);
+//                this.carpenter.startProcessingNewOrder(this.getExecutionTime());
                 break;
                 // todo other events planning
             default:

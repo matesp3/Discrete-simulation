@@ -54,6 +54,10 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     @Override
     public void update(SimResults res) {
+        /*
+         todo: 0. implement simCore.receiveUpdates(<? extends SimResults> results)
+         todo: 1.typecast:find out class type => 2. call proper method based on component => 3. find proper component from list by ID or name => 4. update component
+         */
         TicketSelling.TicketSellRes r = (TicketSelling.TicketSellRes) res;
         SwingUtilities.invokeLater(() -> {
             repInfo.setValue(r.getReplication());

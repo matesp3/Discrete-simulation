@@ -15,8 +15,8 @@ public class FurnitureOrder {
     }
 
     public static class OrderWithPriority {
-        private FurnitureOrder order;
-        private int priority;
+        private final FurnitureOrder order;
+        private final int priority;
 
         public OrderWithPriority(int priority, FurnitureOrder order) {
             this.order = order;
@@ -51,38 +51,52 @@ public class FurnitureOrder {
         }
     }
 
-    private final double[] techStepsStart;
+    private final double[] techStepsBegin;
     private final double[] techStepsEnd;
     private final Product productType;
     private final double timeOfCreation;
+    private final int orderID;
     private TechStep nextTechStep;
 
-    public FurnitureOrder(double timeOfOrderCreation, Product furnitureType) {
+    /**
+     * Technological next step is automatically {@code TechStep.WOOD_PREPARATION}.
+     * @param orderID unique identifier order
+     * @param timeOfOrderCreation time, when this order came to existence in the system
+     */
+    public FurnitureOrder(int orderID, double timeOfOrderCreation, Product furnitureType) {
+        this.orderID = orderID;
         this.timeOfCreation = timeOfOrderCreation;
         this.productType = furnitureType;
-        this.techStepsStart = new double[5];
+        this.techStepsBegin = new double[5];
         this.techStepsEnd = new double[5];
-        Arrays.fill(this.techStepsStart, -1);
+        Arrays.fill(this.techStepsBegin, -1);
         Arrays.fill(this.techStepsEnd, -1);
         this.nextTechStep = TechStep.WOOD_PREPARATION;
+    }
+
+    public int getOrderID() {
+        return this.orderID;
     }
 
     public TechStep getNextTechStep() {
         return this.nextTechStep;
     }
 
+    /**
+     * This new {@code techStep} must be consecutive to the one retrieved by {@code getNextTechStep()}.
+     */
     public void setNextTechStep(TechStep techStep) {
         if (techStep == TechStep.FIT_INSTALLATION && this.productType != Product.WARDROBE)
             throw new IllegalArgumentException("FIT_INSTALLATION is done within WARDROBE process only");
-        if (this.nextTechStep.ordinal() > techStep.ordinal())
-            throw new IllegalArgumentException("Step has been already executed");
+        if (this.nextTechStep.ordinal()+1 != techStep.ordinal())
+            throw new IllegalArgumentException("New techStep is not consecutive with the one that is set right now");
         this.nextTechStep = techStep;
     }
 
-    public void setTechStepStart(TechStep step, double time) {
+    public void setTechStepBegin(TechStep step, double time) {
         if (this.productType != Product.WARDROBE && step == TechStep.FIT_INSTALLATION)
             throw new IllegalArgumentException("FIT_INSTALLATION is used just for WARDROBE process.");
-        this.techStepsStart[step.ordinal()] = time;
+        this.techStepsBegin[step.ordinal()] = time;
     }
 
     public void setTechStepEnd(TechStep step, double time) {
@@ -101,7 +115,7 @@ public class FurnitureOrder {
            throw new IllegalArgumentException("This step number is not part of "+this.productType.name()+" process.");
         if (this.techStepsEnd[step.ordinal()] == -1)
             throw new IllegalArgumentException("Step hasn't been completed yet.");
-        return this.techStepsEnd[step.ordinal()] - this.techStepsStart[step.ordinal()];
+        return this.techStepsEnd[step.ordinal()] - this.techStepsBegin[step.ordinal()];
     }
 
     /**
@@ -113,12 +127,12 @@ public class FurnitureOrder {
      */
     public double getIntraWaitingDuration(TechStep stepBefore) {
         if (stepBefore == null)
-            return this.techStepsStart[TechStep.WOOD_PREPARATION.ordinal()] - this.timeOfCreation;
+            return this.techStepsBegin[TechStep.WOOD_PREPARATION.ordinal()] - this.timeOfCreation;
         if (this.getLastValidIdx() <= stepBefore.ordinal())
             throw new IllegalArgumentException("Process is already finished or this step is not part of the process");
-        if (this.techStepsStart[stepBefore.ordinal()+1] == -1)
+        if (this.techStepsBegin[stepBefore.ordinal()+1] == -1)
             throw new IllegalArgumentException("Next step hasn't been completed yet.");
-        return this.techStepsStart[stepBefore.ordinal()+1] - this.techStepsEnd[stepBefore.ordinal()];
+        return this.techStepsBegin[stepBefore.ordinal()+1] - this.techStepsEnd[stepBefore.ordinal()];
     }
 
     /**
@@ -155,17 +169,17 @@ public class FurnitureOrder {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        FurnitureOrder order = new FurnitureOrder(2.0, Product.CHAIR);
-        order.setTechStepStart(TechStep.WOOD_PREPARATION, 4.5);
+        FurnitureOrder order = new FurnitureOrder(0,2.0, Product.CHAIR);
+        order.setTechStepBegin(TechStep.WOOD_PREPARATION, 4.5);
         order.setTechStepEnd(TechStep.WOOD_PREPARATION, 5.8);
-        order.setTechStepStart(TechStep.CARVING, 17);
+        order.setTechStepBegin(TechStep.CARVING, 17);
         order.setTechStepEnd(TechStep.CARVING, 24);
-        order.setTechStepStart(TechStep.STAINING, 27);
+        order.setTechStepBegin(TechStep.STAINING, 27);
 //        order.getOverallProcessingTime();
         System.out.println("Carving dur:"+order.getTechStepDuration(TechStep.CARVING));
 //        System.out.println("Staining dur:"+order.getTechStepDuration(TechStep.STAINING));
         order.setTechStepEnd(TechStep.STAINING, 30);
-        order.setTechStepStart(TechStep.ASSEMBLING, 32);
+        order.setTechStepBegin(TechStep.ASSEMBLING, 32);
         order.setTechStepEnd(TechStep.ASSEMBLING, 40);
 //        order.setTechStepStart(TechStep.FIT_INSTALLATION, 50);
 //        order.setTechStepEnd(TechStep.FIT_INSTALLATION, 52);
@@ -177,11 +191,11 @@ public class FurnitureOrder {
         System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER");
         PriorityBlockingQueue<FurnitureOrder> orders = new PriorityBlockingQueue<>(10,
                 new FurnitureOrder.OrderComparator());
-        orders.add(new FurnitureOrder(4.0, Product.CHAIR));
-        orders.add(new FurnitureOrder(1.0, Product.CHAIR));
-        orders.add(new FurnitureOrder(3.0, Product.CHAIR));
-        orders.add(new FurnitureOrder(0.0, Product.CHAIR));
-        orders.add(new FurnitureOrder(2.0, Product.CHAIR));
+        orders.add(new FurnitureOrder(1,4.0, Product.CHAIR));
+        orders.add(new FurnitureOrder(2,1.0, Product.CHAIR));
+        orders.add(new FurnitureOrder(3,3.0, Product.CHAIR));
+        orders.add(new FurnitureOrder(4,0.0, Product.CHAIR));
+        orders.add(new FurnitureOrder(5,2.0, Product.CHAIR));
         System.out.println(orders);
         System.out.println("   * Take:"+orders.take());
         System.out.println(orders);
@@ -196,11 +210,11 @@ public class FurnitureOrder {
         System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER WITH PRIORITY");
         PriorityBlockingQueue<FurnitureOrder.OrderWithPriority> prOrders = new PriorityBlockingQueue<>(10,
                 new FurnitureOrder.PrOrderComparator());
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(4.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(1.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(3.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(0.0, Product.CHAIR)));
-        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(2.0, Product.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(6,4.0, Product.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(7,1.0, Product.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(8,3.0, Product.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(1, new FurnitureOrder(9,0.0, Product.CHAIR)));
+        prOrders.add(new FurnitureOrder.OrderWithPriority(0, new FurnitureOrder(10,2.0, Product.CHAIR)));
         System.out.println(prOrders);
         System.out.println("   * Take:"+prOrders.take());
         System.out.println(prOrders);

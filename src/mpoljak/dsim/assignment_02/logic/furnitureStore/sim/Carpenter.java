@@ -1,27 +1,89 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
-import java.util.Comparator;
+import mpoljak.dsim.utils.DoubleComp;
 
 public class Carpenter {
     public enum GROUP {
         A,B,C
     }
-
     public static final int IN_STORAGE = -1;
     private final GROUP group;
     private final int carpenterId;
-    private double lastWorkStart;
-    private double lastWorkEnd;
+    private double orderProcessingBT;
+    private double orderProcessingET;
     private int deskID;
-    private boolean working;
+    private FurnitureOrder currentOrder;
 
     public Carpenter(GROUP group, int carpenterID) {
         this.group = group;
         this.carpenterId = carpenterID;
-        this.working = false;
         this.deskID = IN_STORAGE;
-        this.lastWorkStart = -1;
-        this.lastWorkEnd = -1;
+        this.orderProcessingBT = -1;
+        this.orderProcessingET = -1;
+        this.currentOrder = null;
+    }
+
+    /**
+     * Carpenter receives {@code newOrder} on which will be executed specific technological step.
+     * @param timeOfStart simulation time of assigning {@code newOrder} to this carpenter's instance
+     * @throws RuntimeException if Carpenter is already working
+     * @throws IllegalArgumentException if order is null
+     */
+    public void receiveOrder(FurnitureOrder newOrder, double timeOfStart, int deskID) {
+        if (this.isWorking())
+            throw new RuntimeException("Carpenter is still working.. Cannot start processing of new order");
+        if (newOrder == null)
+            throw new IllegalArgumentException("New order for processing not provided (newOrder=null)");
+        this.deskID = deskID;
+        this.orderProcessingET = -1;
+        this.orderProcessingBT = timeOfStart;
+        this.currentOrder = newOrder;
+    }
+
+    /**
+     * Carpenter returns order after executing specific technological step.
+     * @param timeOfEnd simulation time of completing work on current order by this carpenter's instance
+     */
+    public FurnitureOrder returnOrder(double timeOfEnd) {
+        if (!this.isWorking())
+            throw new RuntimeException("Carpenter is not working, so he cannot end processing of order..");
+        if (DoubleComp.compare(this.orderProcessingBT, timeOfEnd) == 1) {
+            throw new IllegalArgumentException("Order processing beginning > time of end of processing");
+        }
+        this.orderProcessingET = timeOfEnd;
+        FurnitureOrder orderToReturn = this.currentOrder;
+        this.currentOrder = null;
+        return orderToReturn;
+    }
+
+    /**
+     * Starts executing of assigned order's next step (which is assumed to be set!) in time specified by parameter
+     * {@code timeOfStart}.
+     */
+    public void startExecuting(double timeOfStart) {
+        if (!this.isWorking())
+            throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
+        this.currentOrder.setTechStepBegin(currentOrder.getNextTechStep(), timeOfStart);
+    }
+
+    /**
+     * Ends executing of assigned order's next step (which is assumed to be set!) in time specified by parameter
+     * {@code timeOfEnd}.
+     */
+    public void endExecuting(double timeOfEnd) {
+        if (!this.isWorking())
+            throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
+        this.currentOrder.setTechStepEnd(currentOrder.getNextTechStep(), timeOfEnd);
+    }
+
+    /**
+     * @return amount of time of work on lastly processed order
+     * @throws RuntimeException if carpenter is working right now or was not working at all
+     */
+    public double getLastlyProcessedOrderDuration() throws RuntimeException {
+        if (this.isWorking() || this.deskID == IN_STORAGE)
+            throw new RuntimeException("Carpenter is working (hasn't returned order yet) or is located in the storage");
+        return this.orderProcessingET - this.orderProcessingBT;
     }
 
     /**
@@ -31,43 +93,11 @@ public class Carpenter {
         return this.group;
     }
 
+    /**
+     * @return unique identifier of carpenter
+     */
     public int getCarpenterId() {
         return this.carpenterId;
-    }
-
-    /**
-     * @return amount of time of working on lastly processed order
-     * @throws RuntimeException if carpenter is working right now or was not working at all
-     */
-    public double getLastWorkDuration() throws RuntimeException {
-        if (this.working || this.deskID == IN_STORAGE)
-            throw new RuntimeException("Carpenter is working or is still in storage");
-        return this.lastWorkEnd - this.lastWorkStart;
-    }
-
-    public double getLastWorkStart() {
-        return this.lastWorkStart;
-    }
-
-    /**
-     * @param lastWorkStart
-     * @throws RuntimeException if Carpenter is already working
-     */
-    public void setLastWorkStart(double lastWorkStart) {
-        if (this.working)
-            throw new RuntimeException("Carpenter is already working");
-        this.lastWorkEnd = -1;
-        this.lastWorkStart = lastWorkStart;
-        this.working = true;
-    }
-
-    public double getLastWorkEnd() {
-        return this.lastWorkEnd;
-    }
-
-    public void setLastWorkEnd(double lastWorkEnd) {
-        this.lastWorkEnd = lastWorkEnd;
-        this.working = false;
     }
 
     /**
@@ -79,43 +109,48 @@ public class Carpenter {
     }
 
     /**
-     * @param deskID
-     * @throws RuntimeException if Carpenter is already working
+     * @return time of beginning of lastly processing order
      */
-    public void setDeskID(int deskID) {
-        if (this.working)
-            throw new RuntimeException("Carpenter is already working");
-        this.deskID = deskID;
+    public double getOrderProcessingBT() {
+        return this.orderProcessingBT;
     }
 
     /**
-     * @return <code>true</code> if he has started some work
+      * @return time of end of lastly processed order
+     */
+    public double getOrderProcessingET() {
+        return this.orderProcessingET;
+    }
+
+    /**
+     * @return <code>true</code> if he is processing (if he owns) some instance of order
      */
     public boolean isWorking() {
-        return this.working;
+        return this.currentOrder != null;
     }
 
     @Override
     public String toString() {
-        return String.format("Carp{working=%b; ID=%d}", this.working, this.carpenterId);
+        return String.format("Carp{working=%b; ID=%d; currentOrderID=%d}", this.isWorking(), this.carpenterId,
+                this.isWorking() ? this.currentOrder.getOrderID() : null);
     }
 
     public static void main(String[] args) {
         Carpenter carpenter = new Carpenter(GROUP.A, 1);
+        FurnitureOrder order = new FurnitureOrder(14, 0.25, FurnitureOrder.Product.CHAIR);
         System.out.println(carpenter.getGroup());
         System.out.println(carpenter.isWorking());
-//        System.out.println(carpenter.getLastWorkDuration());
-        System.out.println(carpenter.getLastWorkStart());
-        carpenter.setDeskID(1);
-        carpenter.setLastWorkStart(5.0);
-        System.out.println(carpenter.getLastWorkStart());
+        System.out.println(carpenter.getOrderProcessingBT());
+        carpenter.receiveOrder(order,5.0, 1);
+        System.out.println(carpenter.getOrderProcessingBT());
         System.out.println(carpenter.isWorking());
-        carpenter.setLastWorkEnd(56.4);
-        System.out.println(carpenter.getLastWorkEnd());
+//        System.out.println(carpenter.getLastOrderProcessingDuration()); // ok
+        carpenter.returnOrder(56.4);
+        System.out.println(carpenter.getOrderProcessingET());
         System.out.println(carpenter.isWorking());
-        System.out.println(carpenter.getLastWorkDuration());
-        carpenter.setLastWorkStart(60.0);
-        System.out.println(carpenter.getLastWorkStart());
+        System.out.println(carpenter.getLastlyProcessedOrderDuration());
+        carpenter.receiveOrder(order,60.0, 1);
+        System.out.println(carpenter.getOrderProcessingBT());
         System.out.println(carpenter.isWorking());
 //        System.out.println(carpenter.getLastWorkEnd());
 //        System.out.println(carpenter.getLastWorkDuration());

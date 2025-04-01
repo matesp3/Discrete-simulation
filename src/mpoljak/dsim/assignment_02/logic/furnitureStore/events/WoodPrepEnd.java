@@ -16,11 +16,10 @@ public class WoodPrepEnd extends FurnitureStoreEvent {
     @Override
     public void execute() throws InterruptedException {
         /*
-         * 1. set carpenter's work end time
-         * 2. set order's prep end && next tech step
-         * 3. plan transfer from storage to hall
+         * 1. set order's preparation step end
+         * 2. set next tech step
+         * 3. plan begin of transfer from storage to hall
          */
-        this.carpenter.setLastWorkEnd(this.getExecutionTime());
         this.order.setTechStepEnd(FurnitureOrder.TechStep.WOOD_PREPARATION, this.getExecutionTime());
         this.order.setNextTechStep(FurnitureOrder.TechStep.CARVING);
         this.sim.addToCalendar(new TransferBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, this.order,

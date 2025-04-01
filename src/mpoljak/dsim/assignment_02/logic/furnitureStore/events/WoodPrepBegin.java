@@ -17,12 +17,10 @@ public class WoodPrepBegin extends FurnitureStoreEvent {
     @Override
     public void execute() throws InterruptedException {
         /*
-         * 1. set carpenter's work begin time
-         * 2. set order's prep begin
-         * 3. plan end of execution (generate prep duration)
+         * 1. set order's preparation step begin
+         * 2. plan end of prep step execution (generate prep duration)
          */
-        this.carpenter.setLastWorkStart(this.getExecutionTime());
-        this.order.setTechStepStart(FurnitureOrder.TechStep.WOOD_PREPARATION, this.getExecutionTime());
+        this.order.setTechStepBegin(FurnitureOrder.TechStep.WOOD_PREPARATION, this.getExecutionTime());
         this.sim.addToCalendar(new WoodPrepEnd(this.getExecutionTime() + this.sim.nextWoodPreparationDuration(),
                 this.sim, this.order, this.carpenter));
     }
