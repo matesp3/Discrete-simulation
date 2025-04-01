@@ -51,7 +51,7 @@ public class CarvingEnd extends FurnitureStoreEvent {
             this.sim.enqueueForNextProcessing(order);
         }
         // * 6. get new A order from queue A, if exists
-        if (!this.sim.hasWaitingOrder(Carpenter.GROUP.A) || !this.sim.hasAvailableCarpenter(Carpenter.GROUP.A))
+        if (this.sim.hasNotWaitingOrder(Carpenter.GROUP.A) || this.sim.hasNotAvailableCarpenter(Carpenter.GROUP.A))
             return;
         order = this.sim.getOrderForCarpenter(Carpenter.GROUP.A);
         nextCarpenter = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.A);

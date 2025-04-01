@@ -27,8 +27,8 @@ public class DeskAllocation {
     }
 
     /**
-     * @return <code>-1</code> if there was no free desk to occupy or <code>applicantIdentity</code> not provided,
-     * else <code>ID</code> of assigned desk (strategy of assigning is an internal logic).
+     * @return {@code ID} of assigned desk (strategy of assigning is an internal logic) or {@code -1}
+     * if {@code applicantIdentity} not provided
      */
     public int occupyDesk(FurnitureOrder applicantIdentity) {
         if (applicantIdentity == null)

@@ -116,8 +116,7 @@ public class FurnitureStoreSim extends EventSim {
     }
 
     /**
-     * @return <code>ID</code> of assigned desk, or <code>-1</code> if there was no free desk to occupy or
-     * <code>requesterId</code> not provided.
+     * @return {@code ID} of assigned desk, or {@code -1} if {@code requesterId} not provided.
      */
     public int assignFreeDesk(FurnitureOrder requesterId) {
         return this.deskManager.occupyDesk(requesterId);
@@ -174,7 +173,7 @@ public class FurnitureStoreSim extends EventSim {
     /**
      * @return generated time needed to move from (or to) the storage of wood
      */
-    public double nextStorageAndHallTransferDuration() {
+    public double nextStorageAndHallMovingDuration() {
         return this.rndFromStorageTransfer.sample();
     }
 
@@ -300,19 +299,19 @@ public class FurnitureStoreSim extends EventSim {
     }
 
     /**
-     * @return whether exists some order that is waiting for processing by specified {@code group}
+     * @return {@code true} if doesn't exist any order that is waiting for processing by specified {@code group}
      */
-    public boolean hasWaitingOrder(Carpenter.GROUP group) {
+    public boolean hasNotWaitingOrder(Carpenter.GROUP group) {
         if (group == Carpenter.GROUP.C)
-            return !this.ordersC.isEmpty();
-        return !(group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
+            return this.ordersC.isEmpty();
+        return (group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
     }
 
     /**
-     * @return whether is some carpenter of {@code group} available for new order processing
+     * @return whether is not any carpenter of {@code group} available for new order processing
      */
-    public boolean hasAvailableCarpenter(Carpenter.GROUP group) {
-        return !this.getRelevantCarpenterQueue(group).isEmpty();
+    public boolean hasNotAvailableCarpenter(Carpenter.GROUP group) {
+        return this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
     /**

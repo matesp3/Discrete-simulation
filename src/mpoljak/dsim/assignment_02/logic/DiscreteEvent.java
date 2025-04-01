@@ -40,6 +40,9 @@ public abstract class DiscreteEvent {
         this(executionTime, -1);
     }
 
+    /**
+     * @return time of this event's execution
+     */
     public double getExecutionTime() {
         return this.executionTime;
     }

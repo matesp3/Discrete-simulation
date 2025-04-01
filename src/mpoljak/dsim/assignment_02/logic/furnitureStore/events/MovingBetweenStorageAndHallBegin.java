@@ -1,6 +1,5 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
-import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
@@ -21,7 +20,7 @@ public class MovingBetweenStorageAndHallBegin extends FurnitureStoreEvent {
          * 3. plan the event
          */
         // * 1. generate time needed for transferring
-        double startExecTime = this.getExecutionTime() + this.sim.nextStorageAndHallTransferDuration();
+        double startExecTime = this.getExecutionTime() + this.sim.nextStorageAndHallMovingDuration();
         // * 2. determine event to be planned
         FurnitureStoreEvent plannedEvent;
         switch (this.carpenter.getCurrentOrder().getNextTechStep()) {

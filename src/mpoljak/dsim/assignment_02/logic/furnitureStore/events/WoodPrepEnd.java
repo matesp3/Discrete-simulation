@@ -18,13 +18,11 @@ public class WoodPrepEnd extends FurnitureStoreEvent {
         /*
          * 1. end execution
          * 2. set next tech step
-         * 2.5 carpenter remains
+         * 2.1 note: carpenter remains
          * 3. plan begin of transfer from storage to hall
          */
         this.carpenter.endExecuting(this.getExecutionTime());
-        FurnitureOrder order = this.carpenter.getCurrentOrder();
-        order.setDeskID(this.sim.assignFreeDesk(order)); // assign desk for whole process of creating the product from now
-        order.setNextTechStep(FurnitureOrder.TechStep.CARVING);
+        this.carpenter.getCurrentOrder().setNextTechStep(FurnitureOrder.TechStep.CARVING);
         this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, this.carpenter));
     }
 }

@@ -88,6 +88,8 @@ public class FurnitureOrder {
      * Sets desk ID to this order. On this desk ID will be all technological steps executed
      */
     public void setDeskID(int deskID) {
+        if (this.deskID > -1)
+            throw new RuntimeException("DeskID has already been set (it is set only once)");
         this.deskID = deskID;
     }
 
