@@ -4,10 +4,12 @@ import mpoljak.dsim.common.SimCore;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.utils.DoubleComp;
 
+import java.util.PriorityQueue;
+import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public abstract class EventSim extends SimCore {
-    private final PriorityBlockingQueue<DiscreteEvent> eventCal;
+    private final Queue<DiscreteEvent> eventCal;
     private final double maxSimTime;
     private double shiftTime = 5;
     private long sleepTime = 500; // millis
@@ -16,7 +18,8 @@ public abstract class EventSim extends SimCore {
 
     public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
-        this.eventCal = new PriorityBlockingQueue<>(estCalCapacity, new DiscreteEvent.EventComparator());
+//        this.eventCal = new PriorityBlockingQueue<>(estCalCapacity, new DiscreteEvent.EventComparator());
+        this.eventCal = new PriorityQueue<>(estCalCapacity, new DiscreteEvent.EventComparator());
         this.simTime = 0;
         this.maxSimTime = maxTime;
     }
@@ -73,7 +76,8 @@ public abstract class EventSim extends SimCore {
     protected void experiment() throws InterruptedException {
         while (!this.isEnded() && !this.eventCal.isEmpty()) {
             this.checkPauseCondition();
-            DiscreteEvent event = this.eventCal.take();
+//            DiscreteEvent event = this.eventCal.take();
+            DiscreteEvent event = this.eventCal.poll();
             if (DoubleComp.compare(event.getExecutionTime(), this.simTime) == -1) // event.time < this.simTime
                 throw new RuntimeException("Time causality violation.");
             if (DoubleComp.compare(event.getExecutionTime(), this.maxSimTime) == 1) // event.getExecutionTime() > this.maxSimTime

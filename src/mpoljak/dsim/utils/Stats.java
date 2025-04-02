@@ -141,8 +141,10 @@ public abstract class Stats {
 
         @Override
         public String toString() {
-            return String.format("CI:\n * sum^2=%.3f\n  * var=%.3f" + "\n  * stdev=%.3f\n  * halfWidth=%.3f",
-                    this.sumOfSquares, this.getVariance(), this.getStdDev(), this.getHalfWidthCI());
+            double h = this.getHalfWidthCI();
+            double mean = this.getMean();
+            return String.format("CI:\n * CI=<%.3f; %.3f>\n  * halfWidth=%.3f",
+                    mean-h, mean+h, h);
         }
     }
 

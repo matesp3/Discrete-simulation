@@ -8,6 +8,7 @@ import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.generators.ExponentialRnd;
 import mpoljak.dsim.generators.TriangularRnd;
 import mpoljak.dsim.utils.DoubleComp;
+import mpoljak.dsim.utils.Stats;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -51,9 +52,11 @@ public class FurnitureStoreSim extends EventSim {
     private final int carpentersB;
     private final int carpentersC;
     private int newOrderID; // ID of lastly assigned order
+    private final Stats.ArithmeticAvg statOrderInSystemExp;
+    private final Stats.ConfidenceInterval statOrderInSystemSim;
 
     public FurnitureStoreSim(long replicationsCount, int amountA, int amountB, int amountC) {
-        super(replicationsCount, 15, 358_560); // 60*24*249 = 358_560 [min]
+        super(replicationsCount, 15, 119_520); // 60min*8hod*249dni = 358_560 [min]
         // simulation will be regards to minutes
         this.rndOrderArrival = new ExponentialRnd((2.0/60)); // lambda = (2 arrivals per 60 [min])
         this.rndOrderType = new ContinuosUniformRnd(0, 100); // generates percentages of probability of order's type
@@ -74,9 +77,14 @@ public class FurnitureStoreSim extends EventSim {
         this.rndAssemblingWardrobe = new ContinuosUniformRnd(35, 75);
         this.rndFitInstallWardrobe = new ContinuosUniformRnd(15, 25);
 
-        this.ordersA = new ConcurrentLinkedQueue<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
-        this.ordersB = new ConcurrentLinkedQueue<>(); // FIFO ordering based on the docs --^
-        this.ordersC = new PriorityBlockingQueue<>(); // methods of interest: add & poll
+//        this.ordersA = new ConcurrentLinkedQueue<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
+//        this.ordersB = new ConcurrentLinkedQueue<>(); // FIFO ordering based on the docs --^
+//        this.ordersA = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator()); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
+//        this.ordersB = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator()); // FIFO ordering based on the docs --^
+//        this.ordersC = new PriorityBlockingQueue<>(100, new FurnitureOrder.PrOrderComparator()); // methods of interest: add & poll
+        this.ordersA = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator()); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
+        this.ordersB = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator()); // FIFO ordering based on the docs --^
+        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.PrOrderComparator()); // methods of interest: add & poll
         this.deskManager = new DeskAllocation(amountA + amountB + amountC); // sum is enough - maximum occupancy
 
         Comparator<Carpenter> carpenterCmp = (o1, o2) -> Integer.compare(o1.getCarpenterId(), o2.getCarpenterId());
@@ -87,11 +95,15 @@ public class FurnitureStoreSim extends EventSim {
         this.carpentersB = amountB;
         this.carpentersC = amountC;
         this.newOrderID = 1;
+
+        this.statOrderInSystemExp = new Stats.ArithmeticAvg();
+        this.statOrderInSystemSim = new Stats.ConfidenceInterval();
     }
 
     @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
+        this.statOrderInSystemExp.reset();
         this.deskManager.freeAllDesks();
         this.ordersA.clear();
         this.ordersB.clear();
@@ -314,6 +326,25 @@ public class FurnitureStoreSim extends EventSim {
         return this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
+    @Override
+    protected void afterExperiment() {
+        super.afterExperiment();
+        this.statOrderInSystemSim.addSample(this.statOrderInSystemExp.getMean());
+        double count = this.statOrderInSystemSim.getCount();
+        if (count >= 30 && count%500==0)
+            System.out.println("Order duration in system: "+this.statOrderInSystemSim);
+    }
+
+    @Override
+    protected void afterSimulation() {
+        super.afterSimulation();
+    }
+
+    //    - -   -   -   -   -   -   S T A T I S T I C S  -   -   -   -   -   -   -   -   -
+    public void addOrderTimeInSystem(double duration) {
+        this.statOrderInSystemExp.addSample(duration);
+    }
+
     /**
      * @return queue of carpenters based on param <code>group</code>
      */
@@ -329,12 +360,15 @@ public class FurnitureStoreSim extends EventSim {
 //    - -   -   -   -   -   -   - testing... ---v
 
     public static void main(String[] args) throws InterruptedException {
-        FurnitureStoreSim sim = new FurnitureStoreSim(1, 1, 2, 3);
-        Carpenter carp = sim.getFirstFreeCarpenter(Carpenter.GROUP.C);
-        FurnitureOrder order = new FurnitureOrder(sim.assignOrderID(), 5.4, FurnitureOrder.Product.TABLE);
-        int deskID = sim.assignFreeDesk(order);
-        order.setDeskID(deskID);
-        sim.releaseDesk(deskID, order);
-        sim.returnCarpenter(carp); // ok
+//        FurnitureStoreSim sim = new FurnitureStoreSim(1, 1, 2, 3);
+//        Carpenter carp = sim.getFirstFreeCarpenter(Carpenter.GROUP.C);
+//        FurnitureOrder order = new FurnitureOrder(sim.assignOrderID(), 5.4, FurnitureOrder.Product.TABLE);
+//        int deskID = sim.assignFreeDesk(order);
+//        order.setDeskID(deskID);
+//        sim.releaseDesk(deskID, order);
+//        sim.returnCarpenter(carp); // ok
+
+        Queue<FurnitureOrder.OrderWithPriority> ordersC =  new PriorityBlockingQueue<>(5, new FurnitureOrder.PrOrderComparator());
+        ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, new FurnitureOrder(1, 1.0, FurnitureOrder.Product.CHAIR)));
     }
 }

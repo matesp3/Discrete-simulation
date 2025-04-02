@@ -8,10 +8,13 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        EventSim simulation = new FurnitureStoreSim(3, 3,3,3);
+//        EventSim simulation = new FurnitureStoreSim(100, 3,3,20);
+//        FurnitureStoreSim simulation = new FurnitureStoreSim(1000, 3,3,20);
+        FurnitureStoreSim simulation = new FurnitureStoreSim(10_000, 2,2,18);
         simulation.setShiftTime(Double.MAX_VALUE);
         simulation.setSleepTime(0);
         simulation.simulate();
+        System.out.println(simulation.getCurrentReplication());
 //        SwingUtilities.invokeLater(() -> new GeneralWindow(simulation));
     }
 }
