@@ -14,16 +14,7 @@ public class StainingBeginning extends FurnitureStoreEvent {
 
     @Override
     public void execute() throws InterruptedException {
-        /*
-         * 1. update carpenter's desk position regarding order's deskID
-         * 2. start tech step executing
-         * 3. plan end of tech step executing (generate carving duration)
-         */
-        // * 1. update carpenter's desk position regarding order's deskID
-        this.carpenter.setCurrentDeskID(this.carpenter.getCurrentOrder().getDeskID());
-        // * 2. start tech step executing
-        this.carpenter.startExecuting(this.getExecutionTime());
-        // * 3. plan end of tech step executing
+        this.beforePlanOfBeginning();
         this.sim.addToCalendar(
                 new StainingEnd(
                         this.getExecutionTime()+this.sim.nextStainingDuration(

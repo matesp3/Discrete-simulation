@@ -23,7 +23,7 @@ public class FitInstallationEnd extends FurnitureStoreEvent {
          * 4. plan new C order's processing
          */
         // * 1. end order C executing
-        this.carpenter.endExecuting(this.getExecutionTime());
+        this.carpenter.endExecutingStep(this.getExecutionTime());
         // * 2. plan order's C end
         this.sim.addToCalendar(new OrderEnd(this.getExecutionTime(), this.sim, this.carpenter));
         // * 3. get new C order from queue C, if exists && is some carpenter available

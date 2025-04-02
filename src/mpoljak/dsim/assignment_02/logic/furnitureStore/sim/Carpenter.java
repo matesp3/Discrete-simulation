@@ -59,7 +59,7 @@ public class Carpenter {
      * Starts executing of assigned order's next step (which is assumed to be set!) in time specified by parameter
      * {@code timeOfStart}.
      */
-    public void startExecuting(double timeOfStart) {
+    public void startExecutingStep(double timeOfStart) {
         if (!this.isWorking())
             throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
         this.currentOrder.setTechStepBegin(currentOrder.getNextTechStep(), timeOfStart);
@@ -69,7 +69,7 @@ public class Carpenter {
      * Ends executing of assigned order's next step (which is assumed to be set!) in time specified by parameter
      * {@code timeOfEnd}.
      */
-    public void endExecuting(double timeOfEnd) {
+    public void endExecutingStep(double timeOfEnd) {
         if (!this.isWorking())
             throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
         this.currentOrder.setTechStepEnd(currentOrder.getNextTechStep(), timeOfEnd);

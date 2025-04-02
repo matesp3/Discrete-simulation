@@ -19,7 +19,7 @@ public class WoodPrepBeginning extends FurnitureStoreEvent {
          * 1. start of wood preparation execution
          * 2. plan end of the prep step execution (generate prep duration)
          */
-        this.carpenter.startExecuting(this.getExecutionTime());
+        this.carpenter.startExecutingStep(this.getExecutionTime());
         this.sim.addToCalendar(new WoodPrepEnd(this.getExecutionTime() + this.sim.nextWoodPreparationDuration(),
                 this.sim, this.carpenter));
     }

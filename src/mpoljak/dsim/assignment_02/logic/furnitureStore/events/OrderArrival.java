@@ -21,7 +21,7 @@ public class OrderArrival extends FurnitureStoreEvent {
          * 3. plan time of new order arrival
          */
         // * 1. create order
-        FurnitureOrder newOrder = new FurnitureOrder(this.sim.assignOrderID(), this.sim.getSimTime(),
+        FurnitureOrder newOrder = new FurnitureOrder(this.sim.assignOrderID(), this.getExecutionTime(),
                 this.sim.nextProductType());
         newOrder.setDeskID(this.sim.assignFreeDesk(newOrder)); // assign desk for whole process of creating the product from now
         // * 2. plan order's processing or enqueuing for waiting

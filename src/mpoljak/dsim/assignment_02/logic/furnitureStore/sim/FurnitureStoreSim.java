@@ -43,7 +43,9 @@ public class FurnitureStoreSim extends EventSim {
     // other logic
     private final Queue<FurnitureOrder> ordersA;
     private final Queue<FurnitureOrder> ordersB;
-    private final Queue<FurnitureOrder.OrderWithPriority> ordersC;
+    private final Queue<FurnitureOrder> ordersCLowPr;
+    private final Queue<FurnitureOrder> ordersCHighPr;
+//    private final Queue<FurnitureOrder.OrderWithPriority> ordersC;
     private final DeskAllocation deskManager;
     private final Queue<Carpenter> freeA;
     private final Queue<Carpenter> freeB;
@@ -86,7 +88,9 @@ public class FurnitureStoreSim extends EventSim {
 //        this.ordersB = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator());
         this.ordersA = new LinkedList<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
         this.ordersB = new LinkedList<>(); // FIFO ordering based on the docs --^
-        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.WardrobeComparator()); // methods of interest: add & poll
+//        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.WardrobeComparator()); // methods of interest: add & poll
+        this.ordersCLowPr = new LinkedList<>();
+        this.ordersCHighPr = new LinkedList<>();
         this.deskManager = new DeskAllocation(amountA + amountB + amountC); // sum is enough - maximum occupancy
 
         Comparator<Carpenter> carpenterCmp = (o1, o2) -> Integer.compare(o1.getCarpenterId(), o2.getCarpenterId());
@@ -109,7 +113,9 @@ public class FurnitureStoreSim extends EventSim {
         this.deskManager.freeAllDesks();
         this.ordersA.clear();
         this.ordersB.clear();
-        this.ordersC.clear();
+        this.ordersCLowPr.clear();
+        this.ordersCHighPr.clear();
+//        this.ordersC.clear();
         this.freeA.clear();
         this.freeB.clear();
         this.freeC.clear();
@@ -157,13 +163,15 @@ public class FurnitureStoreSim extends EventSim {
                 this.ordersA.add(order);
                 return;
             case STAINING:
-                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, order));
+                this.ordersCLowPr.add(order);
+//                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, order));
                 return;
             case ASSEMBLING:
                 this.ordersB.add(order);
                 return;
             case FIT_INSTALLATION:
-                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_TOP, order));
+                this.ordersCHighPr.add(order);
+//                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_TOP, order));
         }
     }
 
@@ -305,9 +313,12 @@ public class FurnitureStoreSim extends EventSim {
             case B:
                 return this.ordersB.poll();
             case C:
-                if (this.ordersC.peek() == null)
-                    return null;
-                return this.ordersC.poll().getOrder();
+                if (!this.ordersCHighPr.isEmpty())
+                    return this.ordersCHighPr.poll();
+                return this.ordersCLowPr.poll();
+//                if (this.ordersC.peek() == null)
+//                    return null;
+//                return this.ordersC.poll().getOrder();
         }
         throw new IllegalArgumentException("Invalid carpenter group");
     }
@@ -317,7 +328,8 @@ public class FurnitureStoreSim extends EventSim {
      */
     public boolean hasNotWaitingOrder(Carpenter.GROUP group) {
         if (group == Carpenter.GROUP.C)
-            return this.ordersC.isEmpty();
+            return this.ordersCLowPr.isEmpty() && this.ordersCHighPr.isEmpty();
+//            return this.ordersC.isEmpty();
         return (group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
     }
 

@@ -4,6 +4,7 @@ import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
 
 public class CarvingBeginning extends FurnitureStoreEvent {
+
     public CarvingBeginning(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }
@@ -14,16 +15,7 @@ public class CarvingBeginning extends FurnitureStoreEvent {
 
     @Override
     public void execute() throws InterruptedException {
-        /*
-         * 1. update carpenter's desk position regarding order's deskID
-         * 2. start tech step executing
-         * 3. plan end of tech step executing (generate carving duration)
-         */
-        // * 1. update carpenter's desk position regarding order's deskID
-        this.carpenter.setCurrentDeskID(this.carpenter.getCurrentOrder().getDeskID());
-        // * 2. start tech step executing
-        this.carpenter.startExecuting(this.getExecutionTime());
-        // * 3. plan end of tech step executing
+        this.beforePlanOfBeginning();
         this.sim.addToCalendar(
                 new CarvingEnd(
                 this.getExecutionTime()+this.sim.nextCarvingDuration(

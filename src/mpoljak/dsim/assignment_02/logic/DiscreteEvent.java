@@ -13,14 +13,15 @@ public abstract class DiscreteEvent {
         @Override
         public int compare(DiscreteEvent o1, DiscreteEvent o2) {
             int resCmp = DoubleComp.compare(o1.executionTime, o2.executionTime);
-            if (o1.secondaryPriority < 0 && o2.secondaryPriority < 0) {
+            if (resCmp != 0)
                 return resCmp;
+            if (o1.secondaryPriority < 0 && o2.secondaryPriority < 0) {
+                return 0;
             }
             if (o1.secondaryPriority < 0) // o2 has higher priority
                 return 1;
-            if (o2.secondaryPriority < 0) // o1 has higher priority
-                return -1;
-            return resCmp == 0 ? Integer.compare(o1.secondaryPriority, o2.secondaryPriority) : resCmp;
+//            if (o2.secondaryPriority < 0)
+            return -1; // o1 has higher priority
         }
     }
 

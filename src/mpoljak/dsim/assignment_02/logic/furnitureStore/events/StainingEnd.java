@@ -16,28 +16,20 @@ public class StainingEnd extends FurnitureStoreEvent {
     @Override
     public void execute() throws InterruptedException {
         /*
-         * 1. end order C (going to be B) executing
-         * 2. finish carpenterC job with order C(B)
-         * 3. release carpenterC
-         * 4. set next tech step to order C(B)
-         * 5. plan order's C(B) processing or enqueuing for waiting
+         * 1. end order executing by carpenter C
+         * 2. finish carpenterC job with order
+         * 3. start job with carpenterB, if possible
          * --------------------------------------------------------
-         * 6. get new C order from queue C, if exists && is some carpenter available
-         * 7. plan new C order's processing
+         * 4. get new C order from queue C, if exists && is some carpenter available
+         * 5. plan new C order's processing
          */
-        // * 1. end order C (going to be B) executing
-        this.carpenter.endExecuting(this.getExecutionTime());
-        // * 2. finish carpenterC job with order C(B)
-        FurnitureOrder order = this.carpenter.returnOrder(this.getExecutionTime());
-        // * 3. release carpenterC
-        this.sim.returnCarpenter(this.carpenter);
-        // * 4. set next tech step to order C(B)
-        order.setNextTechStep(FurnitureOrder.TechStep.ASSEMBLING);
-        // * 5. plan C(B) order's processing or enqueuing for waiting
-        Carpenter nextCarpenter = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.B);
+        // * 1. end order executing by carpenter C
+        this.carpenter.endExecutingStep(this.getExecutionTime());
+        // * 2. finish carpenterC job with order
+        Carpenter nextCarpenter = this.afterExecutingStep(this.carpenter, FurnitureOrder.TechStep.ASSEMBLING, Carpenter.GROUP.B);
+        // * 3. start job with carpenterB, if possible
         if (nextCarpenter != null) {
-            nextCarpenter.receiveOrder(order, this.getExecutionTime());
-            if (nextCarpenter.getCurrentDeskID() == order.getDeskID()) {
+            if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
                 this.sim.addToCalendar(new AssemblingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             }
             else if (nextCarpenter.getCurrentDeskID() == Carpenter.IN_STORAGE) {
@@ -47,15 +39,12 @@ public class StainingEnd extends FurnitureStoreEvent {
                 this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             }
         }
-        else {
-            this.sim.enqueueForNextProcessing(order);
-        }
-        // * 6. get new C order from queue C, if exists
+        // * 4. get new C order from queue C, if exists
         if (this.sim.hasNotWaitingOrder(Carpenter.GROUP.C) || this.sim.hasNotAvailableCarpenter(Carpenter.GROUP.C))
             return;
-        order = this.sim.getOrderForCarpenter(Carpenter.GROUP.C);
+        FurnitureOrder order = this.sim.getOrderForCarpenter(Carpenter.GROUP.C);
         nextCarpenter = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.C);
-        // * 7. plan new C order's processing
+        // * 5. plan new C order's processing
         nextCarpenter.receiveOrder(order, this.getExecutionTime());
         if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
             if (nextCarpenter.getCurrentDeskID() == order.getDeskID())
