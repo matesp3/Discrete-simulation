@@ -43,11 +43,14 @@ public class FurnitureOrder {
         }
     }
 
-    public static class PrOrderComparator implements Comparator<OrderWithPriority> {
+    public static class WardrobeComparator implements Comparator<OrderWithPriority> {
         @Override
         public int compare(OrderWithPriority o1, OrderWithPriority o2) {
             int cmp = Integer.compare(o1.priority, o2.priority);
-            return cmp != 0 ? cmp : DoubleComp.compare(o1.order.timeOfCreation, o2.order.timeOfCreation);
+            if (cmp != 0)
+                return cmp;
+            int idx = o1.getOrder().getNextTechStep().ordinal();
+            return DoubleComp.compare(o1.getOrder().getLastExecutedTechStepEnd(), o2.getOrder().getLastExecutedTechStepEnd());
         }
     }
 
@@ -138,6 +141,20 @@ public class FurnitureOrder {
         if (this.techStepsEnd[step.ordinal()] == -1)
             throw new IllegalArgumentException("Step hasn't been completed yet.");
         return this.techStepsEnd[step.ordinal()] - this.techStepsBegin[step.ordinal()];
+    }
+
+    public double getLastExecutedTechStepBegin() {
+        if (this.nextTechStep == TechStep.WOOD_PREPARATION)
+            return this.timeOfCreation;
+        return this.techStepsBegin[this.nextTechStep.ordinal()-1];
+    }
+
+    public double getLastExecutedTechStepEnd() {
+        if (this.techStepsEnd[0] == -1) // no step has been executed yet
+            return this.timeOfCreation;
+        if (this.techStepsEnd[this.getLastValidIdx()] > -1) // if order is already completed
+            return this.techStepsEnd[this.getLastValidIdx()];
+        return this.techStepsEnd[this.nextTechStep.ordinal()-1];
     }
 
     /**
@@ -231,7 +248,7 @@ public class FurnitureOrder {
         System.out.println(orders); // ok
         System.out.println("\n        QUEUE TEST FOR FURNITURE ORDER WITH PRIORITY");
         PriorityBlockingQueue<OrderWithPriority> prOrders = new PriorityBlockingQueue<>(10,
-                new PrOrderComparator());
+                new WardrobeComparator());
         prOrders.add(new OrderWithPriority(1, new FurnitureOrder(6,4.0, Product.CHAIR)));
         prOrders.add(new OrderWithPriority(1, new FurnitureOrder(7,1.0, Product.CHAIR)));
         prOrders.add(new OrderWithPriority(0, new FurnitureOrder(8,3.0, Product.CHAIR)));

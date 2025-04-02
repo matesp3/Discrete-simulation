@@ -11,9 +11,9 @@ import mpoljak.dsim.utils.DoubleComp;
 import mpoljak.dsim.utils.Stats;
 
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class FurnitureStoreSim extends EventSim {
@@ -79,12 +79,14 @@ public class FurnitureStoreSim extends EventSim {
 
 //        this.ordersA = new ConcurrentLinkedQueue<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
 //        this.ordersB = new ConcurrentLinkedQueue<>(); // FIFO ordering based on the docs --^
-//        this.ordersA = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator()); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
-//        this.ordersB = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator()); // FIFO ordering based on the docs --^
+//        this.ordersA = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator());
+//        this.ordersB = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator());
 //        this.ordersC = new PriorityBlockingQueue<>(100, new FurnitureOrder.PrOrderComparator()); // methods of interest: add & poll
-        this.ordersA = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator()); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
-        this.ordersB = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator()); // FIFO ordering based on the docs --^
-        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.PrOrderComparator()); // methods of interest: add & poll
+//        this.ordersA = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator());
+//        this.ordersB = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator());
+        this.ordersA = new LinkedList<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
+        this.ordersB = new LinkedList<>(); // FIFO ordering based on the docs --^
+        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.WardrobeComparator()); // methods of interest: add & poll
         this.deskManager = new DeskAllocation(amountA + amountB + amountC); // sum is enough - maximum occupancy
 
         Comparator<Carpenter> carpenterCmp = (o1, o2) -> Integer.compare(o1.getCarpenterId(), o2.getCarpenterId());
@@ -368,7 +370,7 @@ public class FurnitureStoreSim extends EventSim {
 //        sim.releaseDesk(deskID, order);
 //        sim.returnCarpenter(carp); // ok
 
-        Queue<FurnitureOrder.OrderWithPriority> ordersC =  new PriorityBlockingQueue<>(5, new FurnitureOrder.PrOrderComparator());
+        Queue<FurnitureOrder.OrderWithPriority> ordersC =  new PriorityBlockingQueue<>(5, new FurnitureOrder.WardrobeComparator());
         ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, new FurnitureOrder(1, 1.0, FurnitureOrder.Product.CHAIR)));
     }
 }
