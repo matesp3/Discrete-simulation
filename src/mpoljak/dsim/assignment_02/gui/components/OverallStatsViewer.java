@@ -28,7 +28,7 @@ public class OverallStatsViewer extends JPanel {
         this.tableModel.add(statResult);
     }
 
-    public void updateStatsList(List<StatResult> resultList) {
+    public void updateStats(List<StatResult> resultList) {
         this.tableModel.setModels(resultList);
     }
 

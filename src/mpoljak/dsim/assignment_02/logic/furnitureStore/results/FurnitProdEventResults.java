@@ -44,4 +44,20 @@ public class FurnitProdEventResults extends AfterEventResults {
     public FurnitProdEventResults(long experimentNum, double simTime) {
         super(experimentNum, simTime);
     }
+
+    public List<CarpenterResults> getChangedCarpenters() {
+        return changedCarpenters;
+    }
+
+    public void setChangedCarpenters(List<CarpenterResults> changedCarpenters) {
+        this.changedCarpenters = changedCarpenters;
+    }
+
+    public List<OrderResults> getChangedOrders() {
+        return changedOrders;
+    }
+
+    public void setChangedOrders(List<OrderResults> changedOrders) {
+        this.changedOrders = changedOrders;
+    }
 }

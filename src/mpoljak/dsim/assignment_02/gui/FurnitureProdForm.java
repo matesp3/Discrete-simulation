@@ -3,8 +3,8 @@ package mpoljak.dsim.assignment_02.gui;
 import mpoljak.dsim.assignment_02.controllers.SimController;
 import mpoljak.dsim.assignment_02.gui.components.InputWithLabel;
 import mpoljak.dsim.assignment_02.gui.components.OverallStatsViewer;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.common.SimResults;
 
@@ -69,11 +69,18 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
 
     @Override
     public void update(SimResults res) {
-        if (res instanceof FurnitProdExpStats) {
-            SwingUtilities.invokeLater(() -> {
-                this.statsViewer.updateStatsList( ((FurnitProdExpStats)res).getResults() );
-            });
+        if (res instanceof FurnitProdEventResults) {
+            if (true)
+                throw new UnsupportedOperationException("Not supported yet.");
+            FurnitProdEventResults r = (FurnitProdEventResults)res;
+//             todo this.carpentersComponent.updateCarpenters(r.getChangedCarpenters());
+//             todo this.ordersComponent.updateOrders(r.getChangedOrders());
+            return;
         }
+//        else if (res instanceof FurnitProdExpStats)
+        SwingUtilities.invokeLater(() -> {
+            this.statsViewer.updateStats( ((FurnitProdExpStats)res).getResults() );
+        });
     }
 
     @Override
