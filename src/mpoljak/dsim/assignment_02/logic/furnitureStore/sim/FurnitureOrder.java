@@ -198,8 +198,8 @@ public class FurnitureOrder {
 
     @Override
     public String toString() {
-        return String.format("Order{type=%s; arisen->completed=%.02f -> %.2f}",
-        this.productType, this.timeOfCreation, this.getTimeOfOrderCompletion());
+        return String.format("Order{orderID=%d;desk=%d;%s;next=%s[from=%.02f => to=%.02f]}",
+        this.orderID, this.deskID, this.productType, this.nextTechStep, this.timeOfCreation, this.getTimeOfOrderCompletion());
     }
 
     private int getLastValidIdx() {

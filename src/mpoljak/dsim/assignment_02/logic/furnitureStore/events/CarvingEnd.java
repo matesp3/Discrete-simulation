@@ -2,14 +2,14 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
 public class CarvingEnd extends FurnitureStoreEvent {
-    public CarvingEnd(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
+    public CarvingEnd(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }
 
-    public CarvingEnd(double executionTime, FurnitureStoreSim simCore, Carpenter carpenter) {
+    public CarvingEnd(double executionTime, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, simCore, carpenter);
     }
 
@@ -20,7 +20,7 @@ public class CarvingEnd extends FurnitureStoreEvent {
          * 2. finish carpenterA job with order
          * 3. start job with carpenterC, if possible
          * --------------------------------------------------------
-         * 4. get new A order from queue A, if exists && is some carpenter available
+         * 4. try to assign order for carpenterA
          * 5. plan new A order's processing
          */
         // * 1. end order executing by carpenter A
@@ -39,13 +39,11 @@ public class CarvingEnd extends FurnitureStoreEvent {
                 this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             }
         }
-        // * 4. get new A order from queue A, if exists
-        if (this.sim.hasNotWaitingOrder(Carpenter.GROUP.A) || this.sim.hasNotAvailableCarpenter(Carpenter.GROUP.A))
+        // * 4. try to assign order for carpenterA
+        nextCarpenter = this.tryToAssignOrder(Carpenter.GROUP.A);
+        if (nextCarpenter == null)
             return;
-        FurnitureOrder order = this.sim.getOrderForCarpenter(Carpenter.GROUP.A);
-        nextCarpenter = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.A);
         // * 5. plan new A order's processing
-        nextCarpenter.receiveOrder(order, this.getExecutionTime());
         if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
             this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
         else

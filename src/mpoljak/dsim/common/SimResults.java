@@ -1,13 +1,17 @@
 package mpoljak.dsim.common;
 
 public class SimResults {
-    private final long replication;
+    private long experimentNum;
 
-    public SimResults(long replication) {
-        this.replication = replication;
+    public SimResults(long experimentNum) {
+        this.experimentNum = experimentNum;
     }
 
-    public long getReplication() {
-        return replication;
+    public long getExperimentNum() {
+        return this.experimentNum;
+    }
+
+    public void setExperimentNum(long experimentNum) {
+        this.experimentNum = experimentNum;
     }
 }

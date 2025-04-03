@@ -145,7 +145,7 @@ public class Carpenter {
 
     @Override
     public String toString() {
-        return String.format("Carp{working=%b; ID=%d; currentOrderID=%d}", this.isWorking(), this.carpenterId,
+        return String.format("Carp{%s;carpID=%d;desk=%d;orderID=%d}", this.group, this.carpenterId, this.deskID,
                 this.isWorking() ? this.currentOrder.getOrderID() : null);
     }
 

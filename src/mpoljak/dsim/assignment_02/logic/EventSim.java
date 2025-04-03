@@ -6,15 +6,17 @@ import mpoljak.dsim.utils.DoubleComp;
 
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
 
 public abstract class EventSim extends SimCore {
     private final Queue<DiscreteEvent> eventCal;
     private final double maxSimTime;
     private double shiftTime = 5;
-    private long sleepTime = 500; // millis
+    private long sleepTime = 1000; // millis
     private double simTime;
     protected String currentEventId = null;
+    private boolean debugMode = false;
+    private double cachedShiftTime;
+    private long cachedSleepTime;
 
     public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
@@ -22,7 +24,19 @@ public abstract class EventSim extends SimCore {
         this.eventCal = new PriorityQueue<>(estCalCapacity, new DiscreteEvent.EventComparator());
         this.simTime = 0;
         this.maxSimTime = maxTime;
+        this.cachedShiftTime = this.shiftTime;
+        this.cachedSleepTime = this.sleepTime;
     }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+
 
     /**
      * Adds <code>event</code> to calendar, which is maintaining priorities of events by which they will be executed.
@@ -82,16 +96,30 @@ public abstract class EventSim extends SimCore {
                 throw new RuntimeException("Time causality violation.");
             if (DoubleComp.compare(event.getExecutionTime(), this.maxSimTime) == 1) // event.getExecutionTime() > this.maxSimTime
                 break;
-            this.currentEventId = event.getClass().getSimpleName();
             this.simTime = event.getExecutionTime();
+            if (this.debugMode) {
+                this.currentEventId = event.getClass().getSimpleName();
+                System.out.println(String.format("SimTime=%.02f | executing: %s | [rep:%d]", this.simTime, this.currentEventId, this.getCurrentReplication()));
+            }
             event.execute();
-            this.notifyDelegates();
         }
     }
 
     @Override
     protected SimResults getLastResults() {
         return new SimResults((this.eventCal.size()));
+    }
+
+    public void enableMaxSimSpeed(boolean enable) {
+        if (enable) {
+            this.cachedShiftTime = this.shiftTime;
+            this.cachedSleepTime = this.sleepTime;
+            this.shiftTime = Double.MAX_VALUE;
+            this.sleepTime = 0;
+            return;
+        }
+        this.shiftTime = this.cachedShiftTime;
+        this.sleepTime = this.cachedSleepTime;
     }
 
     private static class SystemEvent extends DiscreteEvent {

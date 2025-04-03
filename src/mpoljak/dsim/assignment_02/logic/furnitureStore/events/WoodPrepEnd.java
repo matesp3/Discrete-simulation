@@ -2,14 +2,14 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
 public class WoodPrepEnd extends FurnitureStoreEvent {
-    public WoodPrepEnd(double executionTime, int secondaryPriority, FurnitureStoreSim simCore, Carpenter carpenter) {
+    public WoodPrepEnd(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }
 
-    public WoodPrepEnd(double executionTime, FurnitureStoreSim simCore, Carpenter carpenter) {
+    public WoodPrepEnd(double executionTime, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, simCore, carpenter);
     }
 

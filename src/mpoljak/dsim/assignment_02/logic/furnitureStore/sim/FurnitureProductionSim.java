@@ -2,6 +2,8 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.events.OrderArrival;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.generators.ContinuosUniformRnd;
@@ -16,7 +18,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
-public class FurnitureStoreSim extends EventSim {
+public class FurnitureProductionSim extends EventSim {
     private static final double THRESHOLD_TABLE = 50;
     private static final double THRESHOLD_CHAIR = THRESHOLD_TABLE+15;
     private static final int PR_TOP = 0;
@@ -57,7 +59,7 @@ public class FurnitureStoreSim extends EventSim {
     private final Stats.ArithmeticAvg statOrderInSystemExp;
     private final Stats.ConfidenceInterval statOrderInSystemSim;
 
-    public FurnitureStoreSim(long replicationsCount, int amountA, int amountB, int amountC) {
+    public FurnitureProductionSim(long replicationsCount, int amountA, int amountB, int amountC) {
         super(replicationsCount, 15, 119_520); // 60min*8hod*249dni = 358_560 [min]
         // simulation will be regards to minutes
         this.rndOrderArrival = new ExponentialRnd((2.0/60)); // lambda = (2 arrivals per 60 [min])
@@ -345,8 +347,14 @@ public class FurnitureStoreSim extends EventSim {
         super.afterExperiment();
         this.statOrderInSystemSim.addSample(this.statOrderInSystemExp.getMean());
         double count = this.statOrderInSystemSim.getCount();
-        if (count >= 30 && count%500==0)
+        if (count >= 30 && count%2000==0)
             System.out.println("Order duration in system: "+this.statOrderInSystemSim);
+        if (count > 30) {
+            FurnitProdExpStats res = new FurnitProdExpStats(this.getCurrentReplication());
+            res.addResult(new StatResult("Order time in system", confIntToStr(this.statOrderInSystemSim.getHalfWidthCI() / 60.0
+                    , this.statOrderInSystemSim.getMean() / 60.0), "[h]"));
+            this.notifyDelegates(res);
+        }
     }
 
     @Override
@@ -370,6 +378,10 @@ public class FurnitureStoreSim extends EventSim {
         for (int id = firstID; id <= lastID; id++) {
             freeCarpenters.add(new Carpenter(group, id));
         }
+    }
+
+    private static String confIntToStr(double h, double mean) {
+        return String.format("95%%: <%.2f     | %.02f |   %.02f>", mean-h, mean, mean+h);
     }
 //    - -   -   -   -   -   -   - testing... ---v
 

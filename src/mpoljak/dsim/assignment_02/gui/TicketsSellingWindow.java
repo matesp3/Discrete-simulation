@@ -1,6 +1,7 @@
 package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
+import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.assignment_02.controllers.SimController;
@@ -12,7 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, ActionListener {
+public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDelegate, ActionListener {
 
     // colors
     public static final Color colBg = new Color(148, 172, 204);
@@ -35,10 +36,10 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     private ResultViewer queueInfo;
     private ResultViewer eventInfo;
 
-    public GeneralWindow(SimCore simulation) {
+    public TicketsSellingWindow(EventSim simulation) {
 //        ---- initialization of params of business logic
         simulation.registerDelegate(this);
-        this.simController = new SimController(simulation);
+        this.simController = new SimController(null);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
         this.setSize(new Dimension(400,300));
@@ -60,7 +61,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
          */
         TicketSellingSim.TicketSellRes r = (TicketSellingSim.TicketSellRes) res;
         SwingUtilities.invokeLater(() -> {
-            repInfo.setValue(r.getReplication());
+            repInfo.setValue(r.getExperimentNum());
             busyInfo.setValue(r.isWorkerBusy());
             queueInfo.setValue(r.getQueueLength());
             double mins = r.getTime();
@@ -79,7 +80,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         String cmd = e.getActionCommand();
         if (cmd.equals("Start")) {
             if (! this.simController.isSimRunning()) {
-                this.simController.launchSimulation();
+                this.simController.launchSimulation(1,1,1,1);
                 this.setBtnEnabled(this.btnStart, false);
                 this.setBtnEnabled(this.btnPause, true);
                 this.setBtnEnabled(this.btnCancel, true);

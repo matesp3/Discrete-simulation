@@ -3,20 +3,21 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 import mpoljak.dsim.assignment_02.logic.DiscreteEvent;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureStoreSim;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
 public abstract class FurnitureStoreEvent extends DiscreteEvent {
-    protected final FurnitureStoreSim sim;
+    private static final int OID = 8;
+    protected final FurnitureProductionSim sim;
     protected final Carpenter carpenter;
 
-    public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureStoreSim simCore,
+    public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureProductionSim simCore,
                                Carpenter carpenter) {
         super(executionTime, secondaryPriority);
         this.sim = simCore;
         this.carpenter = carpenter;
     }
 
-    public FurnitureStoreEvent(double executionTime, FurnitureStoreSim simCore,
+    public FurnitureStoreEvent(double executionTime, FurnitureProductionSim simCore,
                                Carpenter carpenter) {
         super(executionTime);
         this.sim = simCore;
@@ -60,5 +61,22 @@ public abstract class FurnitureStoreEvent extends DiscreteEvent {
         else
             currentCarpenter.receiveOrder(order, this.getExecutionTime());
         return currentCarpenter;
+    }
+
+    /**
+     * Tries to assign some order from queue of waiting order of type {@code group}. If it finds some waiting order
+     * it assigns it to carpenter also.
+     * @param group of carpenter that is wanted to get some order from queue
+     * @return carpenter with assigned order or {@code null} if free carpenter or waiting order is missing
+     */
+    protected final Carpenter tryToAssignOrder(Carpenter.GROUP group) {
+        // * 1. get new order from queue, if exists && is some carpenter available
+        if (this.sim.hasNotWaitingOrder(group) || this.sim.hasNotAvailableCarpenter(group))
+            return null;
+        FurnitureOrder order = this.sim.getOrderForCarpenter(group);
+        Carpenter newCarpenter = this.sim.getFirstFreeCarpenter(group);
+        // * 2. plan new order's processing
+        newCarpenter.receiveOrder(order, this.getExecutionTime());
+        return newCarpenter;
     }
 }

@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_02.gui.components;
 
-import mpoljak.dsim.assignment_02.gui.GeneralWindow;
+import mpoljak.dsim.assignment_02.gui.TicketsSellingWindow;
 
 import javax.swing.*;
 
@@ -15,10 +15,10 @@ public class ResultViewer extends JPanel {
     public ResultViewer(String desc, String value) {
         desc = desc == null || desc.isEmpty() ? "Value:" : desc+":";
         this.desc = new JLabel(desc);
-        this.desc.setForeground(GeneralWindow.colTextFont2);
+        this.desc.setForeground(TicketsSellingWindow.colTextFont2);
 
         this.value = new JLabel(value == null ? "" : value);
-        this.value.setForeground(GeneralWindow.colTextFont);
+        this.value.setForeground(TicketsSellingWindow.colTextFont);
 
         this.add(this.desc);
         this.add(this.value);
