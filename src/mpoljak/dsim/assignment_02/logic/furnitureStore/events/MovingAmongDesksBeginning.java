@@ -3,7 +3,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
-public class MovingAmongDesksBeginning extends FurnitureStoreEvent {
+public class MovingAmongDesksBeginning extends FurnitureProdEvent {
     public MovingAmongDesksBeginning(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }
@@ -22,7 +22,7 @@ public class MovingAmongDesksBeginning extends FurnitureStoreEvent {
         // * 1. generate time needed for transferring
         double startExecTime = this.getExecutionTime() + this.sim.nextDeskMovingDuration();
         // * 2. determine event to be planned
-        FurnitureStoreEvent plannedEvent;
+        FurnitureProdEvent plannedEvent;
         switch (this.carpenter.getCurrentOrder().getNextTechStep()) {
             case STAINING:
                 plannedEvent = new StainingBeginning(startExecTime, this.sim, this.carpenter);

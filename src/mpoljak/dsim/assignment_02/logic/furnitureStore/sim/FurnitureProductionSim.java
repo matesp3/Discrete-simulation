@@ -42,6 +42,8 @@ public class FurnitureProductionSim extends EventSim {
     private final Generator rndStainingWardrobe;
     private final Generator rndAssemblingWardrobe;
     private final Generator rndFitInstallWardrobe;
+
+    private final Generator rndDrying;
     // other logic
     private final Queue<FurnitureOrder> ordersA;
     private final Queue<FurnitureOrder> ordersB;
@@ -81,6 +83,7 @@ public class FurnitureProductionSim extends EventSim {
         this.rndAssemblingWardrobe = new ContinuosUniformRnd(35, 75);
         this.rndFitInstallWardrobe = new ContinuosUniformRnd(15, 25);
 
+        this.rndDrying = new TriangularRnd(1, 200/60.0, 80/60.0);
 //        this.ordersA = new ConcurrentLinkedQueue<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
 //        this.ordersB = new ConcurrentLinkedQueue<>(); // FIFO ordering based on the docs --^
 //        this.ordersA = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator());
@@ -266,6 +269,8 @@ public class FurnitureProductionSim extends EventSim {
     public double nextFitInstallationDuration() {
         return this.rndFitInstallWardrobe.sample();
     }
+
+    public double nextDryingDuration() { return this.rndDrying.sample(); }
 
     /**
      * @return carpenter with the highest priority from {@code group} of free carpenters or {@code null} if no available

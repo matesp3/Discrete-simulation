@@ -3,7 +3,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
-public class FitInstallationEnd extends FurnitureStoreEvent {
+public class FitInstallationEnd extends FurnitureProdEvent {
     public FitInstallationEnd(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);
     }

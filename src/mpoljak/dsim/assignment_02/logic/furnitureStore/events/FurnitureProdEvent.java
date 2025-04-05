@@ -5,20 +5,20 @@ import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
-public abstract class FurnitureStoreEvent extends DiscreteEvent {
+public abstract class FurnitureProdEvent extends DiscreteEvent {
     private static final int OID = 8;
     protected final FurnitureProductionSim sim;
     protected final Carpenter carpenter;
 
-    public FurnitureStoreEvent(double executionTime, int secondaryPriority, FurnitureProductionSim simCore,
-                               Carpenter carpenter) {
+    public FurnitureProdEvent(double executionTime, int secondaryPriority, FurnitureProductionSim simCore,
+                              Carpenter carpenter) {
         super(executionTime, secondaryPriority);
         this.sim = simCore;
         this.carpenter = carpenter;
     }
 
-    public FurnitureStoreEvent(double executionTime, FurnitureProductionSim simCore,
-                               Carpenter carpenter) {
+    public FurnitureProdEvent(double executionTime, FurnitureProductionSim simCore,
+                              Carpenter carpenter) {
         super(executionTime);
         this.sim = simCore;
         this.carpenter = carpenter;

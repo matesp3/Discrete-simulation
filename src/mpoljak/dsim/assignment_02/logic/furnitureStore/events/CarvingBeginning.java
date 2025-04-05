@@ -3,7 +3,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
 
-public class CarvingBeginning extends FurnitureStoreEvent {
+public class CarvingBeginning extends FurnitureProdEvent {
 
     public CarvingBeginning(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
         super(executionTime, secondaryPriority, simCore, carpenter);

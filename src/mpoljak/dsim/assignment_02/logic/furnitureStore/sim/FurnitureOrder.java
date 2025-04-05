@@ -11,7 +11,7 @@ public class FurnitureOrder {
         TABLE, CHAIR, WARDROBE
     }
     public enum TechStep {
-        WOOD_PREPARATION, CARVING, STAINING, ASSEMBLING, FIT_INSTALLATION
+        WOOD_PREPARATION, CARVING, STAINING, ASSEMBLING, FIT_INSTALLATION, DRYING
     }
 
     public static class OrderWithPriority {
@@ -113,8 +113,8 @@ public class FurnitureOrder {
     public void setNextTechStep(TechStep techStep) {
         if (techStep == TechStep.FIT_INSTALLATION && this.productType != Product.WARDROBE)
             throw new IllegalArgumentException("FIT_INSTALLATION is done within WARDROBE process only");
-        if (this.nextTechStep.ordinal()+1 != techStep.ordinal())
-            throw new IllegalArgumentException("New techStep is not consecutive with the one that is set right now");
+//        if (this.nextTechStep.ordinal()+1 != techStep.ordinal())
+//            throw new IllegalArgumentException("New techStep is not consecutive with the one that is set right now");
         this.nextTechStep = techStep;
     }
 

@@ -1,58 +1,55 @@
 package mpoljak.dsim.assignment_02.gui.models;
 
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.OrderResults;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FurnitureOrderTableModel extends AbstractTableModel {
-
+public class CarpenterTableModel extends AbstractTableModel {
+    private final List<Carpenter> lResults;
     private final String[] aColNames = new String[] {
-            "OrderID",
+            "ID",
+            "Group",
             "DeskID",
-            "CarpID",
-            "Product",
-            "step",
-            "stepBT",
-            "stepET",
-            "created"};
-    private final List<OrderResults> lResults;
+            "OrderID",
+            "ProcBT",
+            "ProcET",
+            "Working"};
     private final Class<?>[] aColClasses = new Class<?>[] {
             Integer.class,
+            String.class,
             Integer.class,
             Integer.class,
-            String.class,
-            String.class,
             Double.class,
             Double.class,
-            Double.class,};
+            Boolean.class,
+    };
 
-    public FurnitureOrderTableModel(List<OrderResults> lResults) {
+    public CarpenterTableModel(List<Carpenter> lResults) {
         this.lResults = lResults;
     }
 
-    public void add(OrderResults model) {
+    public void add(Carpenter model) {
         this.lResults.add(model);
         this.fireTableDataChanged();
     }
 
-    public void setModels(List<OrderResults> lModels) {
+    public void setModels(List<Carpenter> lModels) {
         this.clear();
         lResults.addAll(lModels);
         this.fireTableDataChanged();
     }
 
-    public OrderResults getModel(int index) {
+    public Carpenter getModel(int index) {
         return this.lResults.get(index);
     }
 
-    public ArrayList<OrderResults> getModels() {
+    public ArrayList<Carpenter> getModels() {
         return new ArrayList<>(this.lResults);
     }
 
-    public void setModel(int index, OrderResults model) {
+    public void setModel(int index, Carpenter model) {
         if (model == null || index < 0 || index > this.lResults.size())
             return;
         this.lResults.set(index, model);
@@ -68,6 +65,7 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
         this.lResults.clear();
         this.fireTableDataChanged();
     }
+
 
     @Override
     public String getColumnName(int column) {
@@ -96,23 +94,21 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        OrderResults stat = this.lResults.get(rowIndex);
+        Carpenter c = this.lResults.get(rowIndex);
         if (columnIndex == 0)
-            return stat.getOrderID();
-        else if (columnIndex == 1)
-            return stat.getDeskID();
-        else if (columnIndex == 2)
-            return stat.getAssignedCarpenterID();
-        else if (columnIndex == 3)
-            return stat.getProductType();
-        else if (columnIndex == 4)
-            return stat.getStep();
-        else if (columnIndex == 5)
-            return stat.getStepStart();
-        else if (columnIndex == 6)
-            return stat.getStepEnd();
-        else if (columnIndex == 7)
-            return stat.getCreated();
+            return c.getCarpenterId();
+        if (columnIndex == 1)
+            return c.getGroup();
+        if (columnIndex == 2)
+            return c.getCurrentDeskID();
+        if (columnIndex == 3)
+            return c.getCurrentOrder();
+        if (columnIndex == 4)
+            return c.getOrderProcessingBT();
+        if (columnIndex == 5)
+            return c.getOrderProcessingET();
+        if (columnIndex == 6)
+            return c.isWorking();
         return null;
     }
 }

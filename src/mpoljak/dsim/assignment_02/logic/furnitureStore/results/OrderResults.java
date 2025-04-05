@@ -23,6 +23,26 @@ public class OrderResults {
         this.productType = productType;
     }
 
+    public int getOrderID() {
+        return orderID;
+    }
+
+    public int getDeskID() {
+        return deskID;
+    }
+
+    public String getStep() {
+        return step;
+    }
+
+    public double getCreated() {
+        return created;
+    }
+
+    public String getProductType() {
+        return productType;
+    }
+
     public int getAssignedCarpenterID() {
         return assignedCarpenterID;
     }
