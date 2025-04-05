@@ -1,8 +1,5 @@
 package mpoljak.dsim.assignment_02.gui;
 
-import mpoljak.dsim.assignment_02.logic.EventSim;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
-
 import javax.swing.*;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;

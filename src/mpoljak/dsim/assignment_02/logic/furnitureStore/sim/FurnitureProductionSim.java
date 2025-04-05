@@ -2,6 +2,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.events.OrderArrival;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.AfterEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.common.Generator;
@@ -374,6 +375,10 @@ public class FurnitureProductionSim extends EventSim {
     }
 
     //    - -   -   -   -   -   -   S T A T I S T I C S  -   -   -   -   -   -   -   -   -
+    public void receiveEventResults(AfterEventResults results) {
+        this.notifyDelegates(results);
+    }
+
     public void addOrderTimeInSystem(double duration) {
         this.statOrderInSystemExp.addSample(duration);
     }

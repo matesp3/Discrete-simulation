@@ -1,5 +1,7 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.OrderResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
@@ -40,5 +42,8 @@ public class OrderArrival extends FurnitureProdEvent {
         // * 3. plan time of new order arrival
         this.setExecutionTime(this.getExecutionTime() + this.sim.nextUntilOrderArrivalDuration());
         this.sim.addToCalendar(this);
+//        String prod = newOrder.getProductType().name();
+//        String step = newOrder.getNextTechStep().name();// new OrderResults(newOrder.getOrderID(), newOrder.getDeskID(), newOrder.getTimeOfOrderCreation(), "", "")
+        this.sim.receiveEventResults(new FurnitProdEventResults(this.sim.getCurrentReplication(), this.getExecutionTime()));
     }
 }

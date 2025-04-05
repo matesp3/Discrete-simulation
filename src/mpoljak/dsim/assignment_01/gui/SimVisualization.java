@@ -86,9 +86,9 @@ public class SimVisualization extends JFrame implements ActionListener {
             this.setBtnEnabled(this.btnStop, true);
             boolean running =this.simController.isSimulationRunning();
             if (!running) {
-                int reps = this.inputRepCount.getText().isBlank() ? DEFAULT_REPLICATIONS
+                int reps = this.inputRepCount.getText().isEmpty() ? DEFAULT_REPLICATIONS
                         : Integer.parseInt(this.inputRepCount.getText());
-                double percentsOmitted = this.inputPercOmitted.getText().isBlank() ? DEFAULT_PERCENTS_OMM
+                double percentsOmitted = this.inputPercOmitted.getText().isEmpty() ? DEFAULT_PERCENTS_OMM
                         : Double.parseDouble(this.inputPercOmitted.getText().replaceAll(",", "."));
                 this.simController.startSimulation(reps, percentsOmitted);
             }

@@ -1,10 +1,7 @@
 package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.assignment_02.controllers.SimController;
-import mpoljak.dsim.assignment_02.gui.components.FurnitureProdAnim;
-import mpoljak.dsim.assignment_02.gui.components.InputWithLabel;
-import mpoljak.dsim.assignment_02.gui.components.OverallStatsViewer;
-import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
+import mpoljak.dsim.assignment_02.gui.components.*;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
 import mpoljak.dsim.common.ISimDelegate;
@@ -36,13 +33,14 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     // tabs
     private OverallStatsViewer statsViewer;
     private FurnitureProdAnim animationViewer;
-
+    // custom components
     private InputWithLabel inputA;
     private InputWithLabel inputB;
     private InputWithLabel inputC;
     private InputWithLabel inputExperiments;
     private InputWithLabel inputSimDur;
     private ResultViewer replicationViewer;
+    private TimeSlider timeSlider;
 
     private JButton btnStart;
     private JButton btnPause;
@@ -163,8 +161,13 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     }
 
     private void createNorthPart() {
+        this.timeSlider = new TimeSlider(this.simController, true, 0, 180, 60, "min",
+                "s", 60.0, COL_BG);
+        this.northPane.add(this.timeSlider);
+
         this.replicationViewer = new ResultViewer("Executed replications");
         this.replicationViewer.setBorder(BorderFactory.createRaisedBevelBorder());
+        this.northPane.add(Box.createRigidArea(new Dimension(50, 0)));
         this.northPane.add(this.replicationViewer);
     }
 
