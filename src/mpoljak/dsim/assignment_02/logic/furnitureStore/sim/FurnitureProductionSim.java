@@ -61,8 +61,8 @@ public class FurnitureProductionSim extends EventSim {
     private final Stats.ArithmeticAvg statOrderInSystemExp;
     private final Stats.ConfidenceInterval statOrderInSystemSim;
 
-    public FurnitureProductionSim(long replicationsCount, int amountA, int amountB, int amountC) {
-        super(replicationsCount, 15, 119_520); // 60min*8hod*249dni = 358_560 [min]
+    public FurnitureProductionSim(long replicationsCount, int amountA, int amountB, int amountC, double timeInMinutes) {
+        super(replicationsCount, 15, timeInMinutes); // 60min*8hod*249dni = 358_560 [min]
         // simulation will be regards to minutes
         this.rndOrderArrival = new ExponentialRnd((2.0/60)); // lambda = (2 arrivals per 60 [min])
         this.rndOrderType = new ContinuosUniformRnd(0, 100); // generates percentages of probability of order's type
@@ -109,6 +109,12 @@ public class FurnitureProductionSim extends EventSim {
 
         this.statOrderInSystemExp = new Stats.ArithmeticAvg();
         this.statOrderInSystemSim = new Stats.ConfidenceInterval();
+    }
+
+    @Override
+    protected void beforeSimulation() {
+        super.beforeSimulation();
+        // todo RESET SIM STATS
     }
 
     @Override

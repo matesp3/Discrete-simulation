@@ -17,6 +17,7 @@ public abstract class EventSim extends SimCore {
     private boolean debugMode = false;
     private double cachedShiftTime;
     private long cachedSleepTime;
+    private boolean shouldCheckPauseCond = true;
 
     public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
@@ -35,8 +36,6 @@ public abstract class EventSim extends SimCore {
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
     }
-
-
 
     /**
      * Adds <code>event</code> to calendar, which is maintaining priorities of events by which they will be executed.
@@ -89,7 +88,8 @@ public abstract class EventSim extends SimCore {
     @Override
     protected void experiment() throws InterruptedException {
         while (!this.isEnded() && !this.eventCal.isEmpty()) {
-            this.checkPauseCondition();
+            if (this.shouldCheckPauseCond)
+                this.checkPauseCondition();
 //            DiscreteEvent event = this.eventCal.take();
             DiscreteEvent event = this.eventCal.poll();
             if (DoubleComp.compare(event.getExecutionTime(), this.simTime) == -1) // event.time < this.simTime
@@ -110,14 +110,16 @@ public abstract class EventSim extends SimCore {
         return new SimResults((this.eventCal.size()));
     }
 
-    public void enableMaxSimSpeed(boolean enable) {
-        if (enable) {
+    public void setEnabledMaxSimSpeed(boolean enabled) {
+        if (enabled) {
+            this.shouldCheckPauseCond = false;
             this.cachedShiftTime = this.shiftTime;
             this.cachedSleepTime = this.sleepTime;
-            this.shiftTime = Double.MAX_VALUE;
+            this.shiftTime = this.isEnded() ? (this.maxSimTime + 1): (this.maxSimTime - this.simTime + 1);
             this.sleepTime = 0;
             return;
         }
+        this.shouldCheckPauseCond = true;
         this.shiftTime = this.cachedShiftTime;
         this.sleepTime = this.cachedSleepTime;
     }

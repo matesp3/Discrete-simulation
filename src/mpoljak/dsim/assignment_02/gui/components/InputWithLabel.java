@@ -30,4 +30,9 @@ public class InputWithLabel extends JPanel {
     public String getStringValue() {
         return textField.getText().trim();
     }
+
+    public void setEnabled(boolean enabled) {
+        this.textField.setEnabled(enabled);
+    }
+
 }

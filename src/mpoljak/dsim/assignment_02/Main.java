@@ -7,7 +7,7 @@ import javax.swing.*;
 
 public class Main {
     public static void main(String[] args) throws InterruptedException {
-        FurnitureProductionSim simulation = new FurnitureProductionSim(10_000, 2, 2, 18);
+        FurnitureProductionSim simulation = new FurnitureProductionSim(10_000, 2, 2, 18,249*8*60); // 60min*8hod*249dni = 358_560 [min]
 //        FurnitureStoreSim simulation = new FurnitureStoreSim(10_000, 3, 3, 20);
 //        FurnitureStoreSim simulation = new FurnitureStoreSim(10_000, 1, 2, 16);
 

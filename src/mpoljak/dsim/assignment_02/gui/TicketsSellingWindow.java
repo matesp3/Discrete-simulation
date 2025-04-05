@@ -80,7 +80,7 @@ public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDele
         String cmd = e.getActionCommand();
         if (cmd.equals("Start")) {
             if (! this.simController.isSimRunning()) {
-                this.simController.launchSimulation(1,1,1,1);
+                this.simController.launchSimulation(1,1,1,1, 7);
                 this.setBtnEnabled(this.btnStart, false);
                 this.setBtnEnabled(this.btnPause, true);
                 this.setBtnEnabled(this.btnCancel, true);
@@ -154,6 +154,8 @@ public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDele
         btn.setBackground(enabled ? colBtn : colBtnDisabled);
         btn.setEnabled(enabled);
     }
+
+
 
     private JLabel createLabel(String caption) {
         JLabel label = new JLabel(caption);
