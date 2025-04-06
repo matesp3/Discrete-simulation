@@ -3,8 +3,13 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.results;
 import java.util.List;
 
 public class FurnitProdEventResults extends AfterEventResults {
-    private List<CarpenterResults> changedCarpenters;
-    private List<OrderResults> changedOrders;
+    private List<CarpenterResults> carpentersA;
+    private List<CarpenterResults> carpentersB;
+    private List<CarpenterResults> carpentersC;
+    private List<OrderResults> ordersA;
+    private List<OrderResults> ordersB;
+    private List<OrderResults> ordersCLow;
+    private List<OrderResults> orderCHigh;
 
     private StatResult wavgOrderQueueTimeA;
     private StatResult realOrderQueueTimeA;
@@ -45,19 +50,59 @@ public class FurnitProdEventResults extends AfterEventResults {
         super(experimentNum, simTime);
     }
 
-    public List<CarpenterResults> getChangedCarpenters() {
-        return changedCarpenters;
+    public List<CarpenterResults> getCarpentersA() {
+        return carpentersA;
     }
 
-    public void setChangedCarpenters(List<CarpenterResults> changedCarpenters) {
-        this.changedCarpenters = changedCarpenters;
+    public void setCarpentersA(List<CarpenterResults> carpentersA) {
+        this.carpentersA = carpentersA;
     }
 
-    public List<OrderResults> getChangedOrders() {
-        return changedOrders;
+    public List<CarpenterResults> getCarpentersB() {
+        return carpentersB;
     }
 
-    public void setChangedOrders(List<OrderResults> changedOrders) {
-        this.changedOrders = changedOrders;
+    public void setCarpentersB(List<CarpenterResults> carpentersB) {
+        this.carpentersB = carpentersB;
+    }
+
+    public List<CarpenterResults> getCarpentersC() {
+        return carpentersC;
+    }
+
+    public void setCarpentersC(List<CarpenterResults> carpentersC) {
+        this.carpentersC = carpentersC;
+    }
+
+    public List<OrderResults> getOrdersA() {
+        return ordersA;
+    }
+
+    public void setOrdersA(List<OrderResults> ordersA) {
+        this.ordersA = ordersA;
+    }
+
+    public List<OrderResults> getOrdersB() {
+        return ordersB;
+    }
+
+    public void setOrdersB(List<OrderResults> ordersB) {
+        this.ordersB = ordersB;
+    }
+
+    public List<OrderResults> getOrdersCLow() {
+        return ordersCLow;
+    }
+
+    public void setOrdersCLow(List<OrderResults> ordersCLow) {
+        this.ordersCLow = ordersCLow;
+    }
+
+    public List<OrderResults> getOrderCHigh() {
+        return orderCHigh;
+    }
+
+    public void setOrderCHigh(List<OrderResults> orderCHigh) {
+        this.orderCHigh = orderCHigh;
     }
 }

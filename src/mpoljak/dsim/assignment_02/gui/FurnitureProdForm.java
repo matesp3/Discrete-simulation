@@ -11,13 +11,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 
-public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionListener {
+public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionListener, ComponentListener {
     // look & feel
     final static String LOOK_AND_FEEL = "Metal"; // null (use the default), "Metal", "System", "Motif" and "GTK"
     final static String THEME = "Test"; // For Metal L&F, themes: "DefaultMetal", "Ocean",  and "Test"
     // colors
     public static final Color COL_BG = new Color(191, 201, 224);
+    public static final Color COL_BG_TAB = new Color(223, 227, 238);
     public static final Color COL_BG_CONTENT = new Color(193, 193, 193);
     public static final Color COL_BTN = new Color(81, 128, 197);
     public static final Color COL_BTN_FONT = new Color(255, 255, 255);
@@ -31,7 +34,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     private final JPanel eastPane = new JPanel(); // EAST
     private final JTabbedPane tabbedContentPane = new JTabbedPane(); // CENTER
     // tabs
-    private OverallStatsViewer statsViewer;
+    private StatsViewer statsViewer;
     private FurnitureProdAnim animationViewer;
     // custom components
     private InputWithLabel inputA;
@@ -56,7 +59,8 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         this.simController = new SimController(this);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
-        this.setSize(new Dimension(900,500));
+        this.setSize(new Dimension(1500,700));
+        this.setMinimumSize(new Dimension(1300, 500));
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.add(this.mainPane);
@@ -67,6 +71,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         this.createComponents();
 //        ----- window: go live
         this.setVisible(true);
+        this.addComponentListener(this);
     }
 
     private String getStrDateTime(double timeMins) {
@@ -152,7 +157,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     }
 
     private void createTabs() {
-        this.statsViewer = new OverallStatsViewer(700,200);
+        this.statsViewer = new StatsViewer();
         this.animationViewer = new FurnitureProdAnim();
 
         this.tabbedContentPane.addTab("Statistics", this.statsViewer);
@@ -161,7 +166,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     }
 
     private void createNorthPart() {
-        this.timeSlider = new TimeSlider(this.simController, true, 0, 180, 60, "min",
+        this.timeSlider = new TimeSlider(this.simController, true, 0, 540, 60, "min",
                 "s", 60.0, COL_BG);
         this.northPane.add(this.timeSlider);
 
@@ -308,5 +313,24 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
 //        txtField.setSize(new Dimension(width, TXT_FIELD_HEIGHT));
         txtField.setColumns( (int)((5.0/7.0)*expectedLettersCount)+1 );
         return txtField;
+    }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+//        System.out.println("resized");
+        this.animationViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
+        this.statsViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
     }
 }

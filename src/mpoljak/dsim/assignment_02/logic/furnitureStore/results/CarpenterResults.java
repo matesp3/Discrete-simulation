@@ -8,6 +8,7 @@ public class CarpenterResults {
     private double orderBT = -1;
     private double orderET = -1;
     private boolean working = false;
+    private String orderRepresentation;
 
     public CarpenterResults(int carpenterID, String group) {
         this.carpenterID = carpenterID;
