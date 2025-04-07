@@ -2,6 +2,7 @@ package mpoljak.dsim.assignment_02.gui.models;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.OrderResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
+import mpoljak.dsim.utils.TimeFormatter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -25,9 +26,9 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
             Integer.class,
             String.class,
             String.class,
-            Double.class,
-            Double.class,
-            Double.class,};
+            String.class,
+            String.class,
+            String.class,};
 
     public FurnitureOrderTableModel(List<OrderResults> lResults) {
         this.lResults = lResults;
@@ -97,23 +98,23 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        OrderResults stat = this.lResults.get(rowIndex);
+        OrderResults order = this.lResults.get(rowIndex);
         if (columnIndex == 0)
-            return stat.getOrderID();
+            return order.getOrderID();
         else if (columnIndex == 1)
-            return stat.getDeskID();
+            return order.getDeskID();
         else if (columnIndex == 2)
-            return stat.getAssignedCarpenterID();
+            return order.getAssignedCarpenterID();
         else if (columnIndex == 3)
-            return stat.getProductType();
+            return order.getProductType();
         else if (columnIndex == 4)
-            return stat.getStep();
+            return order.getStep();
         else if (columnIndex == 5)
-            return stat.getStepStart();
+            return TimeFormatter.getStrDateTime(order.getStepStart()*60, 8, 6);
         else if (columnIndex == 6)
-            return stat.getStepEnd();
+            return TimeFormatter.getStrDateTime(order.getStepEnd()*60, 8, 6);
         else if (columnIndex == 7)
-            return stat.getCreated();
+            return TimeFormatter.getStrDateTime(order.getCreated()*60, 8, 6);
         return null;
     }
 }

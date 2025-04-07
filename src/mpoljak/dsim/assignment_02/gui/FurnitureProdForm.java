@@ -125,6 +125,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         else if (cmd.equals("Max-speed")) {
             this.furnitProdSimController.setEnabledMaxSpeed(checkMaxSpeed.isSelected());
             checkLogs.setEnabled(!checkMaxSpeed.isSelected());
+            this.timeSlider.setVisible(!checkMaxSpeed.isSelected());
             if (checkMaxSpeed.isSelected()) {
                 checkLogs.setSelected(false);
                 furnitProdSimController.setEnabledConsoleLogs(false);

@@ -4,6 +4,8 @@ import mpoljak.dsim.assignment_02.gui.FurnitureProdForm;
 import mpoljak.dsim.assignment_02.gui.models.CarpenterTableModel;
 import mpoljak.dsim.assignment_02.gui.models.FurnitureOrderTableModel;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
+import mpoljak.dsim.utils.SwingTableColumnResizer;
+import mpoljak.dsim.utils.TimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,6 +20,14 @@ public class FurnitureProdAnim extends JPanel {
     private FurnitureOrderTableModel orderTableModelStaining;
     private FurnitureOrderTableModel orderTableModelAssembling;
     private FurnitureOrderTableModel orderTableModelFitInst;
+
+    private JTable carpenterTableA;
+    private JTable carpenterTableB;
+    private JTable carpenterTableC;
+    private JTable orderTableWaiting;
+    private JTable orderTableStaining;
+    private JTable orderTableAssembling;
+    private JTable orderTableFitInst;
     private JScrollPane mainScrollPane;
     private JPanel contentPane;
 
@@ -34,12 +44,21 @@ public class FurnitureProdAnim extends JPanel {
     }
 
     public void resizeContent(int width, int height) {
-//        System.out.println("tu");
         this.mainScrollPane.setPreferredSize(new Dimension(width, height));
-//        int partialHeight = (int) (height/4);
-//        for (int i = 1; i < this.contentPane.getComponentCount(); i++) { // first is sim time display
-//            this.contentPane.getComponent(i).setPreferredSize(new Dimension(width, partialHeight));
-//        }
+        SwingTableColumnResizer.setJTableColsWidth(this.orderTableWaiting, (width-25)/2,
+                new double[] {5,5,5,15,19,17,17,17});
+        SwingTableColumnResizer.setJTableColsWidth(this.orderTableStaining, (width-25)/2,
+                new double[] {5,5,5,15,19,17,17,17});
+        SwingTableColumnResizer.setJTableColsWidth(this.orderTableAssembling, (width-25)/2,
+                new double[] {5,5,5,15,19,17,17,17});
+        SwingTableColumnResizer.setJTableColsWidth(this.orderTableFitInst, (width-25)/2,
+                new double[] {5,5,5,15,19,17,17,17});
+        SwingTableColumnResizer.setJTableColsWidth(this.carpenterTableA, width,
+                new double[] {5,5,5,5,10,15,15,40});
+        SwingTableColumnResizer.setJTableColsWidth(this.carpenterTableB, width,
+                new double[] {5,5,5,5,10,15,15,40});
+        SwingTableColumnResizer.setJTableColsWidth(this.carpenterTableC, width,
+                new double[] {5,5,5,5,10,15,15,40});
     }
 
     private JPanel createTables() {
@@ -60,39 +79,39 @@ public class FurnitureProdAnim extends JPanel {
         p3.setBackground(FurnitureProdForm.COL_BG_TAB);
 
         this.carpenterTableModelA = new CarpenterTableModel(new ArrayList<>());
-        JTable carpenterTableA = new JTable(this.carpenterTableModelA);
+        this.carpenterTableA = new JTable(this.carpenterTableModelA);
         carpenterTableA.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane carpenterScrollPaneA = new JScrollPane(carpenterTableA);
         carpenterScrollPaneA.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneA.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneA.setMaximumSize(new Dimension(1500, 200));
+        carpenterScrollPaneA.setMaximumSize(new Dimension(1800, 200));
 
         this.carpenterTableModelB = new CarpenterTableModel(new ArrayList<>());
-        JTable carpenterTableB = new JTable(this.carpenterTableModelB);
+        this.carpenterTableB = new JTable(this.carpenterTableModelB);
         carpenterTableB.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane carpenterScrollPaneB = new JScrollPane(carpenterTableB);
         carpenterScrollPaneB.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneB.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneB.setMaximumSize(new Dimension(1700, 200));
+        carpenterScrollPaneB.setMaximumSize(new Dimension(1800, 200));
 
         this.carpenterTableModelC = new CarpenterTableModel(new ArrayList<>());
-        JTable carpenterTableC = new JTable(this.carpenterTableModelC);
+        this.carpenterTableC = new JTable(this.carpenterTableModelC);
         carpenterTableC.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane carpenterScrollPaneC = new JScrollPane(carpenterTableC);
         carpenterScrollPaneC.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneC.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneC.setMaximumSize(new Dimension(1700, 200));
+        carpenterScrollPaneC.setMaximumSize(new Dimension(1800, 200));
 
         this.orderTableModelWaiting = new FurnitureOrderTableModel(new ArrayList<>());
-        JTable orderTableWaiting = new JTable(this.orderTableModelWaiting);
+        this.orderTableWaiting = new JTable(this.orderTableModelWaiting);
         orderTableWaiting.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane orderScrollPaneWaiting = new JScrollPane(orderTableWaiting);
         orderScrollPaneWaiting.setPreferredSize(new Dimension(500,150));
         orderScrollPaneWaiting.setMinimumSize(new Dimension(500, 150));
-        orderScrollPaneWaiting.setMaximumSize(new Dimension(1700, 200));
+        orderScrollPaneWaiting.setMaximumSize(new Dimension(1000, 200));
 
         this.orderTableModelStaining = new FurnitureOrderTableModel(new ArrayList<>());
-        JTable orderTableStaining = new JTable(this.orderTableModelStaining);
+        this.orderTableStaining = new JTable(this.orderTableModelStaining);
         orderTableStaining.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane orderScrollPaneStaining = new JScrollPane(orderTableStaining);
         orderScrollPaneStaining.setPreferredSize(new Dimension(500,150));
@@ -100,7 +119,7 @@ public class FurnitureProdAnim extends JPanel {
         orderScrollPaneStaining.setMaximumSize(new Dimension(1000, 200));
 
         this.orderTableModelAssembling = new FurnitureOrderTableModel(new ArrayList<>());
-        JTable orderTableAssembling = new JTable(this.orderTableModelAssembling);
+        this.orderTableAssembling = new JTable(this.orderTableModelAssembling);
         orderTableAssembling.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane orderScrollPaneAssembling = new JScrollPane(orderTableAssembling);
         orderScrollPaneAssembling.setPreferredSize(new Dimension(500,150));
@@ -108,39 +127,54 @@ public class FurnitureProdAnim extends JPanel {
         orderScrollPaneAssembling.setMaximumSize(new Dimension(1000, 200));
 
         this.orderTableModelFitInst = new FurnitureOrderTableModel(new ArrayList<>());
-        JTable orderTableFitInst = new JTable(this.orderTableModelFitInst);
+        this.orderTableFitInst = new JTable(this.orderTableModelFitInst);
         orderTableFitInst.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane orderScrollPaneFitInst = new JScrollPane(orderTableFitInst);
         orderScrollPaneFitInst.setPreferredSize(new Dimension(500,150));
         orderScrollPaneFitInst.setMinimumSize(new Dimension(500, 150));
         orderScrollPaneFitInst.setMaximumSize(new Dimension(1000, 200));
 
-        JLabel jl1 = new JLabel("Order queues {Waiting, Staining}");
-        jl1.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
-        JLabel jl2 = new JLabel("Order queues {Assembling, Fit inst.}");
-        jl2.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
-        JLabel jl3 = new JLabel("Carpenters {group A, group B, group C}");
-        jl3.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
-
+        JLabel jl1A = new JLabel("Order queue for Waiting");
+        jl1A.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl1B = new JLabel("Order queue for Staining");
+        jl1B.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl2A = new JLabel("Order queue for Assembling");
+        jl2A.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl2B = new JLabel("Order queue for Fit installation");
+        jl2B.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl3A = new JLabel("Carpenter's group A");
+        jl3A.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl3B = new JLabel("Carpenter's group B");
+        jl3B.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl3C = new JLabel("Carpenter's group C");
+        jl3C.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
 
         p1.add(Box.createRigidArea(new Dimension(0, 7)));
-        p1.add(jl1);
+        p1.add(jl1A);
         p1.add(Box.createRigidArea(new Dimension(0, 7)));
         p1.add(orderScrollPaneWaiting);
-        p1.add(Box.createRigidArea(new Dimension(0, 3)));
+        p1.add(Box.createRigidArea(new Dimension(0, 7)));
+        p1.add(jl1B);
+        p1.add(Box.createRigidArea(new Dimension(0, 7)));
         p1.add(orderScrollPaneStaining);
 
         p2.add(Box.createRigidArea(new Dimension(0, 7)));
-        p2.add(jl2);
+        p2.add(jl2A);
         p2.add(Box.createRigidArea(new Dimension(0, 7)));
         p2.add(orderScrollPaneAssembling);
         p2.add(Box.createRigidArea(new Dimension(0, 7)));
+        p2.add(jl2B);
+        p2.add(Box.createRigidArea(new Dimension(0, 7)));
         p2.add(orderScrollPaneFitInst);
 
-        p3.add(jl3);
+        p3.add(jl3A);
         p3.add(carpenterScrollPaneA);
         p3.add(Box.createRigidArea(new Dimension(0, 7)));
+        p3.add(jl3B);
+        p3.add(Box.createRigidArea(new Dimension(0, 7)));
         p3.add(carpenterScrollPaneB);
+        p3.add(Box.createRigidArea(new Dimension(0, 7)));
+        p3.add(jl3C);
         p3.add(Box.createRigidArea(new Dimension(0, 7)));
         p3.add(carpenterScrollPaneC);
 
@@ -161,36 +195,19 @@ public class FurnitureProdAnim extends JPanel {
         this.orderTableModelWaiting.setModels(r.getOrdersA());
         this.orderTableModelAssembling.setModels(r.getOrdersB());
         this.orderTableModelStaining.setModels(r.getOrdersCLow());
-        this.orderTableModelFitInst.setModels(r.getOrderCHigh());
-        this.viewSimTime.setValue(getStrDateTime(r.getSimTime()*60, 8, 6));
+        this.orderTableModelFitInst.setModels(r.getOrdersCHigh());
+        this.viewSimTime.setValue(TimeFormatter.getStrDateTime(r.getSimTime()*60, 8, 6));
         this.carpenterTableModelA.setModels(r.getCarpentersA());
         this.carpenterTableModelB.setModels(r.getCarpentersB());
         this.carpenterTableModelC.setModels(r.getCarpentersC());
     }
 
-    /**
-     * If one
-     * @param timeSecs time to be formatted, which is given in seconds
-     * @param dayHours amount of hours that one day lasts
-     * @param startHour if one day lasts {@code dayHours} and its less than {@code 24}, then you may want to specify,
-     *                  which should be considered as 00:00:00 time.
-     * @return formatted date-time
-     */
-    private static String getStrDateTime(double timeSecs, int dayHours, int startHour) {
-        int day = (int) timeSecs / (dayHours*3600) + 1;
-        timeSecs -= (day-1) * dayHours * 3600;
-        int hours = (int) Math.floor(timeSecs/3600.0);
-        timeSecs -= (hours) * 3600;
-        int min = (int)Math.floor(timeSecs/60.0);
-        timeSecs -= min * 60;
-        int secs = (int)Math.ceil(timeSecs);
-        return String.format("Day-%d %02d:%02d:%02d", day, (min == 60 ? hours+1 : hours)%dayHours+startHour, min%60, secs%60);
-    }
+
 
     public static void main(String[] args) {
         double secs = 0;
         for (int i = 0; i < 3600*9; i++) {
-            System.out.println(getStrDateTime(secs++, 8, 6)); // ok
+            System.out.println(TimeFormatter.getStrDateTime(secs++, 8, 6)); // ok
         }
     }
 }

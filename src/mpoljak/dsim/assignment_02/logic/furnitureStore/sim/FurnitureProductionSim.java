@@ -14,17 +14,11 @@ import mpoljak.dsim.generators.TriangularRnd;
 import mpoljak.dsim.utils.DoubleComp;
 import mpoljak.dsim.utils.Stats;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.*;
 
 public class FurnitureProductionSim extends EventSim {
     private static final double THRESHOLD_TABLE = 50;
     private static final double THRESHOLD_CHAIR = THRESHOLD_TABLE+15;
-    private static final int PR_TOP = 0;
-    private static final int PR_LOW = 5;
     // generators
     private final Generator rndOrderArrival;
     private final Generator rndOrderType;
@@ -52,20 +46,22 @@ public class FurnitureProductionSim extends EventSim {
     private final Queue<FurnitureOrder> ordersCLowPr;
     private final Queue<FurnitureOrder> ordersCHighPr;
 //    private final Queue<FurnitureOrder.OrderWithPriority> ordersC;
+    private final Carpenter[] groupA;
+    private final Carpenter[] groupB;
+    private final Carpenter[] groupC;
     private final DeskAllocation deskManager;
     private final Queue<Carpenter> freeA;
     private final Queue<Carpenter> freeB;
     private final Queue<Carpenter> freeC;
-    private final int carpentersA;
-    private final int carpentersB;
-    private final int carpentersC;
+
     private int newOrderID; // ID of lastly assigned order
     private final Stats.ArithmeticAvg statOrderInSystemExp;
     private final Stats.ConfidenceInterval statOrderInSystemSim;
+    private final FurnitProdEventResults eventResults;
 
     public FurnitureProductionSim(long replicationsCount, int amountA, int amountB, int amountC, double timeInMinutes) {
         super(replicationsCount, 15, timeInMinutes); // 60min*8hod*249dni = 358_560 [min]
-        // simulation will be regards to minutes
+        // simulation time unit will be computed in [minute] -> make sure duration generators are parametrized in minutes
         this.rndOrderArrival = new ExponentialRnd((2.0/60)); // lambda = (2 arrivals per 60 [min])
         this.rndOrderType = new ContinuosUniformRnd(0, 100); // generates percentages of probability of order's type
         this.rndFromStorageTransfer = new TriangularRnd(1, 8, 2); // (60s, 480s, 120s)
@@ -86,41 +82,34 @@ public class FurnitureProductionSim extends EventSim {
         this.rndFitInstallWardrobe = new ContinuosUniformRnd(15, 25);
 
         this.rndDrying = new TriangularRnd(1, 200/60.0, 80/60.0);
-//        this.ordersA = new ConcurrentLinkedQueue<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
-//        this.ordersB = new ConcurrentLinkedQueue<>(); // FIFO ordering based on the docs --^
-//        this.ordersA = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator());
-//        this.ordersB = new PriorityBlockingQueue<>(100, new FurnitureOrder.OrderComparator());
-//        this.ordersC = new PriorityBlockingQueue<>(100, new FurnitureOrder.PrOrderComparator()); // methods of interest: add & poll
-//        this.ordersA = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator());
-//        this.ordersB = new PriorityQueue<>(100, new FurnitureOrder.OrderComparator());
-        this.ordersA = new LinkedList<>(); // https://docs.oracle.com/javase/6/docs/api/java/util/concurrent/ConcurrentLinkedQueue.html
-        this.ordersB = new LinkedList<>(); // FIFO ordering based on the docs --^
-//        this.ordersC = new PriorityQueue<>(100, new FurnitureOrder.WardrobeComparator()); // methods of interest: add & poll
+        this.ordersA = new LinkedList<>();
+        this.ordersB = new LinkedList<>(); // FIFO ordering based on the docs
         this.ordersCLowPr = new LinkedList<>();
         this.ordersCHighPr = new LinkedList<>();
+
         this.deskManager = new DeskAllocation(amountA + amountB + amountC); // sum is enough - maximum occupancy
 
+        this.groupA = new Carpenter[amountA];
+        this.createAndSetCarpenters(1, this.groupA, Carpenter.GROUP.A);
+        this.groupB = new Carpenter[amountB];
+        this.createAndSetCarpenters(this.groupA.length+1, this.groupB, Carpenter.GROUP.B);
+        this.groupC = new Carpenter[amountC];
+        this.createAndSetCarpenters(this.groupA.length+this.groupB.length+1, this.groupC, Carpenter.GROUP.C);
         Comparator<Carpenter> carpenterCmp = (o1, o2) -> Integer.compare(o1.getCarpenterId(), o2.getCarpenterId());
-        this.freeA = new PriorityQueue<>(carpenterCmp);
-        this.freeB = new PriorityQueue<>(carpenterCmp);
-        this.freeC = new PriorityQueue<>(carpenterCmp);
-        this.carpentersA = amountA;
-        this.carpentersB = amountB;
-        this.carpentersC = amountC;
+        this.freeA = new PriorityQueue<>(amountA, carpenterCmp);
+        this.freeB = new PriorityQueue<>(amountB, carpenterCmp);
+        this.freeC = new PriorityQueue<>(amountC, carpenterCmp);
         this.newOrderID = 1;
 
         this.statOrderInSystemExp = new Stats.ArithmeticAvg();
         this.statOrderInSystemSim = new Stats.ConfidenceInterval();
+        this.eventResults = new FurnitProdEventResults(0, 0, amountA, amountB, amountC);
     }
 
     @Override
     protected void beforeSimulation() {
         super.beforeSimulation();
         // todo RESET SIM STATS
-    }
-
-    @Override
-    protected void afterEventExecution() {
         this.fireStateChangedNofication();
     }
 
@@ -133,16 +122,16 @@ public class FurnitureProductionSim extends EventSim {
         this.ordersB.clear();
         this.ordersCLowPr.clear();
         this.ordersCHighPr.clear();
-//        this.ordersC.clear();
-        this.freeA.clear();
-        this.freeB.clear();
-        this.freeC.clear();
-        this.createAndAddCarpenters(0, this.carpentersA-1, this.freeA, Carpenter.GROUP.A);
-        this.createAndAddCarpenters(this.carpentersA, (this.carpentersA+this.carpentersB-1), this.freeB, Carpenter.GROUP.B);
-        this.createAndAddCarpenters((this.carpentersA+this.carpentersB),
-                (this.carpentersA+this.carpentersB+this.carpentersC-1), this.freeC, Carpenter.GROUP.C);
+        this.resetAndFillQueue(this.groupA, this.freeA);
+        this.resetAndFillQueue(this.groupB, this.freeB);
+        this.resetAndFillQueue(this.groupC, this.freeC);
         this.newOrderID = 1;
         this.addToCalendar(new OrderArrival(0+this.nextUntilOrderArrivalDuration(), this, null));
+    }
+
+    @Override
+    protected void afterEventExecution() {
+        this.fireStateChangedNofication();
     }
 
     /**
@@ -361,7 +350,16 @@ public class FurnitureProductionSim extends EventSim {
     }
 
     public void fireStateChangedNofication() {
-        this.notifyDelegates(new FurnitProdEventResults(this.getCurrentReplication(), this.getSimTime()));
+        this.eventResults.setSimTime(this.getSimTime());
+        this.eventResults.setExperimentNum(this.getCurrentReplication());
+        this.eventResults.setModelsCarpentersA(this.groupA);
+        this.eventResults.setModelsCarpentersB(this.groupB);
+        this.eventResults.setModelsCarpentersC(this.groupC);
+        this.eventResults.setOrdersA(this.ordersA);
+        this.eventResults.setOrdersB(this.ordersB);
+        this.eventResults.setOrdersCLow(this.ordersCLowPr);
+        this.eventResults.setOrdersCHigh(this.ordersCHighPr);
+        this.notifyDelegates(eventResults);
     }
 
     @Override
@@ -400,9 +398,16 @@ public class FurnitureProductionSim extends EventSim {
         return group == Carpenter.GROUP.A ? this.freeA : (group == Carpenter.GROUP.B ? this.freeB : this.freeC);
     }
 
-    private void createAndAddCarpenters(int firstID, int lastID, Queue<Carpenter> freeCarpenters, Carpenter.GROUP group) {
-        for (int id = firstID; id <= lastID; id++) {
-            freeCarpenters.add(new Carpenter(group, id));
+    private void createAndSetCarpenters(int firstAvailableID, Carpenter[] freeCarpenters, Carpenter.GROUP group) {
+        for (int i = 0; i < freeCarpenters.length; i++) {
+            freeCarpenters[i] = new Carpenter(group, firstAvailableID++);
+        }
+    }
+
+    private void resetAndFillQueue(Carpenter[] arr, Queue<Carpenter> queue) {
+        queue.clear();
+        for (int i = 0; i < arr.length; i++) {
+            queue.add(arr[i]);
         }
     }
 
@@ -419,8 +424,5 @@ public class FurnitureProductionSim extends EventSim {
 //        order.setDeskID(deskID);
 //        sim.releaseDesk(deskID, order);
 //        sim.returnCarpenter(carp); // ok
-
-        Queue<FurnitureOrder.OrderWithPriority> ordersC =  new PriorityBlockingQueue<>(5, new FurnitureOrder.WardrobeComparator());
-        ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, new FurnitureOrder(1, 1.0, FurnitureOrder.Product.CHAIR)));
     }
 }

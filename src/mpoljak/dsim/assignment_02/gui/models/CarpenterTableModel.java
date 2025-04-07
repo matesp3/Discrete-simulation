@@ -1,6 +1,7 @@
 package mpoljak.dsim.assignment_02.gui.models;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.CarpenterResults;
+import mpoljak.dsim.utils.TimeFormatter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -11,19 +12,22 @@ public class CarpenterTableModel extends AbstractTableModel {
     private final String[] aColNames = new String[] {
             "ID",
             "Group",
+            "Working",
             "DeskID",
             "OrderID",
             "ProcBT",
             "ProcET",
-            "Working"};
+            "Order's details"
+    };
     private final Class<?>[] aColClasses = new Class<?>[] {
             Integer.class,
             String.class,
-            Integer.class,
-            Integer.class,
-            Double.class,
-            Double.class,
             Boolean.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class,
+            String.class
     };
 
     public CarpenterTableModel(List<CarpenterResults> lResults) {
@@ -101,15 +105,17 @@ public class CarpenterTableModel extends AbstractTableModel {
         if (columnIndex == 1)
             return c.getGroup();
         if (columnIndex == 2)
-            return c.getDeskID();
-        if (columnIndex == 3)
-            return c.getAssignedOrderID();
-        if (columnIndex == 4)
-            return c.getOrderBT();
-        if (columnIndex == 5)
-            return c.getOrderET();
-        if (columnIndex == 6)
             return c.isWorking();
+        if (columnIndex == 3)
+            return c.getDeskID() < 0 ? "In Storage" : c.getDeskID();
+        if (columnIndex == 4)
+            return c.getAssignedOrderID() < 0 ? "Not assigned" : c.getAssignedOrderID();
+        if (columnIndex == 5)
+            return TimeFormatter.getStrDateTime(c.getOrderBT()*60, 8, 6);
+        if (columnIndex == 6)
+            return TimeFormatter.getStrDateTime(c.getOrderET()*60, 8, 6);
+        if (columnIndex == 7)
+            return c.getOrderRepresentation();
         return null;
     }
 }

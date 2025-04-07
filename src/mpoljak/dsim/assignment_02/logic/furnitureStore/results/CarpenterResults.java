@@ -66,4 +66,8 @@ public class CarpenterResults {
     public void setDeskID(int deskID) {
         this.deskID = deskID;
     }
+
+    public void setOrderRepresentation(String orderRepresentation) {
+        this.orderRepresentation = orderRepresentation;
+    }
 }

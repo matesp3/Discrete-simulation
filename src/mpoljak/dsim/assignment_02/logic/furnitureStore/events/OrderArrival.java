@@ -44,6 +44,5 @@ public class OrderArrival extends FurnitureProdEvent {
         this.sim.addToCalendar(this);
 //        String prod = newOrder.getProductType().name();
 //        String step = newOrder.getNextTechStep().name();// new OrderResults(newOrder.getOrderID(), newOrder.getDeskID(), newOrder.getTimeOfOrderCreation(), "", "")
-        this.sim.receiveEventResults(new FurnitProdEventResults(this.sim.getCurrentReplication(), this.getExecutionTime()));
     }
 }
