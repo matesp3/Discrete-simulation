@@ -7,6 +7,7 @@ import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventRe
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.common.Generator;
+import mpoljak.dsim.common.SimCommand;
 import mpoljak.dsim.generators.ContinuosEmpiricalRnd;
 import mpoljak.dsim.generators.ContinuosUniformRnd;
 import mpoljak.dsim.generators.ExponentialRnd;
@@ -104,13 +105,29 @@ public class FurnitureProductionSim extends EventSim {
         this.statOrderInSystemExp = new Stats.ArithmeticAvg();
         this.statOrderInSystemSim = new Stats.ConfidenceInterval();
         this.eventResults = new FurnitProdEventResults(0, 0, amountA, amountB, amountC);
+
+        SimCommand resultsPrepCmd = new SimCommand(SimCommand.SimCommandType.CUSTOM) {
+            @Override
+            public void invoke() {
+                eventResults.setSimTime(getSimTime());
+                eventResults.setExperimentNum(getCurrentReplication());
+                eventResults.setModelsCarpentersA(groupA);
+                eventResults.setModelsCarpentersB(groupB);
+                eventResults.setModelsCarpentersC(groupC);
+                eventResults.setOrdersA(ordersA);
+                eventResults.setOrdersB(ordersB);
+                eventResults.setOrdersCLow(ordersCLowPr);
+                eventResults.setOrdersCHigh(ordersCHighPr);
+            }
+        };
+        this.eventResults.setResultsPreparationCommand(resultsPrepCmd);
     }
 
     @Override
     protected void beforeSimulation() {
         super.beforeSimulation();
         // todo RESET SIM STATS
-        this.fireStateChangedNofication();
+        this.notifyDelegates(this.eventResults);
     }
 
     @Override
@@ -131,7 +148,7 @@ public class FurnitureProductionSim extends EventSim {
 
     @Override
     protected void afterEventExecution() {
-        this.fireStateChangedNofication();
+        this.notifyDelegates(this.eventResults);
     }
 
     /**
@@ -349,19 +366,6 @@ public class FurnitureProductionSim extends EventSim {
         return this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
-    public void fireStateChangedNofication() {
-        this.eventResults.setSimTime(this.getSimTime());
-        this.eventResults.setExperimentNum(this.getCurrentReplication());
-        this.eventResults.setModelsCarpentersA(this.groupA);
-        this.eventResults.setModelsCarpentersB(this.groupB);
-        this.eventResults.setModelsCarpentersC(this.groupC);
-        this.eventResults.setOrdersA(this.ordersA);
-        this.eventResults.setOrdersB(this.ordersB);
-        this.eventResults.setOrdersCLow(this.ordersCLowPr);
-        this.eventResults.setOrdersCHigh(this.ordersCHighPr);
-        this.notifyDelegates(eventResults);
-    }
-
     @Override
     protected void afterExperiment() {
         super.afterExperiment();
@@ -407,6 +411,7 @@ public class FurnitureProductionSim extends EventSim {
     private void resetAndFillQueue(Carpenter[] arr, Queue<Carpenter> queue) {
         queue.clear();
         for (int i = 0; i < arr.length; i++) {
+            arr[i].reset();
             queue.add(arr[i]);
         }
     }

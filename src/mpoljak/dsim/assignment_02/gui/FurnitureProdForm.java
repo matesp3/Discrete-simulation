@@ -81,16 +81,22 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     @Override
     public void update(SimResults res) {
         if (!this.checkMaxSpeed.isSelected() && res instanceof FurnitProdEventResults) {
+            FurnitProdEventResults r = (FurnitProdEventResults)res;
+            r.prepareResults();
             SwingUtilities.invokeLater(() -> {
-                this.animationViewer.setEventResultsModel( (FurnitProdEventResults)res );
+                this.animationViewer.setEventResultsModel(r);
             });
         }
-        else if (res instanceof FurnitProdExpStats)
+        else if (res instanceof FurnitProdExpStats) {
+            FurnitProdExpStats r = (FurnitProdExpStats) res;
+            r.prepareResults();
             SwingUtilities.invokeLater(() -> {
-                FurnitProdExpStats r = (FurnitProdExpStats)res;
                 this.statsViewer.updateStats(r.getResults());
                 this.replicationViewer.setValue(r.getExperimentNum());
             });
+        }
+//        else
+//            System.out.println("why");
     }
 
     @Override

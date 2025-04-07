@@ -16,7 +16,6 @@ public class FurnitProdSimController {
     private double shiftTime; // minutes
     private long sleepTime; // milliseconds
 
-
     public FurnitProdSimController(FurnitureProdForm gui) {
         this.gui = gui;
         this.sim = null;

@@ -50,23 +50,23 @@ public abstract class EventSim extends SimCore {
     /**
      * @return frequency in [millis] for an artificial event occur
      */
-    public double getShiftTime() {
+    public synchronized double getShiftTime() {
         return this.shiftTime;
     }
 
     /**
      * @param shiftTime frequency in [millis] for an artificial event occur
      */
-    public void setShiftTime(double shiftTime) {
+    public synchronized void setShiftTime(double shiftTime) {
         if (DoubleComp.compare(shiftTime, 0) > -1) // shiftTime >= 0
             this.shiftTime = shiftTime;
     }
 
-    public long getSleepTime() {
+    public synchronized long getSleepTime() {
         return this.sleepTime;
     }
 
-    public void setSleepTime(long sleepTime) {
+    public synchronized void setSleepTime(long sleepTime) {
         this.sleepTime = sleepTime;
     }
 
@@ -113,7 +113,7 @@ public abstract class EventSim extends SimCore {
         return new SimResults((this.eventCal.size()));
     }
 
-    public void setEnabledMaxSimSpeed(boolean enabled) {
+    public synchronized void setEnabledMaxSimSpeed(boolean enabled) {
         if (enabled) {
             this.shouldCheckPauseCond = false;
             this.cachedShiftTime = this.shiftTime;
@@ -136,8 +136,10 @@ public abstract class EventSim extends SimCore {
         }
 
         public void execute() throws InterruptedException {
-            Thread.sleep(this.simCore.sleepTime);
-            this.setExecutionTime(this.simCore.simTime + this.simCore.shiftTime);
+            synchronized (this) {
+                Thread.sleep(this.simCore.sleepTime);
+                this.setExecutionTime(this.simCore.simTime + this.simCore.shiftTime);
+            }
             this.simCore.addToCalendar(this);
         }
     }

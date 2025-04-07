@@ -4,7 +4,7 @@ import mpoljak.dsim.utils.DoubleComp;
 
 public class Carpenter {
     public enum GROUP {
-        A,B,C
+        A,B,C;
     }
     public static final int IN_STORAGE = -1;
     private final GROUP group;
@@ -17,6 +17,13 @@ public class Carpenter {
     public Carpenter(GROUP group, int carpenterID) {
         this.group = group;
         this.carpenterId = carpenterID;
+        this.deskID = IN_STORAGE;
+        this.orderProcessingBT = -1;
+        this.orderProcessingET = -1;
+        this.currentOrder = null;
+    }
+
+    public void reset() {
         this.deskID = IN_STORAGE;
         this.orderProcessingBT = -1;
         this.orderProcessingET = -1;

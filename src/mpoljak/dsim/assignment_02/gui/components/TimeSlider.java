@@ -33,7 +33,7 @@ public class TimeSlider extends JPanel {
         this.resultScale.setHorizontalAlignment(JLabel.CENTER);
         this.resultScale.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
 
-        this.sliderForSecs = new JSlider(sliderHorizontal ? JSlider.HORIZONTAL : JSlider.VERTICAL, 0, 12, 5);
+        this.sliderForSecs = new JSlider(sliderHorizontal ? JSlider.HORIZONTAL : JSlider.VERTICAL, 0, 13, 5);
         this.initSpeedModes();
         controller.setSleepTime(this.modes[sliderForSecs.getValue()].sleep);
         controller.setShiftTime(this.modes[sliderForSecs.getValue()].simUnits); // initialization
@@ -50,7 +50,7 @@ public class TimeSlider extends JPanel {
                 }
             }
         });
-        this.sliderForSecs.setMinorTickSpacing(13);
+        this.sliderForSecs.setMinorTickSpacing(14);
         this.sliderForSecs.setPaintTicks(true);
         this.sliderForSecs.setPaintLabels(true);
 
@@ -65,7 +65,7 @@ public class TimeSlider extends JPanel {
     }
 
     private void initSpeedModes() {
-        this.modes = new SpeedMode[13];
+        this.modes = new SpeedMode[14];
         this.modes[0] = new SpeedMode("1s", 1.0/60.0, 975); // 975 - 1.0/60.0
         this.modes[1] = new SpeedMode("3s", 1.5/60.0, 500); // 150
         this.modes[2] = new SpeedMode("5s", 1.2/60.0, 245); // 245
@@ -79,6 +79,7 @@ public class TimeSlider extends JPanel {
         this.modes[10] = new SpeedMode("1h", 15, 250);
         this.modes[11] = new SpeedMode("4h", 50, 250);
         this.modes[12] = new SpeedMode("8h", 100, 250);
+        this.modes[13] = new SpeedMode("1week", 800, 250);
     }
 
     private String formatOutput(int mode) {
