@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_02.gui;
 
-import mpoljak.dsim.assignment_02.controllers.SimController;
+import mpoljak.dsim.assignment_02.controllers.FurnitProdSimController;
 import mpoljak.dsim.assignment_02.gui.components.*;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
@@ -44,19 +44,21 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     private InputWithLabel inputSimDur;
     private ResultViewer replicationViewer;
     private TimeSlider timeSlider;
-
+    // JComponents
     private JButton btnStart;
     private JButton btnPause;
     private JButton btnCancel;
     private JButton btnSleepConfig;
     private JButton btnShiftConfig;
+    private JCheckBox checkLogs;
+    private JCheckBox checkMaxSpeed;
 
-    private final SimController simController;
+    private final FurnitProdSimController furnitProdSimController;
     private boolean simPaused;
 
     public FurnitureProdForm() {
 //        ---- initialization of params of business logic
-        this.simController = new SimController(this);
+        this.furnitProdSimController = new FurnitProdSimController(this);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
         this.setSize(new Dimension(1500,700));
@@ -74,25 +76,14 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         this.addComponentListener(this);
     }
 
-    private String getStrDateTime(double timeMins) {
-        int day = (int) timeMins / (60*24) + 1;
-        timeMins -= (day-1) * 60*24;
-        int hours = (int) Math.floor(timeMins/60.0);
-        timeMins -= (hours) * 60;
-        int min = (int)Math.ceil(timeMins);
-        return String.format("Day-%d %02d:%02d", day, (min == 60 ? hours+1 : hours)%24, min%60);
-    }
+
 
     @Override
     public void update(SimResults res) {
-        if (res instanceof FurnitProdEventResults) {
-//            if (true)
-//                throw new UnsupportedOperationException("Not supported yet.");
-            FurnitProdEventResults r = (FurnitProdEventResults)res;
-            this.animationViewer.setSimTime(r.getSimTime());
-//             todo this.carpentersComponent.updateCarpenters(r.getChangedCarpenters());
-//             todo this.ordersComponent.updateOrders(r.getChangedOrders());
-            return;
+        if (!this.checkMaxSpeed.isSelected() && res instanceof FurnitProdEventResults) {
+            SwingUtilities.invokeLater(() -> {
+                this.animationViewer.setEventResultsModel( (FurnitProdEventResults)res );
+            });
         }
         else if (res instanceof FurnitProdExpStats)
             SwingUtilities.invokeLater(() -> {
@@ -106,9 +97,9 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     public void actionPerformed(ActionEvent e) {
         String cmd = e.getActionCommand();
         if (cmd.equals("Run")) {
-            if (! this.simController.isSimRunning()) {
+            if (! this.furnitProdSimController.isSimRunning()) {
                 this.statsViewer.clearStatsList();
-                this.simController.launchSimulation(this.inputA.getIntValue(), this.inputB.getIntValue(),
+                this.furnitProdSimController.launchSimulation(this.inputA.getIntValue(), this.inputB.getIntValue(),
                         this.inputC.getIntValue(), this.inputExperiments.getIntValue(), this.inputSimDur.getDoubleValue());
                 this.setBtnEnabled(this.btnStart, false);
                 this.setBtnEnabled(this.btnPause, true);
@@ -118,18 +109,29 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
             }
         }
         else if (cmd.equals("Cancel")) {
-            this.simController.terminateSimulation();
+            this.furnitProdSimController.terminateSimulation();
             this.onSimEnd();
         }
         else if (cmd.equals("Pause")) {
             if (this.simPaused) {
-                this.simController.resumeSimulation();
+                this.furnitProdSimController.resumeSimulation();
                 this.btnPause.setText("Pause");
             } else {
-                this.simController.pauseSimulation();
+                this.furnitProdSimController.pauseSimulation();
                 this.btnPause.setText("Resume");
             }
             this.simPaused = !this.simPaused;
+        }
+        else if (cmd.equals("Max-speed")) {
+            this.furnitProdSimController.setEnabledMaxSpeed(checkMaxSpeed.isSelected());
+            checkLogs.setEnabled(!checkMaxSpeed.isSelected());
+            if (checkMaxSpeed.isSelected()) {
+                checkLogs.setSelected(false);
+                furnitProdSimController.setEnabledConsoleLogs(false);
+            }
+        }
+        else if (cmd.equals("Console-logs")) {
+            this.furnitProdSimController.setEnabledConsoleLogs(checkLogs.isSelected());
         }
     }
 
@@ -166,8 +168,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     }
 
     private void createNorthPart() {
-        this.timeSlider = new TimeSlider(this.simController, true, 0, 540, 60, "min",
-                "s", 60.0, COL_BG);
+        this.timeSlider = new TimeSlider(this.furnitProdSimController, true, COL_BG);
         this.northPane.add(this.timeSlider);
 
         this.replicationViewer = new ResultViewer("Executed replications");
@@ -181,20 +182,20 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         checks.setLayout(new BoxLayout(checks, BoxLayout.Y_AXIS));
         checks.setBackground(COL_BG);
 
-        JCheckBox checkLogs = new JCheckBox("Console-logs");
+        this.checkLogs = new JCheckBox("Console-logs");
         checkLogs.setAlignmentX(Component.CENTER_ALIGNMENT);
         checkLogs.setBackground(COL_BG);
-        checkLogs.addActionListener(e -> {this.simController.setEnabledConsoleLogs(checkLogs.isSelected());});
+        checkLogs.addActionListener(this);
         checkLogs.setSelected(false);
         checks.add(checkLogs);
-        this.simController.setEnabledConsoleLogs(checkLogs.isSelected());
+        this.furnitProdSimController.setEnabledConsoleLogs(checkLogs.isSelected());
 
-        JCheckBox checkMaxSpeed = new JCheckBox("Max-speed");
+        this.checkMaxSpeed = new JCheckBox("Max-speed");
         checkMaxSpeed.setAlignmentX(Component.CENTER_ALIGNMENT);
         checkMaxSpeed.setBackground(COL_BG);
-        checkMaxSpeed.addActionListener(e -> {this.simController.setEnabledMaxSpeed(checkMaxSpeed.isSelected());});
+        checkMaxSpeed.addActionListener(this);
         checkMaxSpeed.setSelected(false);
-        this.simController.setEnabledMaxSpeed(checkMaxSpeed.isSelected());
+        this.furnitProdSimController.setEnabledMaxSpeed(checkMaxSpeed.isSelected());
 
         checks.add(Box.createRigidArea(new Dimension(0, 5)));
         checks.add(checkMaxSpeed);

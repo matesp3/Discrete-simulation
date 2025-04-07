@@ -15,6 +15,18 @@ public class CarpenterResults {
         this.group = group;
     }
 
+    public int getCarpenterID() {
+        return carpenterID;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public String getOrderRepresentation() {
+        return orderRepresentation;
+    }
+
     public double getOrderBT() {
         return orderBT;
     }

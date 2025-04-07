@@ -48,4 +48,6 @@ public class ResultViewer extends JPanel {
         precision = Math.max(0, precision);
         this.value.setText(String.format(("%."+precision+"f"), value));
     }
+
+
 }

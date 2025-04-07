@@ -7,7 +7,7 @@ import mpoljak.dsim.utils.DoubleComp;
 /**
  * Controller is used for communication with business logic (some type of Simulation).
  */
-public class SimController {
+public class FurnitProdSimController {
     private final FurnitureProdForm gui;
     private FurnitureProductionSim sim;
     private boolean simRunning; // true if it's stopped, also
@@ -17,14 +17,14 @@ public class SimController {
     private long sleepTime; // milliseconds
 
 
-    public SimController(FurnitureProdForm gui) {
+    public FurnitProdSimController(FurnitureProdForm gui) {
         this.gui = gui;
         this.sim = null;
         this.simRunning = false;
         this.maxSpeedOn = true;
         this.consoleLogsOn = false;
         this.shiftTime = 5;     // min
-        this.sleepTime = 500;   // millis
+        this.sleepTime = 250;   // millis
     }
 
     public boolean isSimRunning() {

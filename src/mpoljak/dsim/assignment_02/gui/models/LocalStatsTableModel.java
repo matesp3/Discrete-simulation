@@ -28,7 +28,8 @@ public class LocalStatsTableModel extends AbstractTableModel {
 
     public void setModels(List<StatResult> lModels) {
         this.clear();
-        lResults.addAll(lModels);
+        if (lModels != null)
+            lResults.addAll(lModels);
         this.fireTableDataChanged();
     }
 

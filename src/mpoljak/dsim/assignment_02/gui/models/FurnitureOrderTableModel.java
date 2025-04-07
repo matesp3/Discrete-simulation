@@ -40,7 +40,8 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
 
     public void setModels(List<OrderResults> lModels) {
         this.clear();
-        lResults.addAll(lModels);
+        if (lModels != null)
+            lResults.addAll(lModels);
         this.fireTableDataChanged();
     }
 

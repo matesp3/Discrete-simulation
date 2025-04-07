@@ -10,8 +10,8 @@ import java.util.Queue;
 public abstract class EventSim extends SimCore {
     private final Queue<DiscreteEvent> eventCal;
     private final double maxSimTime;
-    private double shiftTime = 5;
-    private long sleepTime = 1000; // millis
+    private volatile double shiftTime = 5;
+    private volatile long sleepTime = 1000; // millis
     private double simTime;
     protected String currentEventId = null;
     private boolean debugMode = false;
@@ -77,6 +77,8 @@ public abstract class EventSim extends SimCore {
         return this.simTime;
     }
 
+    protected abstract void afterEventExecution();
+
     @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
@@ -102,6 +104,7 @@ public abstract class EventSim extends SimCore {
                 System.out.println(String.format("SimTime=%.02f | executing: %s | [rep:%d]", this.simTime, this.currentEventId, this.getCurrentReplication()));
             }
             event.execute();
+            this.afterEventExecution();
         }
     }
 

@@ -3,6 +3,7 @@ package mpoljak.dsim.assignment_02.gui.components;
 import mpoljak.dsim.assignment_02.gui.FurnitureProdForm;
 import mpoljak.dsim.assignment_02.gui.models.CarpenterTableModel;
 import mpoljak.dsim.assignment_02.gui.models.FurnitureOrderTableModel;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 
 import javax.swing.*;
 import java.awt.*;
@@ -154,5 +155,42 @@ public class FurnitureProdAnim extends JPanel {
         content.add(Box.createRigidArea(new Dimension(0, 10)));
         content.add(p3);
         return content;
+    }
+
+    public void setEventResultsModel(FurnitProdEventResults r) {
+        this.orderTableModelWaiting.setModels(r.getOrdersA());
+        this.orderTableModelAssembling.setModels(r.getOrdersB());
+        this.orderTableModelStaining.setModels(r.getOrdersCLow());
+        this.orderTableModelFitInst.setModels(r.getOrderCHigh());
+        this.viewSimTime.setValue(getStrDateTime(r.getSimTime()*60, 8, 6));
+        this.carpenterTableModelA.setModels(r.getCarpentersA());
+        this.carpenterTableModelB.setModels(r.getCarpentersB());
+        this.carpenterTableModelC.setModels(r.getCarpentersC());
+    }
+
+    /**
+     * If one
+     * @param timeSecs time to be formatted, which is given in seconds
+     * @param dayHours amount of hours that one day lasts
+     * @param startHour if one day lasts {@code dayHours} and its less than {@code 24}, then you may want to specify,
+     *                  which should be considered as 00:00:00 time.
+     * @return formatted date-time
+     */
+    private static String getStrDateTime(double timeSecs, int dayHours, int startHour) {
+        int day = (int) timeSecs / (dayHours*3600) + 1;
+        timeSecs -= (day-1) * dayHours * 3600;
+        int hours = (int) Math.floor(timeSecs/3600.0);
+        timeSecs -= (hours) * 3600;
+        int min = (int)Math.floor(timeSecs/60.0);
+        timeSecs -= min * 60;
+        int secs = (int)Math.ceil(timeSecs);
+        return String.format("Day-%d %02d:%02d:%02d", day, (min == 60 ? hours+1 : hours)%dayHours+startHour, min%60, secs%60);
+    }
+
+    public static void main(String[] args) {
+        double secs = 0;
+        for (int i = 0; i < 3600*9; i++) {
+            System.out.println(getStrDateTime(secs++, 8, 6)); // ok
+        }
     }
 }

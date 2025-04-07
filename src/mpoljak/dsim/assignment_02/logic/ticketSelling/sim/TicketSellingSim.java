@@ -64,6 +64,11 @@ public class TicketSellingSim extends EventSim {
     }
 
     @Override
+    protected void afterEventExecution() {
+
+    }
+
+    @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
         this.queueLength = 0;

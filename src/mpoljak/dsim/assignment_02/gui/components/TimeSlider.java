@@ -1,6 +1,6 @@
 package mpoljak.dsim.assignment_02.gui.components;
 
-import mpoljak.dsim.assignment_02.controllers.SimController;
+import mpoljak.dsim.assignment_02.controllers.FurnitProdSimController;
 import mpoljak.dsim.assignment_02.gui.FurnitureProdForm;
 
 import javax.swing.*;
@@ -9,15 +9,22 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 
 public class TimeSlider extends JPanel {
-    private final int MINS_MIN = 0;  //0.25hrs
-    private final int MINS_MID = 60; // 3hrs
-    private final int MINS_MAX = 180; // 8hrs = 1 day
 
+    private class SpeedMode {
+        private String repr;
+        private double simUnits;
+        private long sleep;
+        public SpeedMode(String repr, double simUnits, long sleep) {
+            this.repr = repr;
+            this.simUnits = simUnits;
+            this.sleep = sleep;
+        }
+    }
+    private SpeedMode[] modes;
     private final JLabel resultScale;
     private JSlider sliderForSecs;
 
-    public TimeSlider(SimController controller, boolean sliderHorizontal, int min, int max, int def, String displaySliderUnit,
-                      String displayOtherUnit, double divisorOfSliderValue, Color bg) {
+    public TimeSlider(FurnitProdSimController controller, boolean sliderHorizontal,Color bg) {
             if (controller == null)
                 throw new NullPointerException();
         this.setLayout(new BoxLayout(this, sliderHorizontal ? BoxLayout.X_AXIS : BoxLayout.Y_AXIS));
@@ -26,25 +33,26 @@ public class TimeSlider extends JPanel {
         this.resultScale.setHorizontalAlignment(JLabel.CENTER);
         this.resultScale.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
 
-        this.sliderForSecs = new JSlider(sliderHorizontal ? JSlider.HORIZONTAL : JSlider.VERTICAL, min, max, def);
-        controller.setShiftTime(sliderForSecs.getValue()/divisorOfSliderValue); // initialization
+        this.sliderForSecs = new JSlider(sliderHorizontal ? JSlider.HORIZONTAL : JSlider.VERTICAL, 0, 12, 5);
+        this.initSpeedModes();
+        controller.setSleepTime(this.modes[sliderForSecs.getValue()].sleep);
+        controller.setShiftTime(this.modes[sliderForSecs.getValue()].simUnits); // initialization
+        this.resultScale.setText(formatOutput(sliderForSecs.getValue()));
+
         this.sliderForSecs.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    controller.setShiftTime(sliderForSecs.getValue()/divisorOfSliderValue);
-                    resultScale.setText(formatOutput(displaySliderUnit, displayOtherUnit,
-                            sliderForSecs.getValue()/divisorOfSliderValue));
+                    controller.setSleepTime(modes[sliderForSecs.getValue()].sleep);
+                    controller.setShiftTime(modes[sliderForSecs.getValue()].simUnits);
+                    resultScale.setText(formatOutput(sliderForSecs.getValue()));
                 }
             }
         });
-        this.sliderForSecs.setMajorTickSpacing((max)/4);
-        this.sliderForSecs.setMinorTickSpacing((max)/12);
+        this.sliderForSecs.setMinorTickSpacing(13);
         this.sliderForSecs.setPaintTicks(true);
         this.sliderForSecs.setPaintLabels(true);
-        this.resultScale.setText(formatOutput(displaySliderUnit, displayOtherUnit,
-                this.sliderForSecs.getValue()/divisorOfSliderValue));
 
         this.add(this.sliderForSecs);
         this.add(Box.createRigidArea(sliderHorizontal ? new Dimension(20,0) : new Dimension(0,10)));
@@ -56,7 +64,24 @@ public class TimeSlider extends JPanel {
         }
     }
 
-    private static String formatOutput(String unit1, String unit2, double scaleValue) {
-        return String.format("Sim-speed:  %.01f%s/1%s",  scaleValue, unit1, unit2);
+    private void initSpeedModes() {
+        this.modes = new SpeedMode[13];
+        this.modes[0] = new SpeedMode("1s", 1.0/60.0, 975); // 975 - 1.0/60.0
+        this.modes[1] = new SpeedMode("3s", 1.5/60.0, 500); // 150
+        this.modes[2] = new SpeedMode("5s", 1.2/60.0, 245); // 245
+        this.modes[3] = new SpeedMode("15s", 4.5/60.0, 300); // 300
+        this.modes[4] = new SpeedMode("30s", 0.09, 165); // 162 - 0.09
+        this.modes[5] = new SpeedMode("1min", 0.1, 95); // 94 - 0.1
+        this.modes[6] = new SpeedMode("3min", 50 / 60.0, 250); // 250
+        this.modes[7] = new SpeedMode("5min", 1.25, 250);
+        this.modes[8] = new SpeedMode("15min", 3.85, 250);
+        this.modes[9] = new SpeedMode("30min", 7.25, 250);
+        this.modes[10] = new SpeedMode("1h", 15, 250);
+        this.modes[11] = new SpeedMode("4h", 50, 250);
+        this.modes[12] = new SpeedMode("8h", 100, 250);
+    }
+
+    private String formatOutput(int mode) {
+        return String.format("Sim-speed:  %s/1s",  this.modes[mode].repr);
     }
 }

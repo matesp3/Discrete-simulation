@@ -1,13 +1,13 @@
 package mpoljak.dsim.assignment_02.gui.models;
 
-import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.CarpenterResults;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CarpenterTableModel extends AbstractTableModel {
-    private final List<Carpenter> lResults;
+    private final List<CarpenterResults> lResults;
     private final String[] aColNames = new String[] {
             "ID",
             "Group",
@@ -26,30 +26,31 @@ public class CarpenterTableModel extends AbstractTableModel {
             Boolean.class,
     };
 
-    public CarpenterTableModel(List<Carpenter> lResults) {
+    public CarpenterTableModel(List<CarpenterResults> lResults) {
         this.lResults = lResults;
     }
 
-    public void add(Carpenter model) {
+    public void add(CarpenterResults model) {
         this.lResults.add(model);
         this.fireTableDataChanged();
     }
 
-    public void setModels(List<Carpenter> lModels) {
+    public void setModels(List<CarpenterResults> lModels) {
         this.clear();
-        lResults.addAll(lModels);
+        if (lModels != null)
+            lResults.addAll(lModels);
         this.fireTableDataChanged();
     }
 
-    public Carpenter getModel(int index) {
+    public CarpenterResults getModel(int index) {
         return this.lResults.get(index);
     }
 
-    public ArrayList<Carpenter> getModels() {
+    public ArrayList<CarpenterResults> getModels() {
         return new ArrayList<>(this.lResults);
     }
 
-    public void setModel(int index, Carpenter model) {
+    public void setModel(int index, CarpenterResults model) {
         if (model == null || index < 0 || index > this.lResults.size())
             return;
         this.lResults.set(index, model);
@@ -94,19 +95,19 @@ public class CarpenterTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        Carpenter c = this.lResults.get(rowIndex);
+        CarpenterResults c = this.lResults.get(rowIndex);
         if (columnIndex == 0)
-            return c.getCarpenterId();
+            return c.getCarpenterID();
         if (columnIndex == 1)
             return c.getGroup();
         if (columnIndex == 2)
-            return c.getCurrentDeskID();
+            return c.getDeskID();
         if (columnIndex == 3)
-            return c.getCurrentOrder();
+            return c.getAssignedOrderID();
         if (columnIndex == 4)
-            return c.getOrderProcessingBT();
+            return c.getOrderBT();
         if (columnIndex == 5)
-            return c.getOrderProcessingET();
+            return c.getOrderET();
         if (columnIndex == 6)
             return c.isWorking();
         return null;

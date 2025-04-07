@@ -4,8 +4,7 @@ import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 import mpoljak.dsim.common.ISimDelegate;
-import mpoljak.dsim.assignment_02.controllers.SimController;
-import mpoljak.dsim.common.SimCore;
+import mpoljak.dsim.assignment_02.controllers.FurnitProdSimController;
 import mpoljak.dsim.common.SimResults;
 
 import javax.swing.*;
@@ -25,7 +24,7 @@ public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDele
     public static final Color colTextFont = new Color(3, 2, 108);
     public static final Color colTextFont2 = new Color(18, 129, 248);
 
-    private final SimController simController;
+    private final FurnitProdSimController simController;
     private boolean simPaused;
     private JButton btnStart;
     private JButton btnPause;
@@ -39,7 +38,7 @@ public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDele
     public TicketsSellingWindow(EventSim simulation) {
 //        ---- initialization of params of business logic
         simulation.registerDelegate(this);
-        this.simController = new SimController(null);
+        this.simController = new FurnitProdSimController(null);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
         this.setSize(new Dimension(400,300));

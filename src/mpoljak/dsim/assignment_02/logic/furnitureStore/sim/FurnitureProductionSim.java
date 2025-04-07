@@ -3,6 +3,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.events.OrderArrival;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.AfterEventResults;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.common.Generator;
@@ -116,6 +117,11 @@ public class FurnitureProductionSim extends EventSim {
     protected void beforeSimulation() {
         super.beforeSimulation();
         // todo RESET SIM STATS
+    }
+
+    @Override
+    protected void afterEventExecution() {
+        this.fireStateChangedNofication();
     }
 
     @Override
@@ -352,6 +358,10 @@ public class FurnitureProductionSim extends EventSim {
      */
     public boolean hasNotAvailableCarpenter(Carpenter.GROUP group) {
         return this.getRelevantCarpenterQueue(group).isEmpty();
+    }
+
+    public void fireStateChangedNofication() {
+        this.notifyDelegates(new FurnitProdEventResults(this.getCurrentReplication(), this.getSimTime()));
     }
 
     @Override
