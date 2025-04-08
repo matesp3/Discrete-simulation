@@ -93,6 +93,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
             SwingUtilities.invokeLater(() -> {
                 this.statsViewer.updateOverallStats(r.getResults());
                 this.replicationViewer.setValue(r.getExperimentNum());
+                this.chartCIViewer.addValue(r.getExperimentNum(), r.getOrderTimeInSystemMean()/60.0, r.getOrderTimeInSystemHValue()/60.0);
             });
         }
         else if (res instanceof OtherEventInfo) {
@@ -113,14 +114,15 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         if (cmd.equals("Run")) {
             if (! this.furnitProdSimController.isSimRunning()) {
                 this.statsViewer.clearStatsList();
+                this.chartCIViewer.setMaxReplicationNr(this.inputExperiments.getIntValue());
                 this.chartCIViewer.clearChart();
-                this.furnitProdSimController.launchSimulation(this.inputA.getIntValue(), this.inputB.getIntValue(),
-                        this.inputC.getIntValue(), this.inputExperiments.getIntValue(), this.inputSimDur.getDoubleValue());
                 this.setBtnEnabled(this.btnStart, false);
                 this.setBtnEnabled(this.btnPause, true);
                 this.setBtnEnabled(this.btnCancel, true);
                 this.setEnabledInputs(false);
                 this.replicationViewer.setValue(0);
+                this.furnitProdSimController.launchSimulation(this.inputA.getIntValue(), this.inputB.getIntValue(),
+                        this.inputC.getIntValue(), this.inputExperiments.getIntValue(), this.inputSimDur.getDoubleValue());
             }
         }
         else if (cmd.equals("Cancel")) {

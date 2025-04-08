@@ -281,6 +281,7 @@ public class FurnitureProductionSim extends EventSim {
                     statAllInFitInstQueueTime.getMean(), 5, 60), "[h]"));
             res.addResult(new StatResult("Order time in system", confIntToStr(statAllOrderTimeInSystem.getHalfWidthCI(),
                     statAllOrderTimeInSystem.getMean(), 5, 60), "[h]"));
+            res.setOrderTimeInSystem(statAllOrderTimeInSystem.getMean(), statAllOrderTimeInSystem.getHalfWidthCI());
             this.notifyDelegates(res);
         }
     }

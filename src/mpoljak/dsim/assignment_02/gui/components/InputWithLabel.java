@@ -24,7 +24,7 @@ public class InputWithLabel extends JPanel {
     }
 
     public double getDoubleValue() {
-        return Double.parseDouble(textField.getText());
+        return Double.parseDouble(textField.getText().replaceAll(",", "."));
     }
 
     public String getStringValue() {
