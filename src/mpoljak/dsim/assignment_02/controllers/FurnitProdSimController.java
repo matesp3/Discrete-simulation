@@ -45,6 +45,7 @@ public class FurnitProdSimController {
                 }
                 this.sim.setDebugMode(this.consoleLogsOn);
                 this.sim.simulate();
+                this.simRunning = false;
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

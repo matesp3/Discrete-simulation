@@ -18,6 +18,6 @@ public class OrderEnd extends FurnitureProdEvent {
         FurnitureOrder order = this.carpenter.returnOrder(this.getExecutionTime());
         this.sim.releaseDesk(order.getDeskID(), order);
         this.sim.returnCarpenter(this.carpenter);
-        this.sim.addOrderTimeInSystem(order.getOverallProcessingTime());
+        this.sim.receiveCompletedOrder(order);
     }
 }

@@ -15,6 +15,7 @@ public class FurnitProdEventResults extends AfterEventResults {
     private final List<OrderResults> ordersB;
     private final List<OrderResults> ordersCLow;
     private final List<OrderResults> ordersCHigh;
+    private final List<StatResult> stats;
 
     private StatResult wavgOrderQueueTimeA;
     private StatResult realOrderQueueTimeA;
@@ -72,38 +73,15 @@ public class FurnitProdEventResults extends AfterEventResults {
         this.ordersB = new ArrayList<>();
         this.ordersCLow = new ArrayList<>();
         this.ordersCHigh = new ArrayList<>();
+        this.stats = new ArrayList<>();
     }
 
-    private CarpenterResults rawToModel(Carpenter raw) {
-        CarpenterResults r = new CarpenterResults(raw.getCarpenterId(), raw.getGroup().toString());
-        r.setDeskID(raw.getCurrentDeskID());
-        r.setAssignedOrderID(raw.getCurrentOrder() == null ? -1 : raw.getCurrentOrder().getOrderID());
-        r.setOrderBT(raw.getOrderProcessingBT());
-        r.setOrderET(raw.getOrderProcessingET());
-        r.setOrderRepresentation(raw.getCurrentOrder() == null ? "" : raw.getCurrentOrder().toString());
-        r.setWorking(raw.isWorking());
-        return r;
+    public void clearPrevStats() {
+        this.stats.clear();
     }
 
-    private OrderResults rawToModel(FurnitureOrder raw) {
-        OrderResults r = new OrderResults(raw.getOrderID(), raw.getDeskID(), raw.getTimeOfOrderCreation(),
-                raw.getProductType().toString(), raw.getNextTechStep().toString());
-//        raw.setTechStepBegin(raw.get);
-//        raw.setTechStepEnd();
-        return r;
-    }
-
-    private void setNewCarpenters(Carpenter[] input, List<CarpenterResults> output) {
-        for (int i = 0; i < input.length; i++) {
-            output.set(i, this.rawToModel(input[i])); // size is the same for whole simulation
-        }
-    }
-
-    private void setNewOrders(Queue<FurnitureOrder> input, List<OrderResults> output) {
-        output.clear();
-        for (FurnitureOrder o : input) {
-            output.add(this.rawToModel(o)); // size of structure may vary each time
-        }
+    public void addStat(StatResult stat) {
+        this.stats.add(stat);
     }
 
     public List<CarpenterResults> getCarpentersA() {
@@ -160,5 +138,41 @@ public class FurnitProdEventResults extends AfterEventResults {
 
     public void setOrdersCHigh(Queue<FurnitureOrder> orderCHigh) {
         this.setNewOrders(orderCHigh, this.ordersCHigh);
+    }
+
+    private CarpenterResults rawToModel(Carpenter raw) {
+        CarpenterResults r = new CarpenterResults(raw.getCarpenterId(), raw.getGroup().toString());
+        r.setDeskID(raw.getCurrentDeskID());
+        r.setAssignedOrderID(raw.getCurrentOrder() == null ? -1 : raw.getCurrentOrder().getOrderID());
+        r.setOrderBT(raw.getOrderProcessingBT());
+        r.setOrderET(raw.getOrderProcessingET());
+        r.setOrderRepresentation(raw.getCurrentOrder() == null ? "" : raw.getCurrentOrder().toString());
+        r.setWorking(raw.isWorking());
+        return r;
+    }
+
+    private OrderResults rawToModel(FurnitureOrder raw) {
+        OrderResults r = new OrderResults(raw.getOrderID(), raw.getDeskID(), raw.getTimeOfOrderCreation(),
+                raw.getProductType().toString(), raw.getNextTechStep().toString());
+//        raw.setTechStepBegin(raw.get);
+//        raw.setTechStepEnd();
+        return r;
+    }
+
+    private void setNewCarpenters(Carpenter[] input, List<CarpenterResults> output) {
+        for (int i = 0; i < input.length; i++) {
+            output.set(i, this.rawToModel(input[i])); // size is the same for whole simulation
+        }
+    }
+
+    private void setNewOrders(Queue<FurnitureOrder> input, List<OrderResults> output) {
+        output.clear();
+        for (FurnitureOrder o : input) {
+            output.add(this.rawToModel(o)); // size of structure may vary each time
+        }
+    }
+
+    public List<StatResult> getStats() {
+        return this.stats;
     }
 }

@@ -78,6 +78,27 @@ public abstract class Stats {
             return "WeightedAvg "+ super.toString();
         }
     }
+//  -   -   -   -   -   -   -   Time-WAVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+    public static class TimeWeightedAvg extends WeightedAvg {
+        private double lastInsertionTime = 0;
+
+        public void addSample(double value, double insertionTime) {
+            if (DoubleComp.compare(insertionTime, this.lastInsertionTime) == -1)
+                throw new IllegalArgumentException("Insertion time cannot be less than last insertion time("+insertionTime+" VS "+lastInsertionTime+")");
+
+            double weight = insertionTime - this.lastInsertionTime;
+            this.sum += value * weight;
+            this.count += weight;
+            this.samplesCount++;
+            this.lastInsertionTime = insertionTime;
+        }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.lastInsertionTime = 0;
+    }
+}
 //  -   -   -   -   -   -   -   C I -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     public static class ConfidenceInterval extends ArithmeticAvg {
         private static final double T_ALFA = 1.96 ; // from 30 samples
@@ -131,6 +152,12 @@ public abstract class Stats {
                 throw new RuntimeException("Cannot compute confidence interval for only "+this.count+ " samples." +
                         " There must be at least 30 samples.");
             return (this.getStdDev() * T_ALFA) / Math.sqrt(this.count);
+        }
+
+        public String getRepresentation(int p) {
+            double h = this.getHalfWidthCI();
+            double mean = this.getMean();
+            return String.format(("95% <%."+p+"f   | %."+p+"f |   %."+p+"f>"), mean-h, h, mean+h);
         }
 
         @Override

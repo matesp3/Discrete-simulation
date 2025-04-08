@@ -51,6 +51,10 @@ public class DeskAllocation {
         return assigned;
     }
 
+    public int getAllocatedDesksCount() {
+        return this.desks.size();
+    }
+
     public void freeAllDesks() {
         this.desks.replaceAll(ignored -> null);
         this.firstFree = 0;

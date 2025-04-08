@@ -1,7 +1,5 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.results;
 
-import mpoljak.dsim.common.SimResults;
-
 public class StatResult {
     private String description;
     private String value;

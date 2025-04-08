@@ -4,6 +4,7 @@ import mpoljak.dsim.assignment_02.controllers.FurnitProdSimController;
 import mpoljak.dsim.assignment_02.gui.components.*;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.OtherEventInfo;
 import mpoljak.dsim.common.ISimDelegate;
 import mpoljak.dsim.common.SimResults;
 
@@ -15,9 +16,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionListener, ComponentListener {
-    // look & feel
-    final static String LOOK_AND_FEEL = "Metal"; // null (use the default), "Metal", "System", "Motif" and "GTK"
-    final static String THEME = "Test"; // For Metal L&F, themes: "DefaultMetal", "Ocean",  and "Test"
     // colors
     public static final Color COL_BG = new Color(191, 201, 224);
     public static final Color COL_BG_TAB = new Color(223, 227, 238);
@@ -85,15 +83,26 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
             r.prepareResults();
             SwingUtilities.invokeLater(() -> {
                 this.animationViewer.setEventResultsModel(r);
+                this.statsViewer.updateLocalStats(r.getStats());
+                this.statsViewer.updateExperimentTime(r.getSimTime());
+                this.replicationViewer.setValue(r.getExperimentNum() > 0 ? r.getExperimentNum()-1 : 0);
             });
         }
         else if (res instanceof FurnitProdExpStats) {
             FurnitProdExpStats r = (FurnitProdExpStats) res;
             r.prepareResults();
             SwingUtilities.invokeLater(() -> {
-                this.statsViewer.updateStats(r.getResults());
+                this.statsViewer.updateOverallStats(r.getResults());
                 this.replicationViewer.setValue(r.getExperimentNum());
             });
+        }
+        else if (res instanceof OtherEventInfo) {
+            OtherEventInfo r = (OtherEventInfo) res;
+            if (r.getMessage() == null)
+                return;
+            if (r.getMessage().equals("Sim:ended")) {
+                this.onSimEnd();
+            }
         }
 //        else
 //            System.out.println("why");
@@ -241,8 +250,8 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         inputsPanel.setBackground(COL_BG);
 
         this.inputA = new InputWithLabel("Amount A:", 2, "2");
-        this.inputB = new InputWithLabel("Amount B:", 2, "3");
-        this.inputC = new InputWithLabel("Amount C:", 2, "20");
+        this.inputB = new InputWithLabel("Amount B:", 2, "2");
+        this.inputC = new InputWithLabel("Amount C:", 2, "18");
         this.inputSimDur = new InputWithLabel("Dur [days]:", 3, "249");
         this.inputExperiments = new InputWithLabel("Experiments:", 6, "10000");
         JLabel lblConf = new JLabel("Params:");

@@ -2,10 +2,7 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
 import mpoljak.dsim.assignment_02.logic.EventSim;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.events.OrderArrival;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.AfterEventResults;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.*;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.common.SimCommand;
 import mpoljak.dsim.generators.ContinuosEmpiricalRnd;
@@ -54,10 +51,21 @@ public class FurnitureProductionSim extends EventSim {
     private final Queue<Carpenter> freeA;
     private final Queue<Carpenter> freeB;
     private final Queue<Carpenter> freeC;
-
+    // statistics
     private int newOrderID; // ID of lastly assigned order
-    private final Stats.ArithmeticAvg statOrderInSystemExp;
-    private final Stats.ConfidenceInterval statOrderInSystemSim;
+    private final Stats.ArithmeticAvg statExpOrderTimeInSystem;
+    private final Stats.ConfidenceInterval statAllOrderTimeInSystem;
+
+    private final Stats.TimeWeightedAvg statExpWaitingCount;
+    private final Stats.TimeWeightedAvg statExpStainingCount;
+    private final Stats.TimeWeightedAvg statExpAssemblingCount;
+    private final Stats.TimeWeightedAvg statExpFitInstCount;
+    private final Stats.ConfidenceInterval statAllWaitingCount;
+    private final Stats.ConfidenceInterval statAllStainingCount;
+    private final Stats.ConfidenceInterval statAllAssemblingCount;
+    private final Stats.ConfidenceInterval statAllFitInstCount;
+
+    // sim results
     private final FurnitProdEventResults eventResults;
 
     public FurnitureProductionSim(long replicationsCount, int amountA, int amountB, int amountC, double timeInMinutes) {
@@ -81,15 +89,14 @@ public class FurnitureProductionSim extends EventSim {
         this.rndStainingWardrobe = new ContinuosUniformRnd(600, 700);
         this.rndAssemblingWardrobe = new ContinuosUniformRnd(35, 75);
         this.rndFitInstallWardrobe = new ContinuosUniformRnd(15, 25);
-
+        // orders
         this.rndDrying = new TriangularRnd(1, 200/60.0, 80/60.0);
         this.ordersA = new LinkedList<>();
         this.ordersB = new LinkedList<>(); // FIFO ordering based on the docs
         this.ordersCLowPr = new LinkedList<>();
         this.ordersCHighPr = new LinkedList<>();
-
         this.deskManager = new DeskAllocation(amountA + amountB + amountC); // sum is enough - maximum occupancy
-
+        // carpenters
         this.groupA = new Carpenter[amountA];
         this.createAndSetCarpenters(1, this.groupA, Carpenter.GROUP.A);
         this.groupB = new Carpenter[amountB];
@@ -101,11 +108,20 @@ public class FurnitureProductionSim extends EventSim {
         this.freeB = new PriorityQueue<>(amountB, carpenterCmp);
         this.freeC = new PriorityQueue<>(amountC, carpenterCmp);
         this.newOrderID = 1;
+        // stats
+        this.statExpOrderTimeInSystem = new Stats.ArithmeticAvg();
+        this.statAllOrderTimeInSystem = new Stats.ConfidenceInterval();
 
-        this.statOrderInSystemExp = new Stats.ArithmeticAvg();
-        this.statOrderInSystemSim = new Stats.ConfidenceInterval();
+        this.statExpWaitingCount = new Stats.TimeWeightedAvg();
+        this.statExpStainingCount = new Stats.TimeWeightedAvg();
+        this.statExpAssemblingCount = new Stats.TimeWeightedAvg();
+        this.statExpFitInstCount = new Stats.TimeWeightedAvg();
+        this.statAllWaitingCount = new Stats.ConfidenceInterval();
+        this.statAllStainingCount = new Stats.ConfidenceInterval();
+        this.statAllAssemblingCount = new Stats.ConfidenceInterval();
+        this.statAllFitInstCount = new Stats.ConfidenceInterval();
+        // results information
         this.eventResults = new FurnitProdEventResults(0, 0, amountA, amountB, amountC);
-
         SimCommand resultsPrepCmd = new SimCommand(SimCommand.SimCommandType.CUSTOM) {
             @Override
             public void invoke() {
@@ -118,6 +134,13 @@ public class FurnitureProductionSim extends EventSim {
                 eventResults.setOrdersB(ordersB);
                 eventResults.setOrdersCLow(ordersCLowPr);
                 eventResults.setOrdersCHigh(ordersCHighPr);
+                eventResults.clearPrevStats();
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Waiting", String.valueOf(statExpWaitingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Assembling", String.valueOf(statExpAssemblingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Staining", String.valueOf(statExpStainingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Fit inst.", String.valueOf(statExpFitInstCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("AVG order's time in system", String.valueOf(statExpOrderTimeInSystem.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("Allocated desks count", String.valueOf(deskManager.getAllocatedDesksCount()), "[qty]"));
             }
         };
         this.eventResults.setResultsPreparationCommand(resultsPrepCmd);
@@ -126,14 +149,19 @@ public class FurnitureProductionSim extends EventSim {
     @Override
     protected void beforeSimulation() {
         super.beforeSimulation();
-        // todo RESET SIM STATS
+
+        statAllWaitingCount.reset();
+        statAllStainingCount.reset();
+        statAllAssemblingCount.reset();
+        statAllFitInstCount.reset();
+        statAllOrderTimeInSystem.reset();
+
         this.notifyDelegates(this.eventResults);
     }
 
     @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
-        this.statOrderInSystemExp.reset();
         this.deskManager.freeAllDesks();
         this.ordersA.clear();
         this.ordersB.clear();
@@ -144,11 +172,52 @@ public class FurnitureProductionSim extends EventSim {
         this.resetAndFillQueue(this.groupC, this.freeC);
         this.newOrderID = 1;
         this.addToCalendar(new OrderArrival(0+this.nextUntilOrderArrivalDuration(), this, null));
+        // stats
+        this.statExpOrderTimeInSystem.reset();
+        this.statExpWaitingCount.reset();
+        this.statExpStainingCount.reset();
+        this.statExpAssemblingCount.reset();
+        this.statExpFitInstCount.reset();
     }
 
     @Override
     protected void afterEventExecution() {
         this.notifyDelegates(this.eventResults);
+    }
+
+    @Override
+    protected void afterExperiment() {
+        super.afterExperiment();
+        this.statAllWaitingCount.addSample(this.statExpWaitingCount.getMean());
+        this.statAllStainingCount.addSample(this.statExpStainingCount.getMean());
+        this.statAllAssemblingCount.addSample(this.statExpAssemblingCount.getMean());
+        this.statAllFitInstCount.addSample(this.statExpFitInstCount.getMean());
+        this.statAllOrderTimeInSystem.addSample(this.statExpOrderTimeInSystem.getMean());
+
+        double count = this.statAllOrderTimeInSystem.getCount();
+        if (count >= 30 && count%2000==0)
+            System.out.println("Order duration in system: "+this.statAllOrderTimeInSystem);
+        if (count > 30) {
+            FurnitProdExpStats res = new FurnitProdExpStats(this.getCurrentReplication());
+            res.addResult(new StatResult("Orders count-Waiting", confIntToStr(statAllWaitingCount.getHalfWidthCI(),
+                    statAllWaitingCount.getMean(), 5, 1),"[qty]"));
+            res.addResult(new StatResult("Orders count-Assembling", confIntToStr(statAllAssemblingCount.getHalfWidthCI(),
+                    statAllAssemblingCount.getMean(), 5, 1),"[qty]"));
+            res.addResult(new StatResult("Orders count-Staining", confIntToStr(statAllStainingCount.getHalfWidthCI(),
+                    statAllStainingCount.getMean(), 5, 1),"[qty]"));
+            res.addResult(new StatResult("Orders count-Fit inst.", confIntToStr(statAllFitInstCount.getHalfWidthCI(),
+                    statAllFitInstCount.getMean(), 5, 1),"[qty]"));
+            res.addResult(new StatResult("Order time in system", confIntToStr(statAllOrderTimeInSystem.getHalfWidthCI(),
+                    statAllOrderTimeInSystem.getMean(), 5, 60), "[h]"));
+            this.notifyDelegates(res);
+        }
+    }
+
+    @Override
+    protected void afterSimulation() {
+        super.afterSimulation();
+        OtherEventInfo info = new OtherEventInfo(this.getCurrentReplication(), "Sim:ended");
+        this.notifyDelegates(info);
     }
 
     /**
@@ -185,17 +254,19 @@ public class FurnitureProductionSim extends EventSim {
             case WOOD_PREPARATION:
             case CARVING:
                 this.ordersA.add(order);
+                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime());
                 return;
             case STAINING:
                 this.ordersCLowPr.add(order);
-//                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_LOW, order));
+                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime());
                 return;
             case ASSEMBLING:
                 this.ordersB.add(order);
+                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime());
                 return;
             case FIT_INSTALLATION:
                 this.ordersCHighPr.add(order);
-//                this.ordersC.add(new FurnitureOrder.OrderWithPriority(PR_TOP, order));
+                this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime());
         }
     }
 
@@ -333,15 +404,25 @@ public class FurnitureProductionSim extends EventSim {
      * there's no waiting order for processing by group {@code carpenterGroup}
      */
     public FurnitureOrder getOrderForCarpenter(Carpenter.GROUP carpenterGroup) {
+        FurnitureOrder order = null;
         switch (carpenterGroup) {
             case A:
-                return this.ordersA.poll();
+                order = this.ordersA.poll();
+                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime());
+                return order;
             case B:
-                return this.ordersB.poll();
+                order = this.ordersB.poll();
+                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime());
+                return order;
             case C:
-                if (!this.ordersCHighPr.isEmpty())
-                    return this.ordersCHighPr.poll();
-                return this.ordersCLowPr.poll();
+                if (!this.ordersCHighPr.isEmpty()) {
+                    order = this.ordersCHighPr.poll();
+                    this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime());
+                    return order;
+                }
+                order = this.ordersCLowPr.poll();
+                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime());
+                return order;
 //                if (this.ordersC.peek() == null)
 //                    return null;
 //                return this.ordersC.poll().getOrder();
@@ -366,33 +447,13 @@ public class FurnitureProductionSim extends EventSim {
         return this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
-    @Override
-    protected void afterExperiment() {
-        super.afterExperiment();
-        this.statOrderInSystemSim.addSample(this.statOrderInSystemExp.getMean());
-        double count = this.statOrderInSystemSim.getCount();
-        if (count >= 30 && count%2000==0)
-            System.out.println("Order duration in system: "+this.statOrderInSystemSim);
-        if (count > 30) {
-            FurnitProdExpStats res = new FurnitProdExpStats(this.getCurrentReplication());
-            res.addResult(new StatResult("Order time in system", confIntToStr(this.statOrderInSystemSim.getHalfWidthCI() / 60.0
-                    , this.statOrderInSystemSim.getMean() / 60.0), "[h]"));
-            this.notifyDelegates(res);
-        }
-    }
-
-    @Override
-    protected void afterSimulation() {
-        super.afterSimulation();
-    }
-
     //    - -   -   -   -   -   -   S T A T I S T I C S  -   -   -   -   -   -   -   -   -
     public void receiveEventResults(AfterEventResults results) {
         this.notifyDelegates(results);
     }
 
-    public void addOrderTimeInSystem(double duration) {
-        this.statOrderInSystemExp.addSample(duration);
+    public void receiveCompletedOrder(FurnitureOrder completed) {
+        this.statExpOrderTimeInSystem.addSample(completed.getOverallProcessingTime());
     }
 
     /**
@@ -416,8 +477,15 @@ public class FurnitureProductionSim extends EventSim {
         }
     }
 
-    private static String confIntToStr(double h, double mean) {
-        return String.format("95%%: <%.2f     | %.02f |   %.02f>", mean-h, mean, mean+h);
+    /**
+     * @param p decimal precision of numbers
+     * @param divisor number by which will {@code h} and {@code mean} divided before formatting.
+     * @return formatted confidence interval representation
+     */
+    private static String confIntToStr(double h, double mean, int p, double divisor) {
+        h /= divisor;
+        mean /= divisor;
+        return String.format(("95%% < %."+p+"f | %."+p+"f | %."+p+"f >"), mean-h, mean, mean+h);
     }
 //    - -   -   -   -   -   -   - testing... ---v
 
@@ -429,5 +497,6 @@ public class FurnitureProductionSim extends EventSim {
 //        order.setDeskID(deskID);
 //        sim.releaseDesk(deskID, order);
 //        sim.returnCarpenter(carp); // ok
+//        System.out.println(confIntToStr(5, 12, 5, 1));
     }
 }

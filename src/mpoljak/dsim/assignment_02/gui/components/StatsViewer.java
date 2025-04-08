@@ -5,6 +5,7 @@ import mpoljak.dsim.assignment_02.gui.models.LocalStatsTableModel;
 import mpoljak.dsim.assignment_02.gui.models.OverallStatsTableModel;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.utils.SwingTableColumnResizer;
+import mpoljak.dsim.utils.TimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class StatsViewer extends JPanel {
+    private ResultViewer expTimeViewer;
     private OverallStatsTableModel overallStatsTableModel;
     private LocalStatsTableModel localStatsTableModel;
     private final JScrollPane scrollPane;
@@ -20,6 +22,8 @@ public class StatsViewer extends JPanel {
     private JTable resultsAllJTab;
 
     public StatsViewer() {
+        this.expTimeViewer = new ResultViewer("Time in experiment", "0");
+
         this.contentPane = createTables();
         this.scrollPane = new JScrollPane(this.contentPane);
         this.scrollPane.setWheelScrollingEnabled(true);
@@ -34,6 +38,12 @@ public class StatsViewer extends JPanel {
         JPanel p0 = new JPanel();
         p0.setBackground(FurnitureProdForm.COL_BG_TAB);
         p0.setLayout(new BoxLayout(p0, BoxLayout.X_AXIS));
+        JPanel p1 = new JPanel();
+        p1.setBackground(FurnitureProdForm.COL_BG_TAB);
+        p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+        JPanel p2 = new JPanel();
+        p2.setBackground(FurnitureProdForm.COL_BG_TAB);
+        p2.setLayout(new BoxLayout(p2, BoxLayout.Y_AXIS));
 
         this.overallStatsTableModel = new OverallStatsTableModel(new ArrayList<>());
         this.resultsAllJTab = new JTable(overallStatsTableModel);
@@ -52,20 +62,49 @@ public class StatsViewer extends JPanel {
         statScrollPane2.setMinimumSize(new Dimension(500, 150));
         statScrollPane2.setMaximumSize(new Dimension(1000, 200));
 
+        this.expTimeViewer.setPreferredSize(new Dimension(500, 30));
+        this.expTimeViewer.setMinimumSize(new Dimension(500, 30));
+        this.expTimeViewer.setMaximumSize(new Dimension(1000, 30));
+        this.expTimeViewer.setBorder(BorderFactory.createRaisedBevelBorder());
+        this.expTimeViewer.setAlignmentY(CENTER_ALIGNMENT);
 
-        p0.add(statScrollPane1);
+        JLabel jl1 = new JLabel("Overall Stats");
+        jl1.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+        JLabel jl2 = new JLabel("Stats within one experiment (local)");
+        jl2.setForeground(FurnitureProdForm.COL_TEXT_FONT_1);
+
+        p1.add(Box.createRigidArea(new Dimension(0,47)));
+        p1.add(jl1);
+        p1.add(Box.createRigidArea(new Dimension(0,7)));
+        p1.add(statScrollPane1);
+        p2.add(Box.createRigidArea(new Dimension(0,10)));
+        p2.add(jl2);
+        p2.add(Box.createRigidArea(new Dimension(0,7)));
+        p2.add(this.expTimeViewer);
+        p2.add(Box.createRigidArea(new Dimension(0, 7)));
+        p2.add(statScrollPane2);
+
+        p0.add(p1);
         p0.add(Box.createRigidArea(new Dimension(25,0)));
-        p0.add(statScrollPane2);
+        p0.add(p2);
         content.add(p0);
         return content;
+    }
+
+    public void updateExperimentTime(double time) {
+        this.expTimeViewer.setValue(TimeFormatter.getStrDateTime(time*60, 8, 6));
     }
 
     public void addStatResult(StatResult statResult) {
         this.overallStatsTableModel.add(statResult);
     }
 
-    public void updateStats(List<StatResult> resultList) {
+    public void updateOverallStats(List<StatResult> resultList) {
         this.overallStatsTableModel.setModels(resultList);
+    }
+
+    public void updateLocalStats(List<StatResult> resultList) {
+        this.localStatsTableModel.setModels(resultList);
     }
 
     public void updateStatAtRow(int rowIdx, StatResult statResult) {
