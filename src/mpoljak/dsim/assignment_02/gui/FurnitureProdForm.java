@@ -34,6 +34,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     // tabs
     private StatsViewer statsViewer;
     private FurnitureProdAnim animationViewer;
+    private CIChartViewer chartCIViewer;
     // custom components
     private InputWithLabel inputA;
     private InputWithLabel inputB;
@@ -74,8 +75,6 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         this.addComponentListener(this);
     }
 
-
-
     @Override
     public void update(SimResults res) {
         if (!this.checkMaxSpeed.isSelected() && res instanceof FurnitProdEventResults) {
@@ -114,6 +113,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         if (cmd.equals("Run")) {
             if (! this.furnitProdSimController.isSimRunning()) {
                 this.statsViewer.clearStatsList();
+                this.chartCIViewer.clearChart();
                 this.furnitProdSimController.launchSimulation(this.inputA.getIntValue(), this.inputB.getIntValue(),
                         this.inputC.getIntValue(), this.inputExperiments.getIntValue(), this.inputSimDur.getDoubleValue());
                 this.setBtnEnabled(this.btnStart, false);
@@ -151,6 +151,20 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
         }
     }
 
+    @Override
+    public void componentResized(ComponentEvent e) {
+//        System.out.println("resized");
+        this.animationViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
+        this.statsViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
+        this.chartCIViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 125);
+    }
+    @Override
+    public void componentMoved(ComponentEvent e) {}
+    @Override
+    public void componentShown(ComponentEvent e) {}
+    @Override
+    public void componentHidden(ComponentEvent e) {}
+
     private void onSimEnd() {
         this.setBtnEnabled(this.btnStart, true);
         this.setBtnEnabled(this.btnPause, false);
@@ -177,10 +191,11 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
     private void createTabs() {
         this.statsViewer = new StatsViewer();
         this.animationViewer = new FurnitureProdAnim();
+        this.chartCIViewer = new CIChartViewer();
 
         this.tabbedContentPane.addTab("Statistics", this.statsViewer);
         this.tabbedContentPane.addTab("Animation", this.animationViewer);
-        this.tabbedContentPane.addTab("Value Stabilization", new JLabel("*** TODO chart"));
+        this.tabbedContentPane.addTab("Value Stabilization", this.chartCIViewer);
     }
 
     private void createNorthPart() {
@@ -330,24 +345,5 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
 //        txtField.setSize(new Dimension(width, TXT_FIELD_HEIGHT));
         txtField.setColumns( (int)((5.0/7.0)*expectedLettersCount)+1 );
         return txtField;
-    }
-
-    @Override
-    public void componentResized(ComponentEvent e) {
-//        System.out.println("resized");
-        this.animationViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
-        this.statsViewer.resizeContent(this.getWidth() - 200, this.getHeight() - 150);
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent e) {
-    }
-
-    @Override
-    public void componentShown(ComponentEvent e) {
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent e) {
     }
 }
