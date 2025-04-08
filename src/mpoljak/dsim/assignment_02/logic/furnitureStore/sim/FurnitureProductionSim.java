@@ -68,6 +68,15 @@ public class FurnitureProductionSim extends EventSim {
     private final Stats.ConfidenceInterval statAllUtilizationA;
     private final Stats.ConfidenceInterval statAllUtilizationB;
     private final Stats.ConfidenceInterval statAllUtilizationC;
+
+    private final Stats.ArithmeticAvg statExpInWaitingQueueTime;
+    private final Stats.ArithmeticAvg statExpInStainingQueueTime;
+    private final Stats.ArithmeticAvg statExpInAssemblingQueueTime;
+    private final Stats.ArithmeticAvg statExpInFitInstQueueTime;
+    private final Stats.ConfidenceInterval statAllInWaitingQueueTime;
+    private final Stats.ConfidenceInterval statAllInStainingQueueTime;
+    private final Stats.ConfidenceInterval statAllInAssemblingQueueTime;
+    private final Stats.ConfidenceInterval statAllInFitInstQueueTime;
     // sim results
     private final FurnitProdEventResults eventResults;
 
@@ -128,6 +137,14 @@ public class FurnitureProductionSim extends EventSim {
         this.statAllUtilizationB = new Stats.ConfidenceInterval();
         this.statAllUtilizationC = new Stats.ConfidenceInterval();
 
+        this.statExpInWaitingQueueTime = new Stats.ArithmeticAvg();
+        this.statExpInStainingQueueTime = new Stats.ArithmeticAvg();
+        this.statExpInAssemblingQueueTime = new Stats.ArithmeticAvg();
+        this.statExpInFitInstQueueTime = new Stats.ArithmeticAvg();
+        this.statAllInWaitingQueueTime = new Stats.ConfidenceInterval();
+        this.statAllInStainingQueueTime = new Stats.ConfidenceInterval();
+        this.statAllInAssemblingQueueTime = new Stats.ConfidenceInterval();
+        this.statAllInFitInstQueueTime = new Stats.ConfidenceInterval();
         // results information
         this.eventResults = new FurnitProdEventResults(0, 0, amountA, amountB, amountC);
         SimCommand resultsPrepCmd = new SimCommand(SimCommand.SimCommandType.CUSTOM) {
@@ -151,6 +168,10 @@ public class FurnitureProductionSim extends EventSim {
                 eventResults.addStat(new StatResult("Utilization of group A", String.format("%.5f",getUtilization(groupA, getSimTime())*100), "[%]"));
                 eventResults.addStat(new StatResult("Utilization of group B", String.format("%.5f",getUtilization(groupB, getSimTime())*100), "[%]"));
                 eventResults.addStat(new StatResult("Utilization of group C", String.format("%.5f",getUtilization(groupC, getSimTime())*100), "[%]"));
+                eventResults.addStat(new StatResult("AVG Time in Waiting queue", String.format("%.5f",statExpInWaitingQueueTime.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("AVG Time in Staining queue", String.format("%.5f",statExpInStainingQueueTime.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("AVG Time in Assembling queue", String.format("%.5f",statExpInAssemblingQueueTime.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("AVG Time in Fit inst. queue", String.format("%.5f",statExpInFitInstQueueTime.getMean()/60.0), "[h]"));
                 eventResults.addStat(new StatResult("Allocated desks count", String.valueOf(deskManager.getAllocatedDesksCount()), "[qty]"));
             }
         };
@@ -171,6 +192,11 @@ public class FurnitureProductionSim extends EventSim {
         statAllUtilizationA.reset();
         statAllUtilizationB.reset();
         statAllUtilizationC.reset();
+
+        statAllInWaitingQueueTime.reset();
+        statAllInStainingQueueTime.reset();
+        statAllInAssemblingQueueTime.reset();
+        statAllInFitInstQueueTime.reset();
 
         this.notifyDelegates(this.eventResults);
     }
@@ -195,6 +221,11 @@ public class FurnitureProductionSim extends EventSim {
         this.statExpStainingCount.reset();
         this.statExpAssemblingCount.reset();
         this.statExpFitInstCount.reset();
+
+        this.statExpInWaitingQueueTime.reset();
+        this.statExpInStainingQueueTime.reset();
+        this.statExpInAssemblingQueueTime.reset();
+        this.statExpInFitInstQueueTime.reset();
     }
 
     @Override
@@ -216,6 +247,11 @@ public class FurnitureProductionSim extends EventSim {
         this.statAllUtilizationB.addSample(getUtilization(this.groupB, this.getSimTime()));
         this.statAllUtilizationC.addSample(getUtilization(this.groupC, this.getSimTime()));
 
+        this.statAllInWaitingQueueTime.addSample(this.statExpInWaitingQueueTime.getMean());
+        this.statAllInStainingQueueTime.addSample(this.statExpInStainingQueueTime.getMean());
+        this.statAllInAssemblingQueueTime.addSample(this.statExpInAssemblingQueueTime.getMean());
+        this.statAllInFitInstQueueTime.addSample(this.statExpInFitInstQueueTime.getMean());
+
         double count = this.statAllOrderTimeInSystem.getCount();
         if (count >= 30 && count%2000==0)
             System.out.println("Order duration in system: "+this.statAllOrderTimeInSystem);
@@ -229,14 +265,22 @@ public class FurnitureProductionSim extends EventSim {
                     statAllStainingCount.getMean(), 5, 1),"[qty]"));
             res.addResult(new StatResult("Orders count-Fit inst.", confIntToStr(statAllFitInstCount.getHalfWidthCI(),
                     statAllFitInstCount.getMean(), 5, 1),"[qty]"));
-            res.addResult(new StatResult("Order time in system", confIntToStr(statAllOrderTimeInSystem.getHalfWidthCI(),
-                    statAllOrderTimeInSystem.getMean(), 5, 60), "[h]"));
             res.addResult(new StatResult("Utilization of group A", confIntToStr(statAllUtilizationA.getHalfWidthCI(),
                     statAllUtilizationA.getMean(), 5, 0.01), "[%]"));
             res.addResult(new StatResult("Utilization of group B", confIntToStr(statAllUtilizationB.getHalfWidthCI(),
                     statAllUtilizationB.getMean(), 5, 0.01), "[%]"));
             res.addResult(new StatResult("Utilization of group C", confIntToStr(statAllUtilizationC.getHalfWidthCI(),
                     statAllUtilizationC.getMean(), 5, 0.01), "[%]"));
+            res.addResult(new StatResult("Time in Waiting queue", confIntToStr(statAllInWaitingQueueTime.getHalfWidthCI(),
+                    statAllInWaitingQueueTime.getMean(), 5, 60), "[h]"));
+            res.addResult(new StatResult("Time in Staining queue", confIntToStr(statAllInStainingQueueTime.getHalfWidthCI(),
+                    statAllInStainingQueueTime.getMean(), 5, 60), "[h]"));
+            res.addResult(new StatResult("Time in Assembling queue", confIntToStr(statAllInAssemblingQueueTime.getHalfWidthCI(),
+                    statAllInAssemblingQueueTime.getMean(), 5, 60), "[h]"));
+            res.addResult(new StatResult("Time in Fit inst. queue", confIntToStr(statAllInFitInstQueueTime.getHalfWidthCI(),
+                    statAllInFitInstQueueTime.getMean(), 5, 60), "[h]"));
+            res.addResult(new StatResult("Order time in system", confIntToStr(statAllOrderTimeInSystem.getHalfWidthCI(),
+                    statAllOrderTimeInSystem.getMean(), 5, 60), "[h]"));
             this.notifyDelegates(res);
         }
     }
@@ -278,6 +322,7 @@ public class FurnitureProductionSim extends EventSim {
      * @param order to be enqueued
      */
     public void enqueueForNextProcessing(FurnitureOrder order) {
+        order.setWaitingBT(this.getSimTime());
         switch (order.getNextTechStep()) {
             case WOOD_PREPARATION:
             case CARVING:
@@ -437,25 +482,28 @@ public class FurnitureProductionSim extends EventSim {
             case A:
                 order = this.ordersA.poll();
                 this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime());
-                return order;
+                this.statExpInWaitingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+                break;
             case B:
                 order = this.ordersB.poll();
                 this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime());
-                return order;
+                this.statExpInAssemblingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+                break;
             case C:
                 if (!this.ordersCHighPr.isEmpty()) {
                     order = this.ordersCHighPr.poll();
                     this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime());
-                    return order;
+                    this.statExpInFitInstQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+                    break;
                 }
                 order = this.ordersCLowPr.poll();
                 this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime());
-                return order;
-//                if (this.ordersC.peek() == null)
-//                    return null;
-//                return this.ordersC.poll().getOrder();
+                this.statExpInStainingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid carpenter group");
         }
-        throw new IllegalArgumentException("Invalid carpenter group");
+        return order;
     }
 
     /**

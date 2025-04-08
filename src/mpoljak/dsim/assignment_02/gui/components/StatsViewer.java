@@ -49,18 +49,18 @@ public class StatsViewer extends JPanel {
         this.resultsAllJTab = new JTable(overallStatsTableModel);
         resultsAllJTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane statScrollPane1 = new JScrollPane(resultsAllJTab);
-        statScrollPane1.setPreferredSize(new Dimension(500,500));
+        statScrollPane1.setPreferredSize(new Dimension(500,300));
         statScrollPane1.setMinimumSize(new Dimension(500, 150));
-        statScrollPane1.setMaximumSize(new Dimension(1000, 200));
+        statScrollPane1.setMaximumSize(new Dimension(1000, 300));
 
         this.localStatsTableModel = new LocalStatsTableModel(new ArrayList<>());
         this.resultsLocalJTab = new JTable(localStatsTableModel);
 //        SwingTableColumnResizer.setJTableColsWidth(resultsJTab, width - 40, new double[] {37,57,6});
         resultsLocalJTab.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane statScrollPane2 = new JScrollPane(resultsLocalJTab);
-        statScrollPane2.setPreferredSize(new Dimension(500,500));
+        statScrollPane2.setPreferredSize(new Dimension(500,300));
         statScrollPane2.setMinimumSize(new Dimension(500, 150));
-        statScrollPane2.setMaximumSize(new Dimension(1000, 200));
+        statScrollPane2.setMaximumSize(new Dimension(1000, 300));
 
         this.expTimeViewer.setPreferredSize(new Dimension(500, 30));
         this.expTimeViewer.setMinimumSize(new Dimension(500, 30));

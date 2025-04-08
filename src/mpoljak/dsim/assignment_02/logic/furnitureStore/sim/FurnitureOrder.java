@@ -61,6 +61,7 @@ public class FurnitureOrder {
     private final int orderID;
     private int deskID;
     private TechStep nextTechStep;
+    private double waitingBT; // TODO implement this + remove unneccessary techStepsBT and ET
 
     /**
      * Technological next step is automatically {@code TechStep.WOOD_PREPARATION}.
@@ -77,6 +78,7 @@ public class FurnitureOrder {
         Arrays.fill(this.techStepsBegin, -1);
         Arrays.fill(this.techStepsEnd, -1);
         this.nextTechStep = TechStep.WOOD_PREPARATION;
+        this.waitingBT = -1;
     }
 
     /**
@@ -196,6 +198,14 @@ public class FurnitureOrder {
         return this.techStepsEnd[this.getLastValidIdx()];
     }
 
+    public double getWaitingBT() {
+        return this.waitingBT;
+    }
+
+    public void setWaitingBT(double waitingBT) {
+        this.waitingBT = waitingBT;
+    }
+
     @Override
     public String toString() {
         return String.format("Order{orderID=%d;desk=%d;%s;next=%s[from=%.02f => to=%.02f]}",
@@ -215,14 +225,14 @@ public class FurnitureOrder {
         order.setTechStepEnd(TechStep.CARVING, 24);
         order.setTechStepBegin(TechStep.STAINING, 27);
 //        order.getOverallProcessingTime();
-        System.out.println("Carving dur:"+order.getTechStepDuration(TechStep.CARVING));
+//        System.out.println("Carving dur:"+order.getTechStepDuration(TechStep.CARVING));
 //        System.out.println("Staining dur:"+order.getTechStepDuration(TechStep.STAINING));
         order.setTechStepEnd(TechStep.STAINING, 30);
         order.setTechStepBegin(TechStep.ASSEMBLING, 32);
         order.setTechStepEnd(TechStep.ASSEMBLING, 40);
 //        order.setTechStepStart(TechStep.FIT_INSTALLATION, 50);
 //        order.setTechStepEnd(TechStep.FIT_INSTALLATION, 52);
-        System.out.println("Intra dur:"+order.getIntraWaitingDuration(null));
+//        System.out.println("Intra dur:"+order.getIntraWaitingDuration(null));
         System.out.println("Complete dur:"+order.getOverallProcessingTime());
         System.out.println("Completion time:"+order.getTimeOfOrderCompletion());
         System.out.println(order);
