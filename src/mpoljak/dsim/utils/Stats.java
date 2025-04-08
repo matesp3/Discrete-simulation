@@ -78,6 +78,32 @@ public abstract class Stats {
             return "WeightedAvg "+ super.toString();
         }
     }
+//  -   -   -   -   -   -   -   ARI UTILIZATION -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
+    public static class UtilizationAvg extends ArithmeticAvg {
+        private double valueOf100Percent;
+
+        /**
+         * @param wholePartValue specifies the value, by which cummulated sum will be divided.
+         */
+        public UtilizationAvg(double wholePartValue) {
+                this.valueOf100Percent = wholePartValue;
+        }
+
+        /**
+         * @return value from interval <{@code 0},{@code 1}>
+         */
+        public double getUtilization() {
+            return this.sum/this.valueOf100Percent;
+        }
+
+        public double getValueOf100Percent() {
+            return valueOf100Percent;
+        }
+
+        public void setValueOf100Percent(double valueOf100Percent) {
+            this.valueOf100Percent = valueOf100Percent;
+        }
+}
 //  -   -   -   -   -   -   -   Time-WAVG -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -   -
     public static class TimeWeightedAvg extends WeightedAvg {
         private double lastInsertionTime = 0;

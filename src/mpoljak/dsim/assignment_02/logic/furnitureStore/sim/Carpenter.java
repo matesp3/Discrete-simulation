@@ -13,6 +13,7 @@ public class Carpenter {
     private double orderProcessingET;
     private int deskID;
     private FurnitureOrder currentOrder;
+    private double sumOfWorkingTime;
 
     public Carpenter(GROUP group, int carpenterID) {
         this.group = group;
@@ -21,6 +22,7 @@ public class Carpenter {
         this.orderProcessingBT = -1;
         this.orderProcessingET = -1;
         this.currentOrder = null;
+        this.sumOfWorkingTime = 0;
     }
 
     public void reset() {
@@ -28,6 +30,7 @@ public class Carpenter {
         this.orderProcessingBT = -1;
         this.orderProcessingET = -1;
         this.currentOrder = null;
+        this.sumOfWorkingTime = 0;
     }
 
     /**
@@ -59,6 +62,7 @@ public class Carpenter {
         this.orderProcessingET = timeOfEnd;
         FurnitureOrder orderToReturn = this.currentOrder;
         this.currentOrder = null;
+        this.sumOfWorkingTime += (this.orderProcessingET - this.orderProcessingBT);
         return orderToReturn;
     }
 
@@ -148,6 +152,25 @@ public class Carpenter {
      */
     public boolean isWorking() {
         return this.currentOrder != null;
+    }
+
+    /**
+     * @param simEndTime signalizes the very last moment, up when should be sum of work time retrieved. WARNING! If
+     *                   carpenter is working and has started this work later than {@code simEndTime}, then this method
+     *                   produces incorrect result.
+     * @return amount of overall time, that carpenter has worked from the start of simulation till this moment.
+     */
+    public double getSumOfWorkingTime(double simEndTime) {
+        return this.isWorking() ? (this.sumOfWorkingTime + (simEndTime-this.orderProcessingBT)) // trim last working duration
+                                : this.sumOfWorkingTime;
+    }
+
+    /**
+     * @return amount of overall time, that carpenter has worked (and completed his work, also) from the start of
+     * simulation.
+     */
+    public double getSumOfCompletedWorkingTime() {
+        return this.sumOfWorkingTime;
     }
 
     @Override

@@ -65,6 +65,9 @@ public class FurnitureProductionSim extends EventSim {
     private final Stats.ConfidenceInterval statAllAssemblingCount;
     private final Stats.ConfidenceInterval statAllFitInstCount;
 
+    private final Stats.ConfidenceInterval statAllUtilizationA;
+    private final Stats.ConfidenceInterval statAllUtilizationB;
+    private final Stats.ConfidenceInterval statAllUtilizationC;
     // sim results
     private final FurnitProdEventResults eventResults;
 
@@ -120,6 +123,11 @@ public class FurnitureProductionSim extends EventSim {
         this.statAllStainingCount = new Stats.ConfidenceInterval();
         this.statAllAssemblingCount = new Stats.ConfidenceInterval();
         this.statAllFitInstCount = new Stats.ConfidenceInterval();
+
+        this.statAllUtilizationA = new Stats.ConfidenceInterval();
+        this.statAllUtilizationB = new Stats.ConfidenceInterval();
+        this.statAllUtilizationC = new Stats.ConfidenceInterval();
+
         // results information
         this.eventResults = new FurnitProdEventResults(0, 0, amountA, amountB, amountC);
         SimCommand resultsPrepCmd = new SimCommand(SimCommand.SimCommandType.CUSTOM) {
@@ -135,11 +143,14 @@ public class FurnitureProductionSim extends EventSim {
                 eventResults.setOrdersCLow(ordersCLowPr);
                 eventResults.setOrdersCHigh(ordersCHighPr);
                 eventResults.clearPrevStats();
-                eventResults.addStat(new StatResult("Time-WAVG orders count-Waiting", String.valueOf(statExpWaitingCount.getMean()), "[qty]"));
-                eventResults.addStat(new StatResult("Time-WAVG orders count-Assembling", String.valueOf(statExpAssemblingCount.getMean()), "[qty]"));
-                eventResults.addStat(new StatResult("Time-WAVG orders count-Staining", String.valueOf(statExpStainingCount.getMean()), "[qty]"));
-                eventResults.addStat(new StatResult("Time-WAVG orders count-Fit inst.", String.valueOf(statExpFitInstCount.getMean()), "[qty]"));
-                eventResults.addStat(new StatResult("AVG order's time in system", String.valueOf(statExpOrderTimeInSystem.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Waiting", String.format("%.5f",statExpWaitingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Assembling", String.format("%.5f",statExpAssemblingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Staining", String.format("%.5f",statExpStainingCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("Time-WAVG orders count-Fit inst.", String.format("%.5f",statExpFitInstCount.getMean()), "[qty]"));
+                eventResults.addStat(new StatResult("AVG order's time in system", String.format("%.5f",statExpOrderTimeInSystem.getMean()/60.0), "[h]"));
+                eventResults.addStat(new StatResult("Utilization of group A", String.format("%.5f",getUtilization(groupA, getSimTime())*100), "[%]"));
+                eventResults.addStat(new StatResult("Utilization of group B", String.format("%.5f",getUtilization(groupB, getSimTime())*100), "[%]"));
+                eventResults.addStat(new StatResult("Utilization of group C", String.format("%.5f",getUtilization(groupC, getSimTime())*100), "[%]"));
                 eventResults.addStat(new StatResult("Allocated desks count", String.valueOf(deskManager.getAllocatedDesksCount()), "[qty]"));
             }
         };
@@ -154,7 +165,12 @@ public class FurnitureProductionSim extends EventSim {
         statAllStainingCount.reset();
         statAllAssemblingCount.reset();
         statAllFitInstCount.reset();
+
         statAllOrderTimeInSystem.reset();
+
+        statAllUtilizationA.reset();
+        statAllUtilizationB.reset();
+        statAllUtilizationC.reset();
 
         this.notifyDelegates(this.eventResults);
     }
@@ -174,6 +190,7 @@ public class FurnitureProductionSim extends EventSim {
         this.addToCalendar(new OrderArrival(0+this.nextUntilOrderArrivalDuration(), this, null));
         // stats
         this.statExpOrderTimeInSystem.reset();
+
         this.statExpWaitingCount.reset();
         this.statExpStainingCount.reset();
         this.statExpAssemblingCount.reset();
@@ -192,7 +209,12 @@ public class FurnitureProductionSim extends EventSim {
         this.statAllStainingCount.addSample(this.statExpStainingCount.getMean());
         this.statAllAssemblingCount.addSample(this.statExpAssemblingCount.getMean());
         this.statAllFitInstCount.addSample(this.statExpFitInstCount.getMean());
+
         this.statAllOrderTimeInSystem.addSample(this.statExpOrderTimeInSystem.getMean());
+
+        this.statAllUtilizationA.addSample(getUtilization(this.groupA, this.getSimTime()));
+        this.statAllUtilizationB.addSample(getUtilization(this.groupB, this.getSimTime()));
+        this.statAllUtilizationC.addSample(getUtilization(this.groupC, this.getSimTime()));
 
         double count = this.statAllOrderTimeInSystem.getCount();
         if (count >= 30 && count%2000==0)
@@ -209,6 +231,12 @@ public class FurnitureProductionSim extends EventSim {
                     statAllFitInstCount.getMean(), 5, 1),"[qty]"));
             res.addResult(new StatResult("Order time in system", confIntToStr(statAllOrderTimeInSystem.getHalfWidthCI(),
                     statAllOrderTimeInSystem.getMean(), 5, 60), "[h]"));
+            res.addResult(new StatResult("Utilization of group A", confIntToStr(statAllUtilizationA.getHalfWidthCI(),
+                    statAllUtilizationA.getMean(), 5, 0.01), "[%]"));
+            res.addResult(new StatResult("Utilization of group B", confIntToStr(statAllUtilizationB.getHalfWidthCI(),
+                    statAllUtilizationB.getMean(), 5, 0.01), "[%]"));
+            res.addResult(new StatResult("Utilization of group C", confIntToStr(statAllUtilizationC.getHalfWidthCI(),
+                    statAllUtilizationC.getMean(), 5, 0.01), "[%]"));
             this.notifyDelegates(res);
         }
     }
@@ -475,6 +503,18 @@ public class FurnitureProductionSim extends EventSim {
             arr[i].reset();
             queue.add(arr[i]);
         }
+    }
+
+    /**
+     * @return utilization computed for group of carpenters until moment specified by sim. time parameter
+     * {@code atMoment}.
+     */
+    private static double getUtilization(Carpenter[] group, double atMoment) {
+        double sum = 0;
+        for (Carpenter c : group) {
+            sum += c.getSumOfCompletedWorkingTime() / atMoment;
+        }
+        return sum / group.length;
     }
 
     /**
