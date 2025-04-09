@@ -36,6 +36,7 @@ public class OrderArrival extends FurnitureProdEvent {
                 this.sim.addToCalendar(new WoodPrepBeginning(this.getExecutionTime(), this.sim, carpenterA));
         }
         else {
+
             this.sim.enqueueForNextProcessing(newOrder);
         }
         // * 3. plan time of new order arrival

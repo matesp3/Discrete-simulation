@@ -71,6 +71,14 @@ public class FurnitureOrder {
         return this.step;
     }
 
+    public double getStepBT() {
+        return stepBT;
+    }
+
+    public double getStepET() {
+        return stepET;
+    }
+
     /**
      * This new {@code techStep} must be consecutive to the one retrieved by {@code getNextTechStep()}.
      */

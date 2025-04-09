@@ -111,9 +111,9 @@ public class CarpenterTableModel extends AbstractTableModel {
         if (columnIndex == 4)
             return c.getAssignedOrderID() < 0 ? "Not assigned" : c.getAssignedOrderID();
         if (columnIndex == 5)
-            return Formatter.getStrDateTime(c.getOrderBT()*60, 8, 6);
+            return Formatter.getStrDateTime(c.getOrderBT(), 8, 6);
         if (columnIndex == 6)
-            return Formatter.getStrDateTime(c.getOrderET()*60, 8, 6);
+            return Formatter.getStrDateTime(c.getOrderET(), 8, 6);
         if (columnIndex == 7)
             return c.getOrderRepresentation();
         return null;

@@ -12,9 +12,9 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
     private final String[] aColNames = new String[] {
             "OrderID",
             "DeskID",
-            "CarpID",
             "Product",
             "step",
+            "waitingBT",
             "stepBT",
             "stepET",
             "created"};
@@ -22,7 +22,7 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
     private final Class<?>[] aColClasses = new Class<?>[] {
             Integer.class,
             Integer.class,
-            Integer.class,
+            String.class,
             String.class,
             String.class,
             String.class,
@@ -103,17 +103,17 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
         else if (columnIndex == 1)
             return order.getDeskID();
         else if (columnIndex == 2)
-            return order.getAssignedCarpenterID();
-        else if (columnIndex == 3)
             return order.getProductType();
-        else if (columnIndex == 4)
+        else if (columnIndex == 3)
             return order.getStep();
+        else if (columnIndex == 4)
+            return Formatter.getStrDateTime(order.getWaitingBT(),8, 6);
         else if (columnIndex == 5)
-            return Formatter.getStrDateTime(order.getStepStart()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getStepStart(), 8, 6);
         else if (columnIndex == 6)
-            return Formatter.getStrDateTime(order.getStepEnd()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getStepEnd(), 8, 6);
         else if (columnIndex == 7)
-            return Formatter.getStrDateTime(order.getCreated()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getCreated(), 8, 6);
         return null;
     }
 }

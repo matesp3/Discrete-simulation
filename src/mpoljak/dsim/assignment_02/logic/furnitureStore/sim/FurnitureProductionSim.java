@@ -313,14 +313,13 @@ public class FurnitureProductionSim extends EventSim {
         this.deskManager.setDeskFree(deskId, requesterId);
     }
 
-
     /**
      * Based on <code>order</code>'s next technological step, enqueues order to proper queue of waiting for processing
      * by carpenter.
      * @param order to be enqueued
      */
     public void enqueueForNextProcessing(FurnitureOrder order) {
-        order.setWaitingBT(this.getSimTime());
+//        order.setWaitingBT(this.getSimTime());
         switch (order.getStep()) {
             case WOOD_PREPARATION:
             case CARVING:
@@ -479,23 +478,23 @@ public class FurnitureProductionSim extends EventSim {
             case A:
                 this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime()); // must be before polling
                 order = this.ordersA.poll();
-                this.statExpInWaitingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+//                this.statExpInWaitingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             case B:
                 this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime()); // must be before polling
                 order = this.ordersB.poll();
-                this.statExpInAssemblingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+//                this.statExpInAssemblingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             case C:
                 if (!this.ordersCHighPr.isEmpty()) {
                     this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime()); // must be before polling
                     order = this.ordersCHighPr.poll();
-                    this.statExpInFitInstQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+//                    this.statExpInFitInstQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                     break;
                 }
                 this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime()); // must be before polling
                 order = this.ordersCLowPr.poll();
-                this.statExpInStainingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
+//                this.statExpInStainingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             default:
                 throw new IllegalArgumentException("Invalid carpenter group");
@@ -519,15 +518,35 @@ public class FurnitureProductionSim extends EventSim {
         return this.getRelevantCarpenterQueue(group).isEmpty();
     }
 
-    //    - -   -   -   -   -   -   S T A T I S T I C S  -   -   -   -   -   -   -   -   -
-    public void receiveEventResults(AfterEventResults results) {
-        this.notifyDelegates(results);
+    //    - -   -   -   -   -   -   S T A T I S T I C S (from client input) -   -   -   -   -   -   -   -   -
+
+    /**
+     * Registers new ended waiting duration for this technological step.
+     */
+    public void receiveWaitingForTechStep(double duration, FurnitureOrder.TechStep step) {
+        if (step == null)
+            return;
+        switch (step) {
+            case WOOD_PREPARATION:
+            case CARVING:
+                this.statExpInWaitingQueueTime.addSample(duration);
+                break;
+            case STAINING:
+                this.statExpInStainingQueueTime.addSample(duration);
+                break;
+            case ASSEMBLING:
+                this.statExpInAssemblingQueueTime.addSample(duration);
+                break;
+            case FIT_INSTALLATION:
+                this.statExpInFitInstQueueTime.addSample(duration);
+                break;
+        }
     }
 
     public void receiveCompletedOrder(FurnitureOrder completed) {
         this.statExpOrderTimeInSystem.addSample(completed.getOverallTime());
     }
-
+    //    - -   -   -   -   -   -   E N D  O F  S T A T I S T I C S (from client input) -   -   -   -   -   -   -   -
     /**
      * @return queue of carpenters based on param <code>group</code>
      */

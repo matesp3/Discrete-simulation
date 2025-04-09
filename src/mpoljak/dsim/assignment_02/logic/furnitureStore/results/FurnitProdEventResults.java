@@ -230,8 +230,9 @@ public class FurnitProdEventResults extends AfterEventResults {
     private OrderResults rawToModel(FurnitureOrder raw) {
         OrderResults r = new OrderResults(raw.getOrderID(), raw.getDeskID(), raw.getTimeCreated(),
                 raw.getProductType().toString(), raw.getStep().toString());
-//        raw.setTechStepBegin(raw.get);
-//        raw.setTechStepEnd();
+        r.setWaitingBT(raw.getWaitingBT());
+        r.setStepStart(raw.getStepBT());
+        r.setStepEnd(raw.getStepET());
         return r;
     }
 

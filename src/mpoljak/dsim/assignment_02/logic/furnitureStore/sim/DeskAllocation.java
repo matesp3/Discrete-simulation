@@ -1,7 +1,6 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class DeskAllocation {
     private final ArrayList<FurnitureOrder> desks;
