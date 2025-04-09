@@ -25,7 +25,6 @@ public class AssemblingEnd extends FurnitureProdEvent {
          * 4. plan new B order's processing
          */
         Carpenter nextCarpenter;
-        FurnitureOrder order;
         // * 1. end order B (may lead C) executing
         this.carpenter.endExecutingStep(this.getExecutionTime());
         // * 2. determine if product is completed
@@ -35,26 +34,26 @@ public class AssemblingEnd extends FurnitureProdEvent {
             if (nextCarpenter != null) {
                 if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
                     this.sim.addToCalendar(new FitInstallationBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-                else if (nextCarpenter.getCurrentDeskID() == Carpenter.IN_STORAGE)
-                    this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
-                else
+                else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
                     this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+                else
+                    this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
             }
         }
-        else//  *  2.B1 plan end of completed order
-            this.sim.addToCalendar(new OrderEnd(this.getExecutionTime(), this.sim, this.carpenter));
-
+        else {//  *  2.B1 plan end of completed order
+            FurnitureOrder order = this.carpenter.returnOrder(this.getExecutionTime());
+            this.sim.returnCarpenter(this.carpenter);
+            this.sim.addToCalendar(new OrderEnd(this.getExecutionTime(), this.sim, null, order));
+        }
         // * 3. try to assign order for carpenterB
         nextCarpenter = this.tryToAssignOrder(Carpenter.GROUP.B);
         if (nextCarpenter == null)
             return;
         // * 4. plan new B order's processing
-        if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
-            if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
-                this.sim.addToCalendar(new AssemblingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-            else
-                this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-        }
+        if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
+            this.sim.addToCalendar(new AssemblingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+        else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
+            this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
         else
             this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
     }

@@ -84,7 +84,7 @@ public class FurnitureProdAnim extends JPanel {
         JScrollPane carpenterScrollPaneA = new JScrollPane(carpenterTableA);
         carpenterScrollPaneA.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneA.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneA.setMaximumSize(new Dimension(1800, 200));
+        carpenterScrollPaneA.setMaximumSize(new Dimension(2000, 200));
 
         this.carpenterTableModelB = new CarpenterTableModel(new ArrayList<>());
         this.carpenterTableB = new JTable(this.carpenterTableModelB);
@@ -92,7 +92,7 @@ public class FurnitureProdAnim extends JPanel {
         JScrollPane carpenterScrollPaneB = new JScrollPane(carpenterTableB);
         carpenterScrollPaneB.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneB.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneB.setMaximumSize(new Dimension(1800, 200));
+        carpenterScrollPaneB.setMaximumSize(new Dimension(2000, 200));
 
         this.carpenterTableModelC = new CarpenterTableModel(new ArrayList<>());
         this.carpenterTableC = new JTable(this.carpenterTableModelC);
@@ -100,7 +100,7 @@ public class FurnitureProdAnim extends JPanel {
         JScrollPane carpenterScrollPaneC = new JScrollPane(carpenterTableC);
         carpenterScrollPaneC.setPreferredSize(new Dimension(1000,150));
         carpenterScrollPaneC.setMinimumSize(new Dimension(500, 150));
-        carpenterScrollPaneC.setMaximumSize(new Dimension(1800, 200));
+        carpenterScrollPaneC.setMaximumSize(new Dimension(2000, 200));
 
         this.orderTableModelWaiting = new FurnitureOrderTableModel(new ArrayList<>());
         this.orderTableWaiting = new JTable(this.orderTableModelWaiting);

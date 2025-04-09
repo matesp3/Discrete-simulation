@@ -512,7 +512,7 @@ public class FurnitureProductionSim extends EventSim {
     public boolean hasNotWaitingOrder(Carpenter.GROUP group) {
         if (group == Carpenter.GROUP.C)
             return this.ordersCLowPr.isEmpty() && this.ordersCHighPr.isEmpty();
-        return (group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
+        return ((group == Carpenter.GROUP.A) ? this.ordersA : this.ordersB).isEmpty();
     }
 
     /**
@@ -535,7 +535,8 @@ public class FurnitureProductionSim extends EventSim {
      * @return queue of carpenters based on param <code>group</code>
      */
     private Queue<Carpenter> getRelevantCarpenterQueue(Carpenter.GROUP group) {
-        return group == Carpenter.GROUP.A ? this.freeA : (group == Carpenter.GROUP.B ? this.freeB : this.freeC);
+        return group == Carpenter.GROUP.A ? this.freeA :
+                ((group == Carpenter.GROUP.B) ? this.freeB : this.freeC);
     }
 
     private void createAndSetCarpenters(int firstAvailableID, Carpenter[] freeCarpenters, Carpenter.GROUP group) {
