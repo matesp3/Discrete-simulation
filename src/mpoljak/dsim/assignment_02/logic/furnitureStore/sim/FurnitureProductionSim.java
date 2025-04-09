@@ -440,8 +440,7 @@ public class FurnitureProductionSim extends EventSim {
      * @return carpenter with the highest priority from {@code group} of free carpenters or {@code null} if no available
      */
     public Carpenter getFirstFreeCarpenter(Carpenter.GROUP group) {
-        Queue<Carpenter> freeCarpenters = this.getRelevantCarpenterQueue(group);
-        return freeCarpenters.poll(); // retrieves carpenter with the lowest ID
+        return this.getRelevantCarpenterQueue(group).poll(); // retrieves carpenter with the lowest ID
     }
 
     /**
@@ -513,7 +512,6 @@ public class FurnitureProductionSim extends EventSim {
     public boolean hasNotWaitingOrder(Carpenter.GROUP group) {
         if (group == Carpenter.GROUP.C)
             return this.ordersCLowPr.isEmpty() && this.ordersCHighPr.isEmpty();
-//            return this.ordersC.isEmpty();
         return (group == Carpenter.GROUP.A ? this.ordersA : this.ordersB).isEmpty();
     }
 

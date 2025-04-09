@@ -73,8 +73,8 @@ public abstract class FurnitureProdEvent extends DiscreteEvent {
         // * 1. get new order from queue, if exists && is some carpenter available
         if (this.sim.hasNotWaitingOrder(group) || this.sim.hasNotAvailableCarpenter(group))
             return null;
-        FurnitureOrder order = this.sim.getOrderForCarpenter(group);
         Carpenter newCarpenter = this.sim.getFirstFreeCarpenter(group);
+        FurnitureOrder order = this.sim.getOrderForCarpenter(group);
         // * 2. plan new order's processing
         newCarpenter.receiveOrder(order, this.getExecutionTime());
         return newCarpenter;

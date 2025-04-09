@@ -34,11 +34,11 @@ public class StainingEnd extends FurnitureProdEvent {
             if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
                 this.sim.addToCalendar(new AssemblingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             }
-            else if (nextCarpenter.getCurrentDeskID() == Carpenter.IN_STORAGE) {
-                this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
-            }
-            else {
+            else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
                 this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+            }
+            else { // carpenter is in storage (hasn't been working yet)
+                this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
             }
         }
 //        ------------------------------^
@@ -60,12 +60,14 @@ public class StainingEnd extends FurnitureProdEvent {
         if (nextCarpenter == null)
             return;
         // * 5. plan new C order's processing
-        if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
-            if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
+        if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
+            if (nextCarpenter.getCurrentOrder().getStep() == FurnitureOrder.TechStep.STAINING)
                 this.sim.addToCalendar(new StainingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             else
-                this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+                this.sim.addToCalendar(new FitInstallationBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
         }
+        else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
+            this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
         else
             this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
     }
