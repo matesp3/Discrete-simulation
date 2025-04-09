@@ -15,42 +15,23 @@ public class FurnitProdEventResults extends AfterEventResults {
     private final List<OrderResults> ordersB;
     private final List<OrderResults> ordersCLow;
     private final List<OrderResults> ordersCHigh;
-    private final List<StatResult> stats;
 
-    private StatResult wavgOrderQueueTimeA;
-    private StatResult realOrderQueueTimeA;
-    private StatResult wavgOrderQueueTimeB;
-    private StatResult realOrderQueueTimeB;
-    private StatResult wavgOrderQueueTimeStainingC;
-    private StatResult realOrderQueueTimeStainingC;
-    private StatResult wavgOrderQueueTimeFitInstC;
-    private StatResult realOrderQueueTimeFitInstC;
+    private StatResult.Simple ordersWaitingQueueCount;
+    private StatResult.Simple ordersAssemblingQueueCount;
+    private StatResult.Simple ordersStainingQueueCount;
+    private StatResult.Simple ordersFitInstQueueCount;
 
-    private StatResult wavgFreeCarpTimeA;
-    private StatResult realFreeCarpTimeA;
-    private StatResult wavgFreeCarpTimeB;
-    private StatResult realFreeCarpTimeB;
-    private StatResult wavgFreeCarpTimeC;
-    private StatResult realFreeCarpTimeC;
+    private StatResult.Simple ordersWaitingQueueTime;
+    private StatResult.Simple ordersAssemblingQueueTime;
+    private StatResult.Simple ordersStainingQueueTime;
+    private StatResult.Simple ordersFitInstQueueTime;
 
-    private StatResult avgOrderWaitAmountA;
-    private StatResult realOrderWaitAmountA;
-    private StatResult avgOrderWaitAmountB;
-    private StatResult realOrderWaitAmountB;
-    private StatResult avgOrderWaitAmountStainingC;
-    private StatResult realOrderWaitAmountStainingC;
-    private StatResult avgOrderWaitAmountFitInstC;
-    private StatResult realOrderWaitAmountFitInstC;
+    private StatResult.Simple utilizationGroupA;
+    private StatResult.Simple utilizationGroupB;
+    private StatResult.Simple utilizationGroupC;
 
-    private StatResult avgFreeCarpAmountA;
-    private StatResult realFreeCarpAmountA;
-    private StatResult avgFreeCarpAmountB;
-    private StatResult realFreeCarpAmountB;
-    private StatResult avgFreeCarpAmountC;
-    private StatResult realFreeCarpAmountC;
-
-    private int assignedDesk;
-    private int returnedDesk;
+    private StatResult.Simple orderTimeInSystem;
+    private StatResult.Simple allocatedDesksCount;
 
     /**
      *
@@ -73,15 +54,110 @@ public class FurnitProdEventResults extends AfterEventResults {
         this.ordersB = new ArrayList<>();
         this.ordersCLow = new ArrayList<>();
         this.ordersCHigh = new ArrayList<>();
-        this.stats = new ArrayList<>();
     }
 
-    public void clearPrevStats() {
-        this.stats.clear();
+    public StatResult.Simple getOrdersWaitingQueueCount() {
+        return ordersWaitingQueueCount;
     }
 
-    public void addStat(StatResult stat) {
-        this.stats.add(stat);
+    public void setOrdersWaitingQueueCount(StatResult.Simple ordersWaitingQueueCount) {
+        this.ordersWaitingQueueCount = ordersWaitingQueueCount;
+    }
+
+    public StatResult.Simple getOrdersAssemblingQueueCount() {
+        return ordersAssemblingQueueCount;
+    }
+
+    public void setOrdersAssemblingQueueCount(StatResult.Simple ordersAssemblingQueueCount) {
+        this.ordersAssemblingQueueCount = ordersAssemblingQueueCount;
+    }
+
+    public StatResult.Simple getOrdersStainingQueueCount() {
+        return ordersStainingQueueCount;
+    }
+
+    public void setOrdersStainingQueueCount(StatResult.Simple ordersStainingQueueCount) {
+        this.ordersStainingQueueCount = ordersStainingQueueCount;
+    }
+
+    public StatResult.Simple getOrdersFitInstQueueCount() {
+        return ordersFitInstQueueCount;
+    }
+
+    public void setOrdersFitInstQueueCount(StatResult.Simple ordersFitInstQueueCount) {
+        this.ordersFitInstQueueCount = ordersFitInstQueueCount;
+    }
+
+    public StatResult.Simple getOrdersWaitingQueueTime() {
+        return ordersWaitingQueueTime;
+    }
+
+    public void setOrdersWaitingQueueTime(StatResult.Simple ordersWaitingQueueTime) {
+        this.ordersWaitingQueueTime = ordersWaitingQueueTime;
+    }
+
+    public StatResult.Simple getOrdersAssemblingQueueTime() {
+        return ordersAssemblingQueueTime;
+    }
+
+    public void setOrdersAssemblingQueueTime(StatResult.Simple ordersAssemblingQueueTime) {
+        this.ordersAssemblingQueueTime = ordersAssemblingQueueTime;
+    }
+
+    public StatResult.Simple getOrdersStainingQueueTime() {
+        return ordersStainingQueueTime;
+    }
+
+    public void setOrdersStainingQueueTime(StatResult.Simple ordersStainingQueueTime) {
+        this.ordersStainingQueueTime = ordersStainingQueueTime;
+    }
+
+    public StatResult.Simple getOrdersFitInstQueueTime() {
+        return ordersFitInstQueueTime;
+    }
+
+    public void setOrdersFitInstQueueTime(StatResult.Simple ordersFitInstQueueTime) {
+        this.ordersFitInstQueueTime = ordersFitInstQueueTime;
+    }
+
+    public StatResult.Simple getUtilizationGroupA() {
+        return utilizationGroupA;
+    }
+
+    public void setUtilizationGroupA(StatResult.Simple utilizationGroupA) {
+        this.utilizationGroupA = utilizationGroupA;
+    }
+
+    public StatResult.Simple getUtilizationGroupB() {
+        return utilizationGroupB;
+    }
+
+    public void setUtilizationGroupB(StatResult.Simple utilizationGroupB) {
+        this.utilizationGroupB = utilizationGroupB;
+    }
+
+    public StatResult.Simple getUtilizationGroupC() {
+        return utilizationGroupC;
+    }
+
+    public void setUtilizationGroupC(StatResult.Simple utilizationGroupC) {
+        this.utilizationGroupC = utilizationGroupC;
+    }
+
+    public StatResult.Simple getOrderTimeInSystem() {
+        return orderTimeInSystem;
+    }
+
+    public void setOrderTimeInSystem(StatResult.Simple orderTimeInSystem) {
+        this.orderTimeInSystem = orderTimeInSystem;
+    }
+
+    public StatResult.Simple getAllocatedDesksCount() {
+        return allocatedDesksCount;
+    }
+
+    public void setAllocatedDesksCount(StatResult.Simple allocatedDesksCount) {
+        this.allocatedDesksCount = allocatedDesksCount;
     }
 
     public List<CarpenterResults> getCarpentersA() {
@@ -170,9 +246,5 @@ public class FurnitProdEventResults extends AfterEventResults {
         for (FurnitureOrder o : input) {
             output.add(this.rawToModel(o)); // size of structure may vary each time
         }
-    }
-
-    public List<StatResult> getStats() {
-        return this.stats;
     }
 }

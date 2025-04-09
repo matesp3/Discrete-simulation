@@ -13,7 +13,7 @@ public class FurnitProdSimController {
     private boolean simRunning; // true if it's stopped, also
     private boolean maxSpeedOn;
     private boolean consoleLogsOn;
-    private double shiftTime; // minutes
+    private double shiftTime; // seconds
     private long sleepTime; // milliseconds
 
     public FurnitProdSimController(FurnitureProdForm gui) {
@@ -22,7 +22,7 @@ public class FurnitProdSimController {
         this.simRunning = false;
         this.maxSpeedOn = true;
         this.consoleLogsOn = false;
-        this.shiftTime = 5;     // min
+        this.shiftTime = 5*60;     // secs
         this.sleepTime = 250;   // millis
     }
 
@@ -33,7 +33,7 @@ public class FurnitProdSimController {
     public void launchSimulation(int groupA, int groupB, int groupC, int experiments, double simulatedDays) {
         Runnable r = () -> {
             try {
-                this.sim = new FurnitureProductionSim(experiments, groupA, groupB, groupC, simulatedDays*8*60);// 60min*8hod*249dni = 358_560 [min]
+                this.sim = new FurnitureProductionSim(experiments, groupA, groupB, groupC, simulatedDays*8*3600);// 3600s*8hod*sim_dni [secs]
                 this.sim.registerDelegate(this.gui);
                 if (this.maxSpeedOn) {
                     this.sim.setEnabledMaxSimSpeed(true);

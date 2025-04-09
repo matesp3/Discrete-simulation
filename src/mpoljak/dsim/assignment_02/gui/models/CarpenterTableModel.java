@@ -1,7 +1,7 @@
 package mpoljak.dsim.assignment_02.gui.models;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.CarpenterResults;
-import mpoljak.dsim.utils.TimeFormatter;
+import mpoljak.dsim.utils.Formatter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -111,9 +111,9 @@ public class CarpenterTableModel extends AbstractTableModel {
         if (columnIndex == 4)
             return c.getAssignedOrderID() < 0 ? "Not assigned" : c.getAssignedOrderID();
         if (columnIndex == 5)
-            return TimeFormatter.getStrDateTime(c.getOrderBT()*60, 8, 6);
+            return Formatter.getStrDateTime(c.getOrderBT()*60, 8, 6);
         if (columnIndex == 6)
-            return TimeFormatter.getStrDateTime(c.getOrderET()*60, 8, 6);
+            return Formatter.getStrDateTime(c.getOrderET()*60, 8, 6);
         if (columnIndex == 7)
             return c.getOrderRepresentation();
         return null;

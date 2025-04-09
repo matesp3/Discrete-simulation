@@ -1,8 +1,7 @@
 package mpoljak.dsim.assignment_02.gui.models;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.OrderResults;
-import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
-import mpoljak.dsim.utils.TimeFormatter;
+import mpoljak.dsim.utils.Formatter;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
@@ -110,11 +109,11 @@ public class FurnitureOrderTableModel extends AbstractTableModel {
         else if (columnIndex == 4)
             return order.getStep();
         else if (columnIndex == 5)
-            return TimeFormatter.getStrDateTime(order.getStepStart()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getStepStart()*60, 8, 6);
         else if (columnIndex == 6)
-            return TimeFormatter.getStrDateTime(order.getStepEnd()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getStepEnd()*60, 8, 6);
         else if (columnIndex == 7)
-            return TimeFormatter.getStrDateTime(order.getCreated()*60, 8, 6);
+            return Formatter.getStrDateTime(order.getCreated()*60, 8, 6);
         return null;
     }
 }

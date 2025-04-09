@@ -5,7 +5,7 @@ import mpoljak.dsim.assignment_02.gui.models.CarpenterTableModel;
 import mpoljak.dsim.assignment_02.gui.models.FurnitureOrderTableModel;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
 import mpoljak.dsim.utils.SwingTableColumnResizer;
-import mpoljak.dsim.utils.TimeFormatter;
+import mpoljak.dsim.utils.Formatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,10 +37,6 @@ public class FurnitureProdAnim extends JPanel {
         this.mainScrollPane = new JScrollPane(this.contentPane);
         this.mainScrollPane.setWheelScrollingEnabled(true);
         this.add(this.mainScrollPane);
-    }
-
-    public void setSimTime(double minutes) {
-         this.viewSimTime.setValue(minutes, 0);
     }
 
     public void resizeContent(int width, int height) {
@@ -196,18 +192,16 @@ public class FurnitureProdAnim extends JPanel {
         this.orderTableModelAssembling.setModels(r.getOrdersB());
         this.orderTableModelStaining.setModels(r.getOrdersCLow());
         this.orderTableModelFitInst.setModels(r.getOrdersCHigh());
-        this.viewSimTime.setValue(TimeFormatter.getStrDateTime(r.getSimTime()*60, 8, 6));
+        this.viewSimTime.setValue(Formatter.getStrDateTime(r.getSimTime(), 8, 6));
         this.carpenterTableModelA.setModels(r.getCarpentersA());
         this.carpenterTableModelB.setModels(r.getCarpentersB());
         this.carpenterTableModelC.setModels(r.getCarpentersC());
     }
 
-
-
     public static void main(String[] args) {
         double secs = 0;
         for (int i = 0; i < 3600*9; i++) {
-            System.out.println(TimeFormatter.getStrDateTime(secs++, 8, 6)); // ok
+            System.out.println(Formatter.getStrDateTime(secs++, 8, 6)); // ok
         }
     }
 }

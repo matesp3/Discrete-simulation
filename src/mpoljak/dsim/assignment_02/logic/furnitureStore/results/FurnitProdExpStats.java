@@ -2,45 +2,129 @@ package mpoljak.dsim.assignment_02.logic.furnitureStore.results;
 
 import mpoljak.dsim.common.SimResults;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FurnitProdExpStats extends SimResults {
-    private List<StatResult> results;
-    private double orderTimeInSystemMean;
-    private double orderTimeInSystemHValue;
+    private StatResult.ConfInterval ordersWaitingQueueCount;
+    private StatResult.ConfInterval ordersAssemblingQueueCount;
+    private StatResult.ConfInterval ordersStainingQueueCount;
+    private StatResult.ConfInterval ordersFitInstQueueCount;
+
+    private StatResult.ConfInterval ordersWaitingQueueTime;
+    private StatResult.ConfInterval ordersAssemblingQueueTime;
+    private StatResult.ConfInterval ordersStainingQueueTime;
+    private StatResult.ConfInterval ordersFitInstQueueTime;
+
+    private StatResult.ConfInterval utilizationGroupA;
+    private StatResult.ConfInterval utilizationGroupB;
+    private StatResult.ConfInterval utilizationGroupC;
+
+    private StatResult.ConfInterval orderTimeInSystem;
+    private StatResult.ConfInterval allocatedDesksCount;
 
     public FurnitProdExpStats(long experimentNum) {
         super(experimentNum);
-        this.results = new ArrayList<StatResult>();
     }
 
-    public void addResult(StatResult result) {
-        this.results.add(result);
+    public StatResult.ConfInterval getOrdersWaitingQueueCount() {
+        return ordersWaitingQueueCount;
     }
 
-    public void setResults(List<StatResult> results) {
-        this.results = results;
+    public void setOrdersWaitingQueueCount(StatResult.ConfInterval ordersWaitingQueueCount) {
+        this.ordersWaitingQueueCount = ordersWaitingQueueCount;
     }
 
-    public void setResult(int index, StatResult result) {
-        this.results.set(index, result);
+    public StatResult.ConfInterval getOrdersAssemblingQueueCount() {
+        return ordersAssemblingQueueCount;
     }
 
-    public List<StatResult> getResults() {
-        return this.results;
+    public void setOrdersAssemblingQueueCount(StatResult.ConfInterval ordersAssemblingQueueCount) {
+        this.ordersAssemblingQueueCount = ordersAssemblingQueueCount;
     }
 
-    public void setOrderTimeInSystem(double mean, double h) {
-        this.orderTimeInSystemMean = mean;
-        this.orderTimeInSystemHValue = h;
+    public StatResult.ConfInterval getOrdersStainingQueueCount() {
+        return ordersStainingQueueCount;
     }
 
-    public double getOrderTimeInSystemMean() {
-        return orderTimeInSystemMean;
+    public void setOrdersStainingQueueCount(StatResult.ConfInterval ordersStainingQueueCount) {
+        this.ordersStainingQueueCount = ordersStainingQueueCount;
     }
 
-    public double getOrderTimeInSystemHValue() {
-        return orderTimeInSystemHValue;
+    public StatResult.ConfInterval getOrdersFitInstQueueCount() {
+        return ordersFitInstQueueCount;
+    }
+
+    public void setOrdersFitInstQueueCount(StatResult.ConfInterval ordersFitInstQueueCount) {
+        this.ordersFitInstQueueCount = ordersFitInstQueueCount;
+    }
+
+    public StatResult.ConfInterval getOrdersWaitingQueueTime() {
+        return ordersWaitingQueueTime;
+    }
+
+    public void setOrdersWaitingQueueTime(StatResult.ConfInterval ordersWaitingQueueTime) {
+        this.ordersWaitingQueueTime = ordersWaitingQueueTime;
+    }
+
+    public StatResult.ConfInterval getOrdersAssemblingQueueTime() {
+        return ordersAssemblingQueueTime;
+    }
+
+    public void setOrdersAssemblingQueueTime(StatResult.ConfInterval ordersAssemblingQueueTime) {
+        this.ordersAssemblingQueueTime = ordersAssemblingQueueTime;
+    }
+
+    public StatResult.ConfInterval getOrdersStainingQueueTime() {
+        return ordersStainingQueueTime;
+    }
+
+    public void setOrdersStainingQueueTime(StatResult.ConfInterval ordersStainingQueueTime) {
+        this.ordersStainingQueueTime = ordersStainingQueueTime;
+    }
+
+    public StatResult.ConfInterval getOrdersFitInstQueueTime() {
+        return ordersFitInstQueueTime;
+    }
+
+    public void setOrdersFitInstQueueTime(StatResult.ConfInterval ordersFitInstQueueTime) {
+        this.ordersFitInstQueueTime = ordersFitInstQueueTime;
+    }
+
+    public StatResult.ConfInterval getUtilizationGroupA() {
+        return utilizationGroupA;
+    }
+
+    public void setUtilizationGroupA(StatResult.ConfInterval utilizationGroupA) {
+        this.utilizationGroupA = utilizationGroupA;
+    }
+
+    public StatResult.ConfInterval getUtilizationGroupB() {
+        return utilizationGroupB;
+    }
+
+    public void setUtilizationGroupB(StatResult.ConfInterval utilizationGroupB) {
+        this.utilizationGroupB = utilizationGroupB;
+    }
+
+    public StatResult.ConfInterval getUtilizationGroupC() {
+        return utilizationGroupC;
+    }
+
+    public void setUtilizationGroupC(StatResult.ConfInterval utilizationGroupC) {
+        this.utilizationGroupC = utilizationGroupC;
+    }
+
+    public StatResult.ConfInterval getOrderTimeInSystem() {
+        return orderTimeInSystem;
+    }
+
+    public void setOrderTimeInSystem(StatResult.ConfInterval orderTimeInSystem) {
+        this.orderTimeInSystem = orderTimeInSystem;
+    }
+
+    public StatResult.ConfInterval getAllocatedDesksCount() {
+        return allocatedDesksCount;
+    }
+
+    public void setAllocatedDesksCount(StatResult.ConfInterval allocatedDesksCount) {
+        this.allocatedDesksCount = allocatedDesksCount;
     }
 }

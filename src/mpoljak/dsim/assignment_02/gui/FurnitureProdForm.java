@@ -16,6 +16,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
 public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionListener, ComponentListener {
+    public static final double TIME_UNIT = 3600.0;
     // colors
     public static final Color COL_BG = new Color(191, 201, 224);
     public static final Color COL_BG_TAB = new Color(223, 227, 238);
@@ -82,7 +83,7 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
             r.prepareResults();
             SwingUtilities.invokeLater(() -> {
                 this.animationViewer.setEventResultsModel(r);
-                this.statsViewer.updateLocalStats(r.getStats());
+                this.statsViewer.updateLocalStats(r);
                 this.statsViewer.updateExperimentTime(r.getSimTime());
                 this.replicationViewer.setValue(r.getExperimentNum() > 0 ? r.getExperimentNum()-1 : 0);
             });
@@ -91,9 +92,10 @@ public class FurnitureProdForm extends JFrame implements ISimDelegate, ActionLis
             FurnitProdExpStats r = (FurnitProdExpStats) res;
             r.prepareResults();
             SwingUtilities.invokeLater(() -> {
-                this.statsViewer.updateOverallStats(r.getResults());
+                this.statsViewer.updateOverallStats(r);
                 this.replicationViewer.setValue(r.getExperimentNum());
-                this.chartCIViewer.addValue(r.getExperimentNum(), r.getOrderTimeInSystemMean()/60.0, r.getOrderTimeInSystemHValue()/60.0);
+                this.chartCIViewer.addValue(r.getExperimentNum(), (r.getOrderTimeInSystem().getMean()/TIME_UNIT),
+                        (r.getOrderTimeInSystem().getHalfWidth()/TIME_UNIT));
             });
         }
         else if (res instanceof OtherEventInfo) {

@@ -3,9 +3,12 @@ package mpoljak.dsim.assignment_02.gui.components;
 import mpoljak.dsim.assignment_02.gui.FurnitureProdForm;
 import mpoljak.dsim.assignment_02.gui.models.LocalStatsTableModel;
 import mpoljak.dsim.assignment_02.gui.models.OverallStatsTableModel;
+import mpoljak.dsim.assignment_02.gui.models.StatsModel;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdEventResults;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.results.FurnitProdExpStats;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.results.StatResult;
 import mpoljak.dsim.utils.SwingTableColumnResizer;
-import mpoljak.dsim.utils.TimeFormatter;
+import mpoljak.dsim.utils.Formatter;
 
 import javax.swing.*;
 import java.awt.*;
@@ -92,27 +95,28 @@ public class StatsViewer extends JPanel {
     }
 
     public void updateExperimentTime(double time) {
-        this.expTimeViewer.setValue(TimeFormatter.getStrDateTime(time*60, 8, 6));
+        this.expTimeViewer.setValue(Formatter.getStrDateTime(time, 8, 6));
     }
 
-    public void addStatResult(StatResult statResult) {
+    public void addStatResult(StatsModel statResult) {
         this.overallStatsTableModel.add(statResult);
     }
 
-    public void updateOverallStats(List<StatResult> resultList) {
-        this.overallStatsTableModel.setModels(resultList);
+    public void updateOverallStats(FurnitProdExpStats results) {
+        this.overallStatsTableModel.updateTable(results);
     }
 
-    public void updateLocalStats(List<StatResult> resultList) {
-        this.localStatsTableModel.setModels(resultList);
+    public void updateLocalStats(FurnitProdEventResults results) {
+        this.localStatsTableModel.updateTable(results);
     }
 
-    public void updateStatAtRow(int rowIdx, StatResult statResult) {
+    public void updateStatAtRow(int rowIdx, StatsModel statResult) {
         this.overallStatsTableModel.setModel(rowIdx, statResult);
     }
 
     public void clearStatsList() {
         this.overallStatsTableModel.clear();
+        this.localStatsTableModel.clear();
     }
 
     public void resizeContent(int width, int height) {
