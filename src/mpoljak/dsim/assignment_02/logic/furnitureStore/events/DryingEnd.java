@@ -20,7 +20,7 @@ public class DryingEnd extends FurnitureProdEvent {
     @Override
     public void execute() throws InterruptedException {
 //        FurnitureOrder order = this.carpenter.getCurrentOrder();
-        this.order.setNextTechStep(FurnitureOrder.TechStep.ASSEMBLING);
+        this.order.setStep(FurnitureOrder.TechStep.ASSEMBLING);
         Carpenter nextCarpenter = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.B);
         if (nextCarpenter == null)
             this.sim.enqueueForNextProcessing(this.order);

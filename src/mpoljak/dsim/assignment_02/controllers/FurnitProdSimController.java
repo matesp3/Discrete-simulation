@@ -103,6 +103,16 @@ public class FurnitProdSimController {
         t.start();
     }
 
+    public void setShiftAndSleepTime(double shiftTime, long sleepTime) {
+        this.shiftTime = DoubleComp.compare(shiftTime, 0) == -1 ? 0 : shiftTime;
+        if (this.sim == null)
+            return;
+        Runnable r = () -> sim.setShiftAndSleepTime(shiftTime, sleepTime);
+        Thread t = new Thread(r, "Thread-config shiftTime");
+        t.setDaemon(true); // if GUI ends, simulation also
+        t.start();
+    }
+
     public void setEnabledMaxSpeed(boolean enabled) {
         this.maxSpeedOn = enabled;
         if (this.sim == null)

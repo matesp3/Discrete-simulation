@@ -144,16 +144,16 @@ public class FurnitProdEventResults extends AfterEventResults {
         CarpenterResults r = new CarpenterResults(raw.getCarpenterId(), raw.getGroup().toString());
         r.setDeskID(raw.getCurrentDeskID());
         r.setAssignedOrderID(raw.getCurrentOrder() == null ? -1 : raw.getCurrentOrder().getOrderID());
-        r.setOrderBT(raw.getOrderProcessingBT());
-        r.setOrderET(raw.getOrderProcessingET());
+        r.setOrderBT(raw.getWorkBT());
+        r.setOrderET(raw.getWorkET());
         r.setOrderRepresentation(raw.getCurrentOrder() == null ? "" : raw.getCurrentOrder().toString());
         r.setWorking(raw.isWorking());
         return r;
     }
 
     private OrderResults rawToModel(FurnitureOrder raw) {
-        OrderResults r = new OrderResults(raw.getOrderID(), raw.getDeskID(), raw.getTimeOfOrderCreation(),
-                raw.getProductType().toString(), raw.getNextTechStep().toString());
+        OrderResults r = new OrderResults(raw.getOrderID(), raw.getDeskID(), raw.getTimeCreated(),
+                raw.getProductType().toString(), raw.getStep().toString());
 //        raw.setTechStepBegin(raw.get);
 //        raw.setTechStepEnd();
         return r;

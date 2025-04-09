@@ -17,7 +17,7 @@ public abstract class EventSim extends SimCore {
     private boolean debugMode = false;
     private double cachedShiftTime;
     private long cachedSleepTime;
-    private boolean shouldCheckPauseCond = true;
+    private volatile boolean shouldCheckPauseCond = true;
 
     public EventSim(long replicationsCount, int estCalCapacity, double maxTime) {
         super(replicationsCount);
@@ -70,6 +70,13 @@ public abstract class EventSim extends SimCore {
         this.sleepTime = sleepTime;
     }
 
+    public synchronized void setShiftAndSleepTime(double shiftTime, long sleepTime) {
+        if (DoubleComp.compare(shiftTime, 0) > -1) { // shiftTime >= 0
+            this.shiftTime = shiftTime;
+            this.sleepTime = sleepTime;
+        }
+    }
+
     /**
      * @return current time of simulation
      */
@@ -92,7 +99,6 @@ public abstract class EventSim extends SimCore {
         while (!this.isEnded() && !this.eventCal.isEmpty()) {
             if (this.shouldCheckPauseCond)
                 this.checkPauseCondition();
-//            DiscreteEvent event = this.eventCal.take();
             DiscreteEvent event = this.eventCal.poll();
             if (DoubleComp.compare(event.getExecutionTime(), this.simTime) == -1) // event.time < this.simTime
                 throw new RuntimeException("Time causality violation.");
@@ -101,7 +107,7 @@ public abstract class EventSim extends SimCore {
             this.simTime = event.getExecutionTime();
             if (this.debugMode) {
                 this.currentEventId = event.getClass().getSimpleName();
-                System.out.println(String.format("SimTime=%.02f | executing: %s | [rep:%d]", this.simTime, this.currentEventId, this.getCurrentReplication()));
+                System.out.printf("SimTime=%.02f | executing: %s | [rep:%d]%n", this.simTime, this.currentEventId, this.getCurrentReplication());
             }
             event.execute();
             this.afterEventExecution();
@@ -125,6 +131,8 @@ public abstract class EventSim extends SimCore {
         this.shouldCheckPauseCond = true;
         this.shiftTime = this.cachedShiftTime;
         this.sleepTime = this.cachedSleepTime;
+        this.addToCalendar(new SystemEvent(this.eventCal.isEmpty() ? this.simTime : eventCal.peek().getExecutionTime(),
+                this));
     }
 
     private static class SystemEvent extends DiscreteEvent {

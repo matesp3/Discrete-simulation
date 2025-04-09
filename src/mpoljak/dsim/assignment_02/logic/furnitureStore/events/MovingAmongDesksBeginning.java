@@ -23,7 +23,7 @@ public class MovingAmongDesksBeginning extends FurnitureProdEvent {
         double startExecTime = this.getExecutionTime() + this.sim.nextDeskMovingDuration();
         // * 2. determine event to be planned
         FurnitureProdEvent plannedEvent;
-        switch (this.carpenter.getCurrentOrder().getNextTechStep()) {
+        switch (this.carpenter.getCurrentOrder().getStep()) {
             case STAINING:
                 plannedEvent = new StainingBeginning(startExecTime, this.sim, this.carpenter);
                 break;

@@ -35,8 +35,8 @@ public class TimeSlider extends JPanel {
 
         this.sliderForSecs = new JSlider(sliderHorizontal ? JSlider.HORIZONTAL : JSlider.VERTICAL, 0, 13, 5);
         this.initSpeedModes();
-        controller.setSleepTime(this.modes[sliderForSecs.getValue()].sleep);
         controller.setShiftTime(this.modes[sliderForSecs.getValue()].simUnits); // initialization
+        controller.setSleepTime(this.modes[sliderForSecs.getValue()].sleep);
         this.resultScale.setText(formatOutput(sliderForSecs.getValue()));
 
         this.sliderForSecs.addChangeListener(new ChangeListener() {
@@ -44,8 +44,8 @@ public class TimeSlider extends JPanel {
             public void stateChanged(ChangeEvent e) {
                 JSlider source = (JSlider) e.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    controller.setSleepTime(modes[sliderForSecs.getValue()].sleep);
                     controller.setShiftTime(modes[sliderForSecs.getValue()].simUnits);
+                    controller.setSleepTime(modes[sliderForSecs.getValue()].sleep);
                     resultScale.setText(formatOutput(sliderForSecs.getValue()));
                 }
             }

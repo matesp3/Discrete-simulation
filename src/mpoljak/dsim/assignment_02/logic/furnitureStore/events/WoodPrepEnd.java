@@ -22,7 +22,7 @@ public class WoodPrepEnd extends FurnitureProdEvent {
          * 3. plan begin of transfer from storage to hall
          */
         this.carpenter.endExecutingStep(this.getExecutionTime());
-        this.carpenter.getCurrentOrder().setNextTechStep(FurnitureOrder.TechStep.CARVING);
+        this.carpenter.getCurrentOrder().setStep(FurnitureOrder.TechStep.CARVING);
         this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, this.carpenter));
     }
 }

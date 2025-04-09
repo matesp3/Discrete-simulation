@@ -7,12 +7,13 @@ public class Carpenter {
         A,B,C;
     }
     public static final int IN_STORAGE = -1;
-    private final GROUP group;
+
     private final int carpenterId;
-    private double orderProcessingBT;
-    private double orderProcessingET;
+    private final GROUP group;
     private int deskID;
     private FurnitureOrder currentOrder;
+    private double orderProcessingBT;
+    private double orderProcessingET;
     private double sumOfWorkingTime;
 
     public Carpenter(GROUP group, int carpenterID) {
@@ -47,6 +48,7 @@ public class Carpenter {
         this.orderProcessingET = -1;
         this.orderProcessingBT = timeOfStart;
         this.currentOrder = newOrder;
+        newOrder.setStepBT(timeOfStart);
     }
 
     /**
@@ -61,6 +63,7 @@ public class Carpenter {
         }
         this.orderProcessingET = timeOfEnd;
         FurnitureOrder orderToReturn = this.currentOrder;
+        orderToReturn.setStepET(timeOfEnd);
         this.currentOrder = null;
         this.sumOfWorkingTime += (this.orderProcessingET - this.orderProcessingBT);
         return orderToReturn;
@@ -73,7 +76,7 @@ public class Carpenter {
     public void startExecutingStep(double timeOfStart) {
         if (!this.isWorking())
             throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
-        this.currentOrder.setTechStepBegin(currentOrder.getNextTechStep(), timeOfStart);
+        this.currentOrder.setStepBT(timeOfStart);
     }
 
     /**
@@ -83,14 +86,14 @@ public class Carpenter {
     public void endExecutingStep(double timeOfEnd) {
         if (!this.isWorking())
             throw new RuntimeException("Carpenter is not working, so he cannot start executing tech. step..");
-        this.currentOrder.setTechStepEnd(currentOrder.getNextTechStep(), timeOfEnd);
+        this.currentOrder.setStepET(timeOfEnd);
     }
 
     /**
      * @return amount of time of work on lastly processed order
      * @throws RuntimeException if carpenter is working right now or was not working at all
      */
-    public double getLastlyProcessedOrderDuration() throws RuntimeException {
+    public double getLastWorkDuration() throws RuntimeException {
         if (this.isWorking() || this.deskID == IN_STORAGE)
             throw new RuntimeException("Carpenter is working (hasn't returned order yet) or is located in the storage");
         return this.orderProcessingET - this.orderProcessingBT;
@@ -136,14 +139,14 @@ public class Carpenter {
     /**
      * @return time of beginning of lastly processing order
      */
-    public double getOrderProcessingBT() {
+    public double getWorkBT() {
         return this.orderProcessingBT;
     }
 
     /**
       * @return time of end of lastly processed order
      */
-    public double getOrderProcessingET() {
+    public double getWorkET() {
         return this.orderProcessingET;
     }
 
@@ -185,17 +188,17 @@ public class Carpenter {
         order.setDeskID(1);
         System.out.println(carpenter.getGroup());
         System.out.println(carpenter.isWorking());
-        System.out.println(carpenter.getOrderProcessingBT());
+        System.out.println(carpenter.getWorkBT());
         carpenter.receiveOrder(order,5.0);
-        System.out.println(carpenter.getOrderProcessingBT());
+        System.out.println(carpenter.getWorkBT());
         System.out.println(carpenter.isWorking());
 //        System.out.println(carpenter.getLastlyProcessedOrderDuration()); // ok
         carpenter.returnOrder(56.4);
-        System.out.println(carpenter.getOrderProcessingET());
+        System.out.println(carpenter.getWorkET());
         System.out.println(carpenter.isWorking());
-        System.out.println(carpenter.getLastlyProcessedOrderDuration());
+        System.out.println(carpenter.getLastWorkDuration());
         carpenter.receiveOrder(order,60.0);
-        System.out.println(carpenter.getOrderProcessingBT());
+        System.out.println(carpenter.getWorkBT());
         System.out.println(carpenter.isWorking());
 //        System.out.println(carpenter.getOrderProcessingET());
 //        System.out.println(carpenter.getLastlyProcessedOrderDuration()); // ok

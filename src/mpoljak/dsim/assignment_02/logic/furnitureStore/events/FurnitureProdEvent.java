@@ -54,7 +54,7 @@ public abstract class FurnitureProdEvent extends DiscreteEvent {
         // *  2. release carpenterB
         this.sim.returnCarpenter(currentCarpenter);
         // *  3. set next tech step to order B(may lead C or ending approached) & plan order's B(may lead C) processing
-        order.setNextTechStep(nextStep);
+        order.setStep(nextStep);
         currentCarpenter = this.sim.getFirstFreeCarpenter(nextCarpenterGroup);
         if (currentCarpenter == null)
             this.sim.enqueueForNextProcessing(order);

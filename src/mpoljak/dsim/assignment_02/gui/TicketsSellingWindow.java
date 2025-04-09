@@ -54,10 +54,6 @@ public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDele
 
     @Override
     public void update(SimResults res) {
-        /*
-         todo: 0. implement simCore.receiveUpdates(<? extends SimResults> results)
-         todo: 1.typecast:find out class type => 2. call proper method based on component => 3. find proper component from list by ID or name => 4. update component
-         */
         TicketSellingSim.TicketSellRes r = (TicketSellingSim.TicketSellRes) res;
         SwingUtilities.invokeLater(() -> {
             repInfo.setValue(r.getExperimentNum());

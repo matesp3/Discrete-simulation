@@ -324,7 +324,7 @@ public class FurnitureProductionSim extends EventSim {
      */
     public void enqueueForNextProcessing(FurnitureOrder order) {
         order.setWaitingBT(this.getSimTime());
-        switch (order.getNextTechStep()) {
+        switch (order.getStep()) {
             case WOOD_PREPARATION:
             case CARVING:
                 this.ordersA.add(order);
@@ -530,7 +530,7 @@ public class FurnitureProductionSim extends EventSim {
     }
 
     public void receiveCompletedOrder(FurnitureOrder completed) {
-        this.statExpOrderTimeInSystem.addSample(completed.getOverallProcessingTime());
+        this.statExpOrderTimeInSystem.addSample(completed.getOverallTime());
     }
 
     /**

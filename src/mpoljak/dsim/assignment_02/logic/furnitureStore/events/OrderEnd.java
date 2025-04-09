@@ -16,6 +16,7 @@ public class OrderEnd extends FurnitureProdEvent {
     @Override
     public void execute() throws InterruptedException {
         FurnitureOrder order = this.carpenter.returnOrder(this.getExecutionTime());
+        order.setTimeCompleted(this.getExecutionTime());
         this.sim.releaseDesk(order.getDeskID(), order);
         this.sim.returnCarpenter(this.carpenter);
         this.sim.receiveCompletedOrder(order);
