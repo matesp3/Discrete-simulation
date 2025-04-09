@@ -30,11 +30,10 @@ public class OrderArrival extends FurnitureProdEvent {
         Carpenter carpenterA = this.sim.getFirstFreeCarpenter(Carpenter.GROUP.A);
         if (carpenterA != null) {
             carpenterA.receiveOrder(newOrder, this.getExecutionTime());
-
-            if (carpenterA.getCurrentDeskID() == Carpenter.IN_STORAGE)
-                this.sim.addToCalendar(new WoodPrepBeginning(this.getExecutionTime(), this.sim, carpenterA));
-            else
+            if (carpenterA.getCurrentDeskID() != Carpenter.IN_STORAGE)
                 this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, carpenterA));
+            else
+                this.sim.addToCalendar(new WoodPrepBeginning(this.getExecutionTime(), this.sim, carpenterA));
         }
         else {
             this.sim.enqueueForNextProcessing(newOrder);
@@ -42,7 +41,5 @@ public class OrderArrival extends FurnitureProdEvent {
         // * 3. plan time of new order arrival
         this.setExecutionTime(this.getExecutionTime() + this.sim.nextUntilOrderArrivalDuration());
         this.sim.addToCalendar(this);
-//        String prod = newOrder.getProductType().name();
-//        String step = newOrder.getNextTechStep().name();// new OrderResults(newOrder.getOrderID(), newOrder.getDeskID(), newOrder.getTimeOfOrderCreation(), "", "")
     }
 }

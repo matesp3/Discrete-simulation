@@ -236,6 +236,11 @@ public class FurnitureProductionSim extends EventSim {
     @Override
     protected void afterExperiment() {
         super.afterExperiment();
+        this.statExpWaitingCount.addSample(this.ordersA.size(), this.getMaxSimTime());
+        this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getMaxSimTime());
+        this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getMaxSimTime());
+        this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getMaxSimTime());
+
         this.statAllWaitingCount.addSample(this.statExpWaitingCount.getMean());
         this.statAllStainingCount.addSample(this.statExpStainingCount.getMean());
         this.statAllAssemblingCount.addSample(this.statExpAssemblingCount.getMean());
@@ -253,8 +258,6 @@ public class FurnitureProductionSim extends EventSim {
         this.statAllInFitInstQueueTime.addSample(this.statExpInFitInstQueueTime.getMean());
 
         double count = this.statAllOrderTimeInSystem.getCount();
-        if (count >= 30 && count%2000==0)
-            System.out.println("Order duration in system: "+this.statAllOrderTimeInSystem);
         if (count > 30) {
             FurnitProdExpStats res = new FurnitProdExpStats(this.getCurrentReplication());
             res.addResult(new StatResult("Orders count-Waiting", confIntToStr(statAllWaitingCount.getHalfWidthCI(),
@@ -327,20 +330,20 @@ public class FurnitureProductionSim extends EventSim {
         switch (order.getStep()) {
             case WOOD_PREPARATION:
             case CARVING:
+                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime()); // must be before adding
                 this.ordersA.add(order);
-                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime());
                 return;
             case STAINING:
+                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime()); // must be before adding
                 this.ordersCLowPr.add(order);
-                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime());
                 return;
             case ASSEMBLING:
+                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime()); // must be before adding
                 this.ordersB.add(order);
-                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime());
                 return;
             case FIT_INSTALLATION:
+                this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime()); // must be before adding
                 this.ordersCHighPr.add(order);
-                this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime());
         }
     }
 
@@ -480,24 +483,24 @@ public class FurnitureProductionSim extends EventSim {
         FurnitureOrder order = null;
         switch (carpenterGroup) {
             case A:
+                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime()); // must be before polling
                 order = this.ordersA.poll();
-                this.statExpWaitingCount.addSample(this.ordersA.size(), this.getSimTime());
                 this.statExpInWaitingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             case B:
+                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime()); // must be before polling
                 order = this.ordersB.poll();
-                this.statExpAssemblingCount.addSample(this.ordersB.size(), this.getSimTime());
                 this.statExpInAssemblingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             case C:
                 if (!this.ordersCHighPr.isEmpty()) {
+                    this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime()); // must be before polling
                     order = this.ordersCHighPr.poll();
-                    this.statExpFitInstCount.addSample(this.ordersCHighPr.size(), this.getSimTime());
                     this.statExpInFitInstQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                     break;
                 }
+                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime()); // must be before polling
                 order = this.ordersCLowPr.poll();
-                this.statExpStainingCount.addSample(this.ordersCLowPr.size(), this.getSimTime());
                 this.statExpInStainingQueueTime.addSample(this.getSimTime() - order.getWaitingBT());
                 break;
             default:

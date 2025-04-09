@@ -1,6 +1,7 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.sim;
 
 import mpoljak.dsim.utils.DoubleComp;
+import mpoljak.dsim.utils.TimeFormatter;
 
 import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -137,8 +138,11 @@ public class FurnitureOrder {
 
     @Override
     public String toString() {
-        return String.format("Order{orderID=%d;desk=%d;%s;next=%s[from=%.02f => to=%.02f]}",
-        this.orderID, this.deskID, this.productType, this.step, this.timeCreated, this.getTimeCompleted());
+        return String.format("Order: [orderID=%5d ;desk=%5d; waitingBT=%s; stepBT=%s; setET=%s; next=%-16s ;%-8s; [created=%.02f => completed=%.02f] ]",
+        this.orderID, this.deskID, TimeFormatter.getStrDateTime(this.waitingBT, 8, 6),
+                TimeFormatter.getStrDateTime(this.stepBT, 8, 6),
+                TimeFormatter.getStrDateTime(this.stepET, 8, 6),
+                this.step, this.productType, this.timeCreated, this.timeCompleted);
     }
 
     private void stepCheck(TechStep newStep) {

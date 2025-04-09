@@ -9,10 +9,7 @@ public class DeskAllocation {
 
     public DeskAllocation(int amountOfDesks) {
         this.desks = new ArrayList<>(amountOfDesks*2);
-        for (int i = 0; i < amountOfDesks*2; i++) {
-            this.desks.add(null);
-        }
-        this.firstFree = 0;
+        this.firstFree = -1;
     }
 
     public void setDeskFree(int deskId, FurnitureOrder userIdentity) {
@@ -56,8 +53,8 @@ public class DeskAllocation {
     }
 
     public void freeAllDesks() {
-        this.desks.replaceAll(ignored -> null);
-        this.firstFree = 0;
+        this.desks.clear();
+        this.firstFree = -1;
     }
 
     @Override

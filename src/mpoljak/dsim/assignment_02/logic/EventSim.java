@@ -84,6 +84,10 @@ public abstract class EventSim extends SimCore {
         return this.simTime;
     }
 
+    public double getMaxSimTime() {
+        return this.maxSimTime;
+    }
+
     protected abstract void afterEventExecution();
 
     @Override
@@ -112,6 +116,7 @@ public abstract class EventSim extends SimCore {
             event.execute();
             this.afterEventExecution();
         }
+        this.simTime = this.maxSimTime;
     }
 
     @Override

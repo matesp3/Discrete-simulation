@@ -62,10 +62,9 @@ public class Carpenter {
             throw new IllegalArgumentException("Order processing beginning > time of end of processing");
         }
         this.orderProcessingET = timeOfEnd;
-        FurnitureOrder orderToReturn = this.currentOrder;
-        orderToReturn.setStepET(timeOfEnd);
-        this.currentOrder = null;
         this.sumOfWorkingTime += (this.orderProcessingET - this.orderProcessingBT);
+        FurnitureOrder orderToReturn = this.currentOrder;
+        this.currentOrder = null;
         return orderToReturn;
     }
 
