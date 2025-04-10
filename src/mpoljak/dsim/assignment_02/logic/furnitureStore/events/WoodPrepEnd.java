@@ -23,6 +23,7 @@ public class WoodPrepEnd extends FurnitureProdEvent {
          */
         this.carpenter.endExecutingStep(this.getExecutionTime());
         this.carpenter.getCurrentOrder().setStep(FurnitureOrder.TechStep.CARVING);
+        this.carpenter.getCurrentOrder().setWaitingBT(-1); // <-- CARVING is NOT part of waiting, but part of work
         this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, this.carpenter));
     }
 }

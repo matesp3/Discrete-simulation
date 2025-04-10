@@ -1,7 +1,9 @@
 package mpoljak.dsim.assignment_02.logic.furnitureStore.events;
 
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.Carpenter;
+import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureOrder;
 import mpoljak.dsim.assignment_02.logic.furnitureStore.sim.FurnitureProductionSim;
+import mpoljak.dsim.utils.DoubleComp;
 
 public class MovingAmongDesksBeginning extends FurnitureProdEvent {
     public MovingAmongDesksBeginning(double executionTime, int secondaryPriority, FurnitureProductionSim simCore, Carpenter carpenter) {
@@ -20,10 +22,12 @@ public class MovingAmongDesksBeginning extends FurnitureProdEvent {
          * 3. plan the event
          */
         // * 1. generate time needed for transferring
-        double startExecTime = this.getExecutionTime() + this.sim.nextDeskMovingDuration();
+        double movingDuration = this.sim.nextDeskMovingDuration();
+        double startExecTime = this.getExecutionTime() + movingDuration;
         // * 2. determine event to be planned
+        FurnitureOrder order = this.carpenter.getCurrentOrder();
         FurnitureProdEvent plannedEvent;
-        switch (this.carpenter.getCurrentOrder().getStep()) {
+        switch (order.getStep()) {
             case STAINING:
                 plannedEvent = new StainingBeginning(startExecTime, this.sim, this.carpenter);
                 break;
@@ -35,6 +39,10 @@ public class MovingAmongDesksBeginning extends FurnitureProdEvent {
                 break;
             default:
                 plannedEvent = null;
+        }
+        if (DoubleComp.compare(order.getWaitingBT(), 0) > -1) { // waitingBT >= 0 --> active waiting for start of work
+            this.sim.receiveWaitingForTechStep(this.getExecutionTime() - order.getWaitingBT() + movingDuration, order.getStep());
+            order.setWaitingBT(-1);
         }
         // * 3. plan the event
         this.sim.addToCalendar(plannedEvent);

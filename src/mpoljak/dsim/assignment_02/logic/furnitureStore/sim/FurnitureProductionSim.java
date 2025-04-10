@@ -319,7 +319,7 @@ public class FurnitureProductionSim extends EventSim {
      * @param order to be enqueued
      */
     public void enqueueForNextProcessing(FurnitureOrder order) {
-//        order.setWaitingBT(this.getSimTime());
+
         switch (order.getStep()) {
             case WOOD_PREPARATION:
             case CARVING:

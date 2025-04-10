@@ -32,10 +32,17 @@ public class FitInstallationEnd extends FurnitureProdEvent {
         Carpenter nextCarpenter = this.tryToAssignOrder(Carpenter.GROUP.C);
         if (nextCarpenter == null)
             return;
+        order = nextCarpenter.getCurrentOrder();
         // * 4. plan new C order's processing
         if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
-            if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
-                this.sim.addToCalendar(new FitInstallationBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+            if (nextCarpenter.getCurrentDeskID() == order.getDeskID()) {
+                this.sim.receiveWaitingForTechStep(this.getExecutionTime()-order.getWaitingBT(), order.getStep());
+                order.setWaitingBT(-1);
+                if (nextCarpenter.getCurrentOrder().getStep() == FurnitureOrder.TechStep.FIT_INSTALLATION)
+                    this.sim.addToCalendar(new FitInstallationBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+                else
+                    this.sim.addToCalendar(new StainingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+            }
             else
                 this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
         }

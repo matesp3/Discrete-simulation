@@ -30,13 +30,18 @@ public class CarvingEnd extends FurnitureProdEvent {
         // * 3. start job with carpenterC, if possible
         if (nextCarpenter != null) {
             if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
+                this.sim.receiveWaitingForTechStep(0, FurnitureOrder.TechStep.STAINING);
+                nextCarpenter.getCurrentOrder().setWaitingBT(-1);
                 this.sim.addToCalendar(new StainingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
             }
-            else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
-                this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-            }
             else {
-                this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
+                nextCarpenter.getCurrentOrder().setWaitingBT(this.getExecutionTime());
+                if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE) {
+                    this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+                }
+                else {
+                    this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
+                }
             }
         }
         // * 4. try to assign order for carpenterA
@@ -46,7 +51,10 @@ public class CarvingEnd extends FurnitureProdEvent {
         // * 5. plan new A order's processing
         if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
             this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
-        else
+        else {
+            this.sim.receiveWaitingForTechStep(this.getExecutionTime()-nextCarpenter.getCurrentOrder().getWaitingBT(), FurnitureOrder.TechStep.WOOD_PREPARATION);
+            nextCarpenter.getCurrentOrder().setWaitingBT(-1);
             this.sim.addToCalendar(new WoodPrepBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+        }
     }
 }

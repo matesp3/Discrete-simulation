@@ -32,12 +32,18 @@ public class AssemblingEnd extends FurnitureProdEvent {
             // * 2.A1 finish carpenterB job with order B and plan next job
             nextCarpenter = this.afterExecutingStep(this.carpenter, FurnitureOrder.TechStep.FIT_INSTALLATION, Carpenter.GROUP.C);
             if (nextCarpenter != null) {
-                if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
+                if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
+                    this.sim.receiveWaitingForTechStep(0, FurnitureOrder.TechStep.FIT_INSTALLATION);
+                    nextCarpenter.getCurrentOrder().setWaitingBT(-1);
                     this.sim.addToCalendar(new FitInstallationBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-                else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
-                    this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
-                else
-                    this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
+                }
+                else {
+                    nextCarpenter.getCurrentOrder().setWaitingBT(this.getExecutionTime());
+                    if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
+                        this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+                    else
+                        this.sim.addToCalendar(new MovingBetweenStorageAndHallBegin(this.getExecutionTime(), this.sim, nextCarpenter));
+                }
             }
         }
         else {//  *  2.B1 plan end of completed order
@@ -50,8 +56,11 @@ public class AssemblingEnd extends FurnitureProdEvent {
         if (nextCarpenter == null)
             return;
         // * 4. plan new B order's processing
-        if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID())
+        if (nextCarpenter.getCurrentDeskID() == nextCarpenter.getCurrentOrder().getDeskID()) {
+            this.sim.receiveWaitingForTechStep(this.getExecutionTime()-nextCarpenter.getCurrentOrder().getWaitingBT(), FurnitureOrder.TechStep.ASSEMBLING);
+            nextCarpenter.getCurrentOrder().setWaitingBT(-1);
             this.sim.addToCalendar(new AssemblingBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
+        }
         else if (nextCarpenter.getCurrentDeskID() != Carpenter.IN_STORAGE)
             this.sim.addToCalendar(new MovingAmongDesksBeginning(this.getExecutionTime(), this.sim, nextCarpenter));
         else

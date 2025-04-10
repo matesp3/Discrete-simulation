@@ -35,14 +35,12 @@ public class FurnitProdSimController {
             try {
                 this.sim = new FurnitureProductionSim(experiments, groupA, groupB, groupC, simulatedDays*8*3600);// 3600s*8hod*sim_dni [secs]
                 this.sim.registerDelegate(this.gui);
-                if (this.maxSpeedOn) {
+//                --
+                this.sim.setShiftTime(this.shiftTime); // even if maxSpeed is enabled, due to caching
+                this.sim.setSleepTime(this.sleepTime);
+                if (maxSpeedOn)
                     this.sim.setEnabledMaxSimSpeed(true);
-                }
-                else {
-                    this.sim.setEnabledMaxSimSpeed(false);
-                    this.sim.setShiftTime(this.shiftTime);
-                    this.sim.setSleepTime(this.sleepTime);
-                }
+//                --
                 this.sim.setDebugMode(this.consoleLogsOn);
                 this.sim.simulate();
                 this.simRunning = false;
