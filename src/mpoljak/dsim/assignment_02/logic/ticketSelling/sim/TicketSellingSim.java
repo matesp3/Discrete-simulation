@@ -1,16 +1,17 @@
-package mpoljak.dsim.assignment_02.logic.sim;
+package mpoljak.dsim.assignment_02.logic.ticketSelling.sim;
 
-import mpoljak.dsim.assignment_02.logic.events.ticketSelling.CustomerArrival;
+import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.events.CustomerArrival;
 import mpoljak.dsim.common.SimResults;
 import mpoljak.dsim.generators.ExponentialRnd;
 
-public class TicketSelling extends EventSim {
+public class TicketSellingSim extends EventSim {
     private int queueLength;
     private boolean workerBusy;
-    private ExponentialRnd rndArrivals;
-    private ExponentialRnd rndDurations;
+    private final ExponentialRnd rndArrivals;
+    private final ExponentialRnd rndDurations;
 
-    public TicketSelling(long replicationsCount, int estCalCapacity) {
+    public TicketSellingSim(long replicationsCount, int estCalCapacity) {
         super(replicationsCount, estCalCapacity, 100000);
         this.workerBusy = false;
         this.queueLength = 0;
@@ -18,8 +19,9 @@ public class TicketSelling extends EventSim {
         this.rndArrivals = new ExponentialRnd(12); // 12 per 60 min  -> 1 per 5 minutes
         this.rndDurations = new ExponentialRnd(15); // 15 per 60 min -> 1 per 4 minutes
 
-        double minDuration = 60.0 / 15; // minutes
+        double minDuration = 15; // minutes
         this.setShiftTime(minDuration);
+        this.setSleepTime(500);
     }
 
     public void setWorkerFree() {
@@ -62,6 +64,11 @@ public class TicketSelling extends EventSim {
     }
 
     @Override
+    protected void afterEventExecution() {
+
+    }
+
+    @Override
     protected void beforeExperiment() {
         super.beforeExperiment();
         this.queueLength = 0;
@@ -91,10 +98,6 @@ public class TicketSelling extends EventSim {
 
         public int getQueueLength() {
             return queueLength;
-        }
-
-        public void setQueueLength(int queueLength) {
-            this.queueLength = queueLength;
         }
 
         public boolean isWorkerBusy() {

@@ -142,8 +142,7 @@ public abstract class SimCore {
         this.executeCommandsOfType(SimCommand.SimCommandType.AFTER_EXP);
     }
 
-    protected final void notifyDelegates() {
-        SimResults r = this.getLastResults();
+    protected final void notifyDelegates(SimResults r) {
         for (ISimDelegate d : this.delegates) {
             d.update(r);
         }

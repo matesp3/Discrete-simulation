@@ -25,17 +25,18 @@ public class DoubleComp {
         System.out.println("    * compare(a,b) =  0 ['a' is is equal to 'b' for given epsilon]");
         System.out.println("    * compare(a,b) =  1 ['a' is greater than 'b']\n");
 
-        printRes(1.543,1.5432, EPSILON);
-        printRes(1.5435,1.5432, EPSILON);
-        printRes(1.5429,1.5432, EPSILON);
-        printRes(1.542,1.5432, EPSILON);
-        printRes(1.5431,1.5432, EPSILON);
-        printRes(1.54311,1.5432, EPSILON);
-        printRes(1.5431,1.54321, EPSILON);
+//        printRes(1.543,1.5432, EPSILON);
+//        printRes(1.5435,1.5432, EPSILON);
+//        printRes(1.5429,1.5432, EPSILON);
+//        printRes(1.542,1.5432, EPSILON);
+//        printRes(1.5431,1.5432, EPSILON);
+//        printRes(1.54311,1.5432, EPSILON);
+//        printRes(1.5431,1.54321, EPSILON);
+        printRes(48956.830367564224, 48956.83045913015, EPSILON);
     }
 
     private static void printRes(double a, double b, double eps) {
-        System.out.println(String.format("compare(a=%.5f; b=%.5f) => %d [epsilon=%f]", a, b, compare(a, b), eps));
+        System.out.println(String.format("compare(a=%.5f; b=%.5f) => %d [epsilon=%.5f]", a, b, compare(a, b), eps));
     }
 
     public static void main(String[] args) {

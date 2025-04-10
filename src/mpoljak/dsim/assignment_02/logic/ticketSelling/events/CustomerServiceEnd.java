@@ -1,15 +1,14 @@
-package mpoljak.dsim.assignment_02.logic.events.ticketSelling;
+package mpoljak.dsim.assignment_02.logic.ticketSelling.events;
 
-import mpoljak.dsim.assignment_02.logic.events.DiscreteEvent;
-import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 
 public class CustomerServiceEnd extends TicketSellingEvent {
 
-    public CustomerServiceEnd(double executionTime, int secondaryPriority, TicketSelling simCore) {
+    public CustomerServiceEnd(double executionTime, int secondaryPriority, TicketSellingSim simCore) {
         super(executionTime, secondaryPriority, simCore);
     }
 
-    public CustomerServiceEnd(double executionTime, TicketSelling simCore) {
+    public CustomerServiceEnd(double executionTime, TicketSellingSim simCore) {
         super(executionTime, simCore);
     }
 

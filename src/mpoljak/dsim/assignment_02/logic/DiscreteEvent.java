@@ -1,6 +1,5 @@
-package mpoljak.dsim.assignment_02.logic.events;
+package mpoljak.dsim.assignment_02.logic;
 
-import mpoljak.dsim.assignment_02.logic.sim.EventSim;
 import mpoljak.dsim.common.Generator;
 import mpoljak.dsim.generators.DiscreteUniformRnd;
 import mpoljak.dsim.utils.DoubleComp;
@@ -14,14 +13,15 @@ public abstract class DiscreteEvent {
         @Override
         public int compare(DiscreteEvent o1, DiscreteEvent o2) {
             int resCmp = DoubleComp.compare(o1.executionTime, o2.executionTime);
-            if (o1.secondaryPriority < 0 && o2.secondaryPriority < 0) {
+            if (resCmp != 0)
                 return resCmp;
+            if (o1.secondaryPriority < 0 && o2.secondaryPriority < 0) {
+                return 0;
             }
             if (o1.secondaryPriority < 0) // o2 has higher priority
                 return 1;
-            if (o2.secondaryPriority < 0) // o1 has higher priority
-                return -1;
-            return resCmp == 0 ? Integer.compare(o1.secondaryPriority, o2.secondaryPriority) : resCmp;
+//            if (o2.secondaryPriority < 0)
+            return -1; // o1 has higher priority
         }
     }
 
@@ -41,6 +41,9 @@ public abstract class DiscreteEvent {
         this(executionTime, -1);
     }
 
+    /**
+     * @return time of this event's execution
+     */
     public double getExecutionTime() {
         return this.executionTime;
     }
@@ -79,6 +82,11 @@ public abstract class DiscreteEvent {
             System.out.println("take: " + queue.take());
             System.out.println("    |_-->"+queue);
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format("tim=%d sec_pr=%d", (int)this.getExecutionTime(), this.getSecondaryPriority() );
     }
 
     public static class TestEvent extends DiscreteEvent {

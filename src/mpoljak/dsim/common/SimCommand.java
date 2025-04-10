@@ -2,7 +2,7 @@ package mpoljak.dsim.common;
 
 public abstract class SimCommand {
     public enum SimCommandType {
-        BEFORE_SIM, BEFORE_EXP, AFTER_EXP, AFTER_SIM
+        BEFORE_SIM, BEFORE_EXP, AFTER_EXP, AFTER_SIM, CUSTOM
     }
     private final SimCommandType type;
 

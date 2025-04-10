@@ -1,10 +1,10 @@
 package mpoljak.dsim.assignment_02.gui;
 
 import mpoljak.dsim.assignment_02.gui.components.ResultViewer;
-import mpoljak.dsim.assignment_02.logic.sim.TicketSelling;
+import mpoljak.dsim.assignment_02.logic.EventSim;
+import mpoljak.dsim.assignment_02.logic.ticketSelling.sim.TicketSellingSim;
 import mpoljak.dsim.common.ISimDelegate;
-import mpoljak.dsim.assignment_02.controllers.SimController;
-import mpoljak.dsim.common.SimCore;
+import mpoljak.dsim.assignment_02.controllers.FurnitProdSimController;
 import mpoljak.dsim.common.SimResults;
 
 import javax.swing.*;
@@ -12,7 +12,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, ActionListener {
+public class TicketsSellingWindow extends javax.swing.JFrame implements ISimDelegate, ActionListener {
 
     // colors
     public static final Color colBg = new Color(148, 172, 204);
@@ -24,24 +24,24 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     public static final Color colTextFont = new Color(3, 2, 108);
     public static final Color colTextFont2 = new Color(18, 129, 248);
 
-    private SimController simController;
+    private final FurnitProdSimController simController;
     private boolean simPaused;
     private JButton btnStart;
     private JButton btnPause;
     private JButton btnCancel;
     private ResultViewer repInfo;
-    private ResultViewer timeInfo;
+    private ResultViewer dateTimeInfo;
     private ResultViewer busyInfo;
     private ResultViewer queueInfo;
     private ResultViewer eventInfo;
 
-    public GeneralWindow(SimCore simulation) {
+    public TicketsSellingWindow(EventSim simulation) {
 //        ---- initialization of params of business logic
         simulation.registerDelegate(this);
-        this.simController = new SimController(simulation);
+        this.simController = new FurnitProdSimController(null);
         this.simPaused = false;
 //        ---- window: size, layout and behavior
-        this.setSize(new Dimension(600,400));
+        this.setSize(new Dimension(400,300));
         this.setLocationRelativeTo(null);
         this.setLayout(new FlowLayout(FlowLayout.CENTER));
         this.setBackground(this.colBg);
@@ -54,16 +54,19 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
 
     @Override
     public void update(SimResults res) {
-        TicketSelling.TicketSellRes r = (TicketSelling.TicketSellRes) res;
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                repInfo.setValue(r.getReplication());
-                busyInfo.setValue(r.isWorkerBusy());
-                queueInfo.setValue(r.getQueueLength());
-                timeInfo.setValue(r.getTime(), -1);
-                eventInfo.setValue(r.getEventId());
-            }
+        TicketSellingSim.TicketSellRes r = (TicketSellingSim.TicketSellRes) res;
+        SwingUtilities.invokeLater(() -> {
+            repInfo.setValue(r.getExperimentNum());
+            busyInfo.setValue(r.isWorkerBusy());
+            queueInfo.setValue(r.getQueueLength());
+            double mins = r.getTime();
+            int day = (int) mins / (60*24) + 1;
+            mins -= (day-1) * 60*24;
+            int hours = (int) Math.floor(mins/60.0);
+            mins -= (hours) * 60;
+            int min = (int)Math.ceil(mins);
+            dateTimeInfo.setValue(String.format("Day-%d %02d:%02d", day, (min == 60 ? hours+1 : hours)%24, min%60));
+            eventInfo.setValue(r.getEventId());
         });
     }
 
@@ -72,7 +75,7 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         String cmd = e.getActionCommand();
         if (cmd.equals("Start")) {
             if (! this.simController.isSimRunning()) {
-                this.simController.launchSimulation();
+                this.simController.launchSimulation(1,1,1,1, 7);
                 this.setBtnEnabled(this.btnStart, false);
                 this.setBtnEnabled(this.btnPause, true);
                 this.setBtnEnabled(this.btnCancel, true);
@@ -99,12 +102,6 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
     }
 
     private void createComponents() {
-        this.repInfo = new ResultViewer("Replication");
-        this.timeInfo = new ResultViewer("Time");
-        this.busyInfo = new ResultViewer("Worker busy");
-        this.queueInfo = new ResultViewer("Queue length");
-        this.eventInfo = new ResultViewer("Event");
-
         this.btnStart = this.createBtn("Start");
         this.btnPause = this.createBtn("Pause");
         this.btnCancel = this.createBtn("Cancel");
@@ -112,35 +109,52 @@ public class GeneralWindow extends javax.swing.JFrame implements ISimDelegate, A
         this.setBtnEnabled(btnPause, false);
         this.setBtnEnabled(btnCancel, false);
 
-        this.add(this.repInfo);
-        this.add(this.timeInfo);
-        this.add(this.busyInfo);
-        this.add(this.queueInfo);
-        this.add(this.eventInfo);
-        this.add(this.btnStart);
-        this.add(this.btnPause);
-        this.add(this.btnCancel);
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout());
+        buttonPanel.add(this.btnStart);
+        buttonPanel.add(this.btnPause);
+        buttonPanel.add(this.btnCancel);
+
+        this.repInfo = new ResultViewer("Replication");
+        this.dateTimeInfo = new ResultViewer("DateTime");
+        this.busyInfo = new ResultViewer("Worker busy");
+        this.queueInfo = new ResultViewer("Queue length");
+        this.eventInfo = new ResultViewer("Event");
+
+        JPanel infoBox = new JPanel();
+        infoBox.setLayout(new BoxLayout(infoBox, BoxLayout.Y_AXIS));
+
+        infoBox.add(buttonPanel);
+        infoBox.add(this.repInfo);
+        infoBox.add(this.dateTimeInfo);
+        infoBox.add(this.busyInfo);
+        infoBox.add(this.queueInfo);
+        infoBox.add(this.eventInfo);
+        this.add(infoBox);
+
     }
 
     private JButton createBtn(String caption) {
         JButton btn = new JButton(caption);
-        btn.setBackground(this.colBtn);
+        btn.setBackground(colBtn);
         btn.setActionCommand(caption);
         btn.addActionListener(this);
-        btn.setForeground(this.colBtnFont);
+        btn.setForeground(colBtnFont);
 //        btn.setBorder(BorderFactory.createLineBorder(this.colBorder));
 //        btn.setSize(50, 30);
         return btn;
     }
 
     private void setBtnEnabled(JButton btn, boolean enabled) {
-        btn.setBackground(enabled ? this.colBtn : this.colBtnDisabled);
+        btn.setBackground(enabled ? colBtn : colBtnDisabled);
         btn.setEnabled(enabled);
     }
 
+
+
     private JLabel createLabel(String caption) {
         JLabel label = new JLabel(caption);
-        label.setForeground(this.colTextFont);
+        label.setForeground(colTextFont);
         return label;
     }
 
